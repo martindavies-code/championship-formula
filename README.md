@@ -1,6 +1,6 @@
 # The Championship Formula
 
-**An empirical study of every completed Premier League final table and top-scorer chart from 1992–93 through 2024–25 (33 seasons, 666 team-seasons, 12,786 matches, 33,962 goals).**
+**An empirical study of every completed Premier League final table and top-scorer chart from 1992–93 through 2024–25 (33 seasons, 666 team-seasons, 12,786 matches, 34,433 goals).**
 
 This repository contains a static, zero-dependency single-page web application (`index.html`, `styles.css`, `app.js`) and its verified local dataset (`data/premier-league-1992-2025.json`). Every statistic, correlation, quantile, table cell, and SVG chart rendered on the page is computed at runtime in the browser directly from `data/premier-league-1992-2025.json`.
 
@@ -89,9 +89,9 @@ This repository contains a static, zero-dependency single-page web application (
 ### III. The 40-Point Myth (30 Seasons of the 38-Game Era, 1995–96 to 2024–25)
 
 - **Highest Relegated Total (18th Place)**: Mean **34.5 points**, median **34.0 points** (IQR `33–37`, range `25` [2024–25 Leicester City] to `42` [2002–03 West Ham United]).
-- **Guaranteed Survival Without Goal Difference (`18th + 1`)**: Mean **35.5 points**, median **35 points**.
+- **Needed to Finish Above 18th Outright (`18th + 1`)**: Mean **35.5 points**, median **35 points**. This is a typical figure, not a guarantee: 35 points would not have beaten 18th place in **14 of 30 seasons**.
 - **Lowest Surviving Total (17th Place)**: Mean **37.9 points**, median **38.0 points** (range `32` to `44`). In **22 of 30 seasons (73.3%)**, 17th place survived with **fewer than 40 points**.
-- **How Often Was 40 Points Relegated?**: Only **3 times in 30 seasons (10.0%)**—`1996-97` Sunderland (`40 pts`), `1997-98` Bolton Wanderers (`40 pts`, relegated on GD), and `2002-03` West Ham United (`42 pts`). **Zero teams have been relegated with 40+ points in the last 22 seasons (since 2002–03)**, and the 18th-place average over the last 10 seasons (2015–16 to 2024–25) has fallen to **32.1 points**.
+- **How Often Was a Club Relegated on 40+ Points?**: Only **3 times in 30 seasons (10.0%)**—`1996-97` Sunderland (`40 pts`), `1997-98` Bolton Wanderers (`40 pts`, relegated on GD), and `2002-03` West Ham United (`42 pts`). A fourth club, `2010-11` Birmingham City, went down on **39 points**, when 40 would have been enough to finish above 18th. **Zero teams have been relegated with 40+ points in the last 22 seasons (since 2002–03)**, and the 18th-place average over the last 10 seasons (2015–16 to 2024–25) has fallen to **32.1 points**.
 
 ---
 

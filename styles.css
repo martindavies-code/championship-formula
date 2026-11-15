@@ -831,3 +831,44 @@ table.data-table tbody tr.row-relegated th[scope="row"] {
   justify-content: space-between;
   gap: 1rem;
 }
+
+/* Anchor landing: keep headings clear of the sticky section nav */
+:target,
+section[id],
+h2[id],
+h3[id] {
+  scroll-margin-block-start: 6.5rem;
+}
+
+/* Keep controls inside the viewport on narrow screens */
+.select-control {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.chart-controls {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+@media (max-width: 600px) {
+  #season-select {
+    inline-size: 100%;
+  }
+  .chart-controls:has(#season-select) {
+    inline-size: 100%;
+    flex-wrap: nowrap;
+  }
+  .chart-controls:has(#season-select) .select-control {
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 700px) {
+  :target,
+  section[id],
+  h2[id],
+  h3[id] {
+    scroll-margin-block-start: 10rem;
+  }
+}
