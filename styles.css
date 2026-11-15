@@ -872,3 +872,67 @@ h3[id] {
     scroll-margin-block-start: 10rem;
   }
 }
+
+/* ==========================================================================
+   SMALL-SCREEN TABLE & CALLOUT FIT (phones up to 700px)
+   Compact stat tables shrink type and let label and range cells wrap so every
+   column fits the viewport instead of clipping mid-cell; callout key-value
+   lists stack value under label so long labels are not squeezed.
+   ========================================================================== */
+
+@media (max-width: 700px) {
+  .chart-panel {
+    padding: 0.75rem;
+  }
+
+  #sec1-corr-table,
+  #sec2-dist-table,
+  #sec4-draws-table,
+  #sec5-gb-table {
+    min-inline-size: 0;
+    font-size: 0.68rem;
+  }
+
+  #sec5-gb-table {
+    font-size: 0.66rem;
+  }
+
+  #sec1-corr-table th,
+  #sec1-corr-table td,
+  #sec2-dist-table th,
+  #sec2-dist-table td,
+  #sec4-draws-table th,
+  #sec4-draws-table td,
+  #sec5-gb-table th,
+  #sec5-gb-table td {
+    padding: 0.35rem 0.25rem;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
+  #sec1-corr-table thead th,
+  #sec2-dist-table thead th,
+  #sec4-draws-table thead th,
+  #sec5-gb-table thead th {
+    font-size: 0.6rem;
+  }
+
+  #sec1-corr-table caption,
+  #sec2-dist-table caption,
+  #sec4-draws-table caption,
+  #sec5-gb-table caption {
+    font-size: 0.66rem;
+    padding: 0.6rem 0.5rem;
+  }
+
+  /* Callout key-value lists: stack the value under its label */
+  .finding-kv-list {
+    grid-template-columns: 1fr;
+    gap: 0.1rem 0;
+  }
+
+  .finding-kv-list dd {
+    text-align: start;
+    margin-block-end: 0.55rem;
+  }
+}
