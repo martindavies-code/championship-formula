@@ -490,12 +490,14 @@ test('Stage 2 A1-A5 browser DOM invariants: dual GF/GA metrics, draw copy/quarti
     }`);
     await new Promise((r) => setTimeout(r, 150));
     const rawSingle = await cdp.evalJs(`() => ({
+      body: document.body.innerText,
       sec1Title: document.getElementById('sec1-title').textContent,
       sec3Tier: document.getElementById('sec3-tier-tbody').textContent,
       sec3Prose: document.getElementById('sec3-prose').textContent,
       sec3Callout: document.getElementById('sec3-callout-list').textContent,
       sec4Title: document.getElementById('sec4-title').textContent,
     })`);
+    assert.ok(!/\b1 (?:clubs|slots|tables|tiers|seasons|Tier-Seasons)\b/.test(rawSingle.body), 'Single-slot UI must use singular nouns for count 1');
     assert.ok(rawSingle.sec1Title.includes('Small Sample'), 'Single-slot selection must trigger small-sample guard');
     assert.ok(rawSingle.sec3Tier.includes('Reading') && rawSingle.sec3Tier.includes('44 pts') && rawSingle.sec3Tier.includes('0.957'), 'Raw mode survival tier table must keep official 44 pts / 0.957 PPG for Reading');
     assert.ok(!rawSingle.sec3Tier.includes('50 pts') && !rawSingle.sec3Prose.includes('50 pts') && rawSingle.sec3Callout.includes('0 / 1'), 'Raw mode must NOT leak 50 raw points / 1.087 PPG into official Reading relegation');

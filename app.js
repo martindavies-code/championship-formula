@@ -346,7 +346,7 @@
       return;
     }
 
-    if (metaCov) metaCov.textContent = `${m.firstSeason} to ${m.lastSeason} · ${m.numSlots} Tier-Seasons (${fmtInt(m.allTeams.length)} Team-Seasons)`;
+    if (metaCov) metaCov.textContent = `${m.firstSeason} to ${m.lastSeason} · ${m.numSlots} ${plural(m.numSlots, 'Tier-Season')} (${fmtInt(m.allTeams.length)} Team-Seasons)`;
     if (metaMat) metaMat.textContent = `${fmtInt(m.totalMatches)} Matches`;
     if (metaGoals) metaGoals.textContent = `${fmtInt(m.totalGoals)} Goals`;
 
@@ -392,7 +392,7 @@
     const note = document.getElementById('ledger-sample-note');
     if (!grid) return;
     clearEl(grid);
-    if (note) note.textContent = `${m.numSlots} slots · ${fmtInt(m.allTeams.length)} club-seasons (${state.scope.pointsMode === 'raw' ? 'Raw 3W+D' : 'Official'})`;
+    if (note) note.textContent = `${m.numSlots} ${plural(m.numSlots, 'slot')} · ${fmtInt(m.allTeams.length)} club-seasons (${state.scope.pointsMode === 'raw' ? 'Raw 3W+D' : 'Official'})`;
 
     const gfPred = m.correlations.find((c) => c.key === 'gfPerGame');
     const gaPred = m.correlations.find((c) => c.key === 'gaPerGame');
@@ -479,7 +479,7 @@
           ? `${dl.count} ${plural(dl.count, 'club')}`
           : (dl.finishScore?.median !== null && dl.finishScore?.median !== undefined ? `${fmtNum(dl.finishScore.median * 100, 1)}% Pct` : 'N/A'),
         claim: smallSample
-          ? `${dl.count} draw-leading ${plural(dl.count, 'club')} in selected ${plural(m.numSlots, 'table')}`
+          ? `${dl.count} draw-leading ${plural(dl.count, 'club')} in ${m.numSlots} selected ${plural(m.numSlots, 'table')}`
           : `${dl.middleHalfCount} of ${dl.count} (${fmtNum(dlMidPct, 0)}%) in middle half; ${dl.championCount} ${plural(dl.championCount, 'title')}`,
         detail: smallSample
           ? m.seasonDrawLeaders.map((r) => `${r.team} (${ordinal(r.officialPos)}, ${r.drawn}D in ${r.season} T${r.tier})`).join('; ')
@@ -885,7 +885,7 @@
 
     if (titleEl) {
       if (smallSample) {
-        titleEl.textContent = `Title Race Snapshot: ${plural(m.champs.length, 'Champion')} in Selected Scope`;
+        titleEl.textContent = `Title Race Snapshot: ${m.champs.length} ${plural(m.champs.length, 'Champion')} in Selected Scope`;
       } else {
         titleEl.textContent = m.champFewerWinsCases.length > 0
           ? `Champions Lead by +${fmtNum((cStats.gdPerGame?.mean ?? 0) - (rStats.gdPerGame?.mean ?? 0), 2)} GD/G—Though ${m.champFewerWinsCases.length} Won Fewer Matches Than a Rival`
@@ -899,14 +899,14 @@
         const pairSummaries = m.titlePairs.map((p) => `${p.season} T${p.tier}: ${p.champion.team} (${p.champion.points} pts, ${fmtNum(p.champion.officialPpg, 2)} PPG) beat ${p.runnerUp.team} (${p.runnerUp.points} pts, ${fmtNum(p.runnerUp.officialPpg, 2)} PPG)`).join('; ');
         proseEl.append(
           el('p', null,
-            `Small-sample scope (${plural(m.champs.length, 'title race')}, < 3 tier-seasons): cross-season title averages and spreads are suppressed. `,
+            `Small-sample scope (${m.champs.length} ${plural(m.champs.length, 'title race')}, < 3 tier-seasons): cross-season title averages and spreads are suppressed. `,
             pairSummaries ? `${pairSummaries}.${rawNote}` : rawNote.trim()
           )
         );
       } else {
         proseEl.append(
           el('p', null,
-            `Across ${plural(m.champs.length, 'title race')} in scope, champions average `,
+            `Across ${m.champs.length} ${plural(m.champs.length, 'title race')} in scope, champions average `,
             el('strong', { textContent: `${fmtNum(cStats.ppg?.mean, 2)} PPG` }),
             ` (vs ${fmtNum(rStats.ppg?.mean, 2)} for 2nd place) behind `,
             el('strong', { textContent: `${fmtNum(cStats.gfPerGame?.mean, 2)} GF/G` }),
@@ -916,7 +916,7 @@
           ),
           el('p', null,
             m.champFewerWinsCases.length > 0
-              ? `Expanding outside Tier 1 highlights that title winners do not always top the win column: ${plural(m.champFewerWinsCases.length, 'champion')} (all in Tiers 2–4) finished 1st despite fewer wins than another club, led historically by Burnley in the 1981–82 Third Division (21 wins and 17 draws for 80 points vs Carlisle United’s 23 wins).`
+              ? `Expanding outside Tier 1 highlights that title winners do not always top the win column: ${m.champFewerWinsCases.length} ${plural(m.champFewerWinsCases.length, 'champion')} (all in Tiers 2–4) finished 1st despite fewer wins than another club, led historically by Burnley in the 1981–82 Third Division (21 wins and 17 draws for 80 points vs Carlisle United’s 23 wins).`
               : 'Every champion inside this filtered selection led or shared the lead in total matches won.'
           )
         );
@@ -936,7 +936,7 @@
       clearEl(eraEl);
       for (const e of m.eraSplits) {
         eraEl.appendChild(el('div', { className: 'era-card' },
-          el('div', { className: 'era-years', textContent: `${e.name} · ${e.years} (${plural(e.count, 'slot')})` }),
+          el('div', { className: 'era-years', textContent: `${e.name} · ${e.years} (${e.count} ${plural(e.count, 'slot')})` }),
           el('div', { className: 'era-main num', textContent: `${fmtNum(e.champPpg, 2)} PPG` }),
           el('div', { className: 'era-sub num', textContent: `Runner-up ${fmtNum(e.runnerPpg, 2)} · GD ${fmtSigned(e.champGdPerGame, 2)}/G` })
         ));
@@ -1035,7 +1035,7 @@
 
     if (subEl) {
       const basisTag = isRawMode() ? ' · Official league outcomes' : '';
-      subEl.textContent = `${labelMap[k]} across ${plural(pairs.length, 'tier-season')} (${m.firstSeason} to ${m.lastSeason})${basisTag}`;
+      subEl.textContent = `${labelMap[k]} across ${pairs.length} ${plural(pairs.length, 'tier-season')} (${m.firstSeason} to ${m.lastSeason})${basisTag}`;
     }
 
     const years = Array.from(new Set(pairs.map((p) => p.startYear))).sort((a, b) => a - b);
@@ -1196,29 +1196,29 @@
       titleEl.textContent = ss.slotCount === 0
         ? 'Relegation Suspended Across Selected Re-Election / Reprieve Seasons'
         : smallSample
-          ? `Survival Cutoff Snapshot (${plural(ss.slotCount, 'Relegation-Active Table')})`
+          ? `Survival Cutoff Snapshot (${ss.slotCount} ${plural(ss.slotCount, 'Relegation-Active Table')})`
           : `Survival Varies by Tier: 40/38g Fails Lower-Tier Cutoffs While 50/46g Is Rarely Reached`;
     }
 
     if (proseEl) {
       clearEl(proseEl);
       if (ss.slotCount === 0) {
-        proseEl.append(el('p', { textContent: `All ${plural(m.noRelegationSlots.length, 'selected slot')} experienced zero relegation (${m.noRelegationSlots.map((x) => `${x.season} T${x.tier}`).join(', ')}). Expand the scope to examine active relegation boundaries.` }));
+        proseEl.append(el('p', { textContent: `All ${m.noRelegationSlots.length} selected ${plural(m.noRelegationSlots.length, 'slot')} experienced zero relegation (${m.noRelegationSlots.map((x) => `${x.season} T${x.tier}`).join(', ')}). Expand the scope to examine active relegation boundaries.` }));
       } else if (smallSample) {
         const slotDesc = m.survivalSeries.map((s) => `${s.season} T${s.tier}: lowest survivor ${s.survivingTeam} (${s.survivingPts} pts, ${fmtNum(s.survivingPpg, 3)} PPG) vs highest relegated ${s.relegatedTeam} (${s.relegatedHighPts} pts, ${fmtNum(s.relegatedHighPpg, 3)} PPG)`).join('; ');
         const reprieveDesc = boundaryReprieves.length > 0
           ? ` Boundary reprieves excluded from lowest merit survivor: ${boundaryReprieves.map((r) => `${r.team} (${r.season} T${r.tier}, ${ordinal(r.pos)}, ${r.outcomeType})`).join(', ')}.`
           : '';
-        proseEl.append(el('p', null, `Small-sample scope (${plural(ss.slotCount, 'relegation-active table')}, < 3 slots): cross-season medians are suppressed. ${slotDesc}.${reprieveDesc}${rawNote}`));
+        proseEl.append(el('p', null, `Small-sample scope (${ss.slotCount} ${plural(ss.slotCount, 'relegation-active table')}, < 3 slots): cross-season medians are suppressed. ${slotDesc}.${reprieveDesc}${rawNote}`));
       } else {
         const highRelSlot = m.survivalSeries.reduce((b, x) => ((x.relegatedHighPpg ?? 0) > (b?.relegatedHighPpg ?? 0) ? x : b), null);
         const exclParts = [];
-        if (ss.excludedNoRelegationCount > 0) exclParts.push(`${plural(ss.excludedNoRelegationCount, 'zero-relegation slot')} separated`);
-        if (boundaryReprieves.length > 0) exclParts.push(`${plural(boundaryReprieves.length, 'boundary reprieve row')} excluded from lowest merit survivor`);
+        if (ss.excludedNoRelegationCount > 0) exclParts.push(`${ss.excludedNoRelegationCount} ${plural(ss.excludedNoRelegationCount, 'zero-relegation slot')} separated`);
+        if (boundaryReprieves.length > 0) exclParts.push(`${boundaryReprieves.length} ${plural(boundaryReprieves.length, 'boundary reprieve row')} excluded from lowest merit survivor`);
         const exclClause = exclParts.length > 0 ? ` (${exclParts.join('; ')})` : '';
         proseEl.append(
           el('p', null,
-            `Across ${plural(ss.slotCount, 'relegation-active table')}${exclClause}, the median lowest surviving side earned `,
+            `Across ${ss.slotCount} ${plural(ss.slotCount, 'relegation-active table')}${exclClause}, the median lowest surviving side earned `,
             el('strong', { textContent: `${fmtNum(ss.survivingPpg?.median, 3)} PPG` }),
             ` (${fmtNum(ss.survivingPts38?.median, 1)} on a 38-game scale; ${fmtNum(ss.survivingPts46?.median, 1)} over 46 games). Premier League survival folklore fixes on 40 points (1.053 PPG), whereas Championship and League One relegation battles regularly require ~49–50 points over 46 games (1.067–1.087 PPG).${rawNote}`
           ),
@@ -1285,7 +1285,7 @@
         ? `${ds.relegatedDueToDeductionCount} ${ds.relegatedDueToDeductionCount === 1 ? 'club was' : 'clubs were'} relegated after deductions despite finishing above the bottom on 3W+D points (e.g. ${examples}).`
         : 'no clubs changed relegation status on raw 3W+D points in this scope.';
       const affectedClause = ds.affectedRowsCount > 0
-        ? `${plural(ds.affectedRowsCount, 'club-season')} received points adjustments; ${relClause}`
+        ? `${ds.affectedRowsCount} ${plural(ds.affectedRowsCount, 'club-season')} received points adjustments; ${relClause}`
         : 'no clubs received points adjustments in this scope.';
       dedNoteEl.textContent = `On-pitch 3W+D sensitivity check (official survival cutoffs above retain actual league points): ${affectedClause}`;
     }
@@ -1314,16 +1314,16 @@
     if (subEl) {
       subEl.textContent = mode === 'ppg'
         ? `Lowest safe vs. highest relegated club in Official Points Per Game (directly comparable across 38–46 game leagues)${basisTag}`
-        : `Normalised ${mult}-game official point equivalent (PPG × ${mult}) across ${plural(m.survivalSeries.length, 'relegation-active table')}${basisTag}`;
+        : `Normalised ${mult}-game official point equivalent (PPG × ${mult}) across ${m.survivalSeries.length} ${plural(m.survivalSeries.length, 'relegation-active table')}${basisTag}`;
     }
     if (noteEl) {
       const notes = [];
       const activeBoundaryReprieves = (m.excludedSurvivalRows || []).filter((r) => r.relegationActiveSlot);
       if (m.noRelegationSlots.length > 0) {
-        notes.push(`Excludes ${plural(m.noRelegationSlots.length, 'zero-relegation Tier 4 slot')} (${m.noRelegationSlots.map((x) => `${x.season} T${x.tier}`).join(', ')}).`);
+        notes.push(`Excludes ${m.noRelegationSlots.length} zero-relegation Tier 4 ${plural(m.noRelegationSlots.length, 'slot')} (${m.noRelegationSlots.map((x) => `${x.season} T${x.tier}`).join(', ')}).`);
       }
       if (activeBoundaryReprieves.length > 0) {
-        notes.push(`Excludes ${plural(activeBoundaryReprieves.length, 'reprieved/expelled boundary club')} from lowest merit survivor (${activeBoundaryReprieves.map((r) => `${r.team} ${r.season} T${r.tier} (${ordinal(r.pos)}, ${r.outcomeType})`).join(', ')}).`);
+        notes.push(`Excludes ${activeBoundaryReprieves.length} reprieved/expelled boundary ${plural(activeBoundaryReprieves.length, 'club')} from lowest merit survivor (${activeBoundaryReprieves.map((r) => `${r.team} ${r.season} T${r.tier} (${ordinal(r.pos)}, ${r.outcomeType})`).join(', ')}).`);
       }
       notes.push(`Horizontal rules mark 1.053 PPG (40 points per 38 games: ${(40 / 38 * mult).toFixed(digits)}) and 1.087 PPG (50 points per 46 games: ${(50 / 46 * mult).toFixed(digits)}).`);
       noteEl.textContent = notes.join(' ');
@@ -1432,9 +1432,9 @@
 
     if (titleEl) {
       if (smallSample) {
-        titleEl.textContent = `Draw Leaders in Selected Scope (${plural(dl.count, 'Club-Season')})`;
+        titleEl.textContent = `Draw Leaders in Selected Scope (${dl.count} ${plural(dl.count, 'Club-Season')})`;
       } else if (dl.championCount > 0) {
-        titleEl.textContent = `Leading in Draws Clusters in the Middle Half (${fmtNum(midPct, 0)}% Between 25%–75%)—With ${plural(dl.championCount, 'Champion')}`;
+        titleEl.textContent = `Leading in Draws Clusters in the Middle Half (${fmtNum(midPct, 0)}% Between 25%–75%)—With ${dl.championCount} ${plural(dl.championCount, 'Champion')}`;
       } else {
         titleEl.textContent = `Leading in Draws Clusters in the Middle Half (${fmtNum(midPct, 0)}% Between 25%–75%)`;
       }
@@ -1443,19 +1443,19 @@
     if (proseEl) {
       clearEl(proseEl);
       if (smallSample) {
-        const listStr = m.seasonDrawLeaders.map((r) => `${r.team} (${r.season} T${r.tier}: ${r.drawn}D, ${ordinal(r.pos)} of ${r.tableSize})`).join('; ');
+        const listStr = m.seasonDrawLeaders.map((r) => `${r.team} (${r.season} T${r.tier}: ${r.drawn}D, ${ordinal(r.pos)} of ${r.teamCount})`).join('; ');
         proseEl.append(
           el('p', null,
-            `Small-sample scope (${plural(dl.slotCount, 'table')}, < 3 slots): cross-season medians and percentage distributions are suppressed. Draw leaders in scope: ${listStr}.${rawNote}`
+            `Small-sample scope (${dl.slotCount} ${plural(dl.slotCount, 'table')}, < 3 slots): cross-season medians and percentage distributions are suppressed. Draw leaders in scope: ${listStr}.${rawNote}`
           )
         );
       } else {
         const coLeaderNote = dl.coLeaderSlotsCount > 0
-          ? ` (${plural(dl.coLeaderSlotsCount, 'table')} produced tied co-leaders, so these ${dl.count} club-seasons are not independent observations)`
+          ? ` (${dl.coLeaderSlotsCount} ${plural(dl.coLeaderSlotsCount, 'table')} produced tied co-leaders, so these ${dl.count} club-seasons are not independent observations)`
           : '';
         proseEl.append(
           el('p', null,
-            `Across ${plural(dl.count, 'club-season')} that led or co-led their division in draws within ${plural(dl.slotCount, 'table')}${coLeaderNote}, median finish percentile is `,
+            `Across ${dl.count} ${plural(dl.count, 'club-season')} that led or co-led their division in draws within ${dl.slotCount} ${plural(dl.slotCount, 'table')}${coLeaderNote}, median finish percentile is `,
             el('strong', { textContent: `${fmtNum((dl.finishScore?.median ?? 0) * 100, 1)}%` }),
             ` (${ordinal(dl.pos?.median)} raw rank; because division sizes vary from 20 to 24 clubs, finish percentile — 100% first to 0% last — is used for cross-tier splits).`
           ),
@@ -1472,7 +1472,7 @@
             el('strong', { textContent: `${dl.promotedCount}` }),
             ` earned promotion. `,
             champText
-              ? `${plural(dl.championCount, 'draw leader')} won a title: ${champText}.${rawNote}`
+              ? `${dl.championCount} draw ${plural(dl.championCount, 'leader')} won a title: ${champText}.${rawNote}`
               : `No draw-leading side in scope won the league title.${rawNote}`
           )
         );
@@ -1481,7 +1481,7 @@
 
     if (calloutEl) {
       clearEl(calloutEl);
-      appendKV(calloutEl, 'Draw-Leader Club-Seasons', dl.coLeaderSlotsCount > 0 ? `${dl.count} across ${dl.slotCount} tables` : String(dl.count));
+      appendKV(calloutEl, 'Draw-Leader Club-Seasons', dl.coLeaderSlotsCount > 0 ? `${dl.count} across ${plural(dl.slotCount, 'table')}` : String(dl.count));
       appendKV(calloutEl, 'Median Finish Percentile', smallSample && dl.count === 1 ? `${fmtNum((dl.finishScore?.min ?? 0) * 100, 1)}% (${ordinal(dl.pos?.min)} raw)` : `${fmtNum((dl.finishScore?.median ?? 0) * 100, 1)}% (${ordinal(dl.pos?.median)} raw)`, 'highlight');
       appendKV(calloutEl, 'Middle Half (25%–75%)', `${dl.middleHalfCount} / ${dl.count} (${fmtNum(midPct, 1)}%)`);
       appendKV(calloutEl, 'Top / Bottom Quarters', `${dl.topQuarterCount} (>75%) / ${dl.bottomQuarterCount} (<25%)`);
