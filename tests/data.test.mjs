@@ -201,3 +201,169 @@ test('Spot checks: historical anomalies, deductions, tie-breaks, and 2024-25 pla
   assert.equal(get('2024-25-T3').table.find((r) => r.promotionMethod === 'playoff').team, 'Charlton Athletic');
   assert.equal(get('2024-25-T4').table.find((r) => r.promotionMethod === 'playoff').team, 'AFC Wimbledon');
 });
+
+// D1, D2, D3: Sourced independent relegation fixture across all 44 seasons (Tiers 1-4)
+// Derived from RSSSF engpaul/FLA (1981-2007), RSSSF tablese (2008-2024), & Wikipedia/EFL rulings — NOT from importer inference flags.
+const INDEPENDENT_EXPECTED_RELEGATIONS = {
+  1981: [3, 3, 4, 0], // T4 re-election (RSSSF 1981-82.html)
+  1982: [3, 3, 4, 0], // T4 re-election (RSSSF 1982-83.html)
+  1983: [3, 3, 4, 0], // T4 re-election (RSSSF 1983-84.html)
+  1984: [3, 3, 4, 0], // T4 re-election (RSSSF 1984-85.html)
+  1985: [3, 3, 4, 0], // T4 re-election (RSSSF 1985-86.html)
+  1986: [3, 3, 4, 1], // T4: Lincoln City 24th relegated (RSSSF 1986-87.html)
+  1987: [4, 3, 4, 1], // T1: 18th Chelsea lost PO + 19th-21st; T4: Newport County 24th (RSSSF 1987-88.html)
+  1988: [3, 3, 4, 1], // T4: Darlington 24th (RSSSF 1988-89.html)
+  1989: [3, 3, 4, 1], // T4: Colchester United 24th (RSSSF 1989-90.html)
+  1990: [2, 2, 3, 0], // D2: Restructuring; T4 0 relegated — 23rd Aldershot stayed up before 1991-92 withdrawal (RSSSF 1990-91.html)
+  1991: [3, 3, 4, 0], // T4: 0 relegated — Aldershot expunged March 1992, 18th Maidstone resigned August 1992 (RSSSF 1991-92.html)
+  1992: [3, 3, 4, 1], // T4: Halifax Town 22nd (RSSSF 1992-93.html)
+  1993: [3, 3, 4, 0], // T4: 22nd Northampton reprieved, Kidderminster stadium grading (RSSSF 1993-94.html)
+  1994: [4, 4, 5, 0], // PL 22->20 contraction; T4: 22nd Exeter reprieved, Macclesfield stadium grading (RSSSF 1994-95.html)
+  1995: [3, 3, 4, 0], // T4: 24th Torquay reprieved, Stevenage stadium grading (RSSSF 1995-96.html)
+  1996: [3, 3, 4, 1], // T4: Hereford United 24th (RSSSF 1996-97.html)
+  1997: [3, 3, 4, 1], // T4: Doncaster Rovers 24th (RSSSF 1997-98.html)
+  1998: [3, 3, 4, 1], // T4: Scarborough 24th (RSSSF 1998-99.html)
+  1999: [3, 3, 4, 1], // T4: Chester City 24th (RSSSF 1999-00.html)
+  2000: [3, 3, 4, 1], // T4: Barnet 24th (RSSSF 2000-01.html)
+  2001: [3, 3, 4, 1], // T4: Halifax Town 24th (RSSSF 2001-02.html)
+  2002: [3, 3, 4, 2], // Two-down starts; T4: Exeter City & Shrewsbury Town (RSSSF 2002-03.html)
+  2003: [3, 3, 4, 2], // D1: T2 Walsall 22nd, Bradford 23rd, Wimbledon 24th; T4 Carlisle & York (RSSSF 2003-04.html & Wikipedia)
+  2004: [3, 3, 4, 2], // T4: Kidderminster & Cambridge (RSSSF 2004-05.html)
+  2005: [3, 3, 4, 2], // T4: Oxford United & Rushden & Diamonds (RSSSF 2005-06.html)
+  2006: [3, 3, 4, 2], // T4: Boston United (-10 admin to Conf North) & Torquay United (Wikipedia/EFL)
+  2007: [3, 3, 4, 2], // T4: Mansfield & Wrexham (RSSSF 2007-08.html)
+  2008: [3, 3, 4, 2], // T4: Chester City & Luton Town (RSSSF eng09.html)
+  2009: [3, 3, 4, 2], // T4: Grimsby Town & Darlington (RSSSF eng2010.html)
+  2010: [3, 3, 4, 2], // T4: Lincoln City & Stockport County (RSSSF eng2011.html)
+  2011: [3, 3, 4, 2], // T4: Hereford United & Macclesfield Town (RSSSF eng2012.html)
+  2012: [3, 3, 4, 2], // T4: Barnet & Aldershot Town (RSSSF eng2013.html)
+  2013: [3, 3, 4, 2], // T4: Bristol Rovers & Torquay United (RSSSF eng2014.html)
+  2014: [3, 3, 4, 2], // T4: Cheltenham Town & Tranmere Rovers (RSSSF eng2015.html)
+  2015: [3, 3, 4, 2], // T4: Dagenham & Redbridge & York City (RSSSF eng2016.html)
+  2016: [3, 3, 4, 2], // T4: Hartlepool United & Leyton Orient (RSSSF eng2017.html)
+  2017: [3, 3, 4, 2], // T4: Barnet & Chesterfield (RSSSF eng2018.html)
+  2018: [3, 3, 4, 2], // T4: Notts County & Yeovil Town; Bury 2nd promoted before Aug 2019 expulsion (RSSSF eng2019.html & EFL)
+  2019: [3, 3, 3, 1], // COVID curtailed L1/L2: T3 Tranmere/Southend/Bolton; T4 bottom Macclesfield -17, Stevenage reprieved (RSSSF eng2020.html & EFL)
+  2020: [3, 3, 4, 2], // T4: Southend United & Grimsby Town (RSSSF eng2021.html)
+  2021: [3, 3, 4, 2], // T4: Oldham Athletic & Scunthorpe United (RSSSF eng2022.html)
+  2022: [3, 3, 4, 2], // T2: Reading, Blackpool, Wigan (-6); T4: Hartlepool & Rochdale (EFL/Wikipedia)
+  2023: [3, 3, 4, 2], // T4: Sutton United & Forest Green Rovers (RSSSF eng2024.html)
+  2024: [3, 3, 4, 2], // T4: Carlisle United & Morecambe (RSSSF eng2025.html)
+};
+
+// Sourced Tier 4 exit & non-exit fixture covering every non-standard exit/reprieve plus re-election/modern rules
+const EXPECTED_T4_EXIT_SOURCES = [
+  { slotId: '1981-82-T4', relCount: 0, nonRelegatingReason: 're-election era' },
+  { slotId: '1982-83-T4', relCount: 0, nonRelegatingReason: 're-election era' },
+  { slotId: '1983-84-T4', relCount: 0, nonRelegatingReason: 're-election era' },
+  { slotId: '1984-85-T4', relCount: 0, nonRelegatingReason: 're-election era' },
+  { slotId: '1985-86-T4', relCount: 0, nonRelegatingReason: 're-election era' },
+  { slotId: '1986-87-T4', relCount: 1, relegatedTeams: ['Lincoln City'] },
+  { slotId: '1990-91-T4', relCount: 0, nonRelegatingReason: 'restructuring; Aldershot remained for 1991-92 before folding' },
+  { slotId: '1991-92-T4', relCount: 0, nonRelegatingReason: 'Aldershot expunged; Maidstone resigned August 1992' },
+  { slotId: '1992-93-T4', relCount: 1, relegatedTeams: ['Halifax Town'] },
+  { slotId: '1993-94-T4', relCount: 0, nonRelegatingReason: 'Northampton reprieved; Kidderminster ground-grading' },
+  { slotId: '1994-95-T4', relCount: 0, nonRelegatingReason: 'Exeter reprieved; Macclesfield ground-grading' },
+  { slotId: '1995-96-T4', relCount: 0, nonRelegatingReason: 'Torquay reprieved; Stevenage ground-grading' },
+  { slotId: '2006-07-T4', relCount: 2, relegatedTeams: ['Boston United', 'Torquay United'] },
+  { slotId: '2018-19-T4', relCount: 2, relegatedTeams: ['Notts County', 'Yeovil Town'], promotedNonRel: 'Bury' },
+  { slotId: '2019-20-T4', relCount: 1, relegatedTeams: ['Macclesfield Town'], safeAtBottom: 'Stevenage' },
+  { slotId: '2024-25-T4', relCount: 2, relegatedTeams: ['Carlisle United', 'Morecambe'] },
+];
+
+// Genuine source-verified boundary mismatches between rel(T_k) and prom(T_{k+1}) across 132 boundaries
+const DOCUMENTED_BOUNDARY_EXCEPTIONS = new Map([
+  ['1986-87|T1/T2', 'T1 shrank 22->21: 19th T1 Charlton won transitional play-off vs T2 4th Leeds United (rel=3 vs prom=2)'],
+  ['1987-88|T1/T2', 'T1 shrank 21->20: 18th T1 Chelsea lost transitional play-off vs T2 3rd Middlesbrough (rel=4 vs prom=3)'],
+  ['1990-91|T1/T2', 'T1 expanded 20->22 ahead of 1991-92 (rel=2 vs prom=4)'],
+  ['1990-91|T2/T3', 'Restructuring to hold T2 at 24 clubs while feeding T1 expansion (rel=2 vs prom=4)'],
+  ['1990-91|T3/T4', 'Fourth Division promoted 5 clubs to hold T3 at 24 during expansion restructuring (rel=3 vs prom=5)'],
+  ['1994-95|T1/T2', 'Premier League contracted 22->20 ahead of 1995-96 (rel=4 vs prom=2)'],
+  ['1994-95|T2/T3', 'Knock-on contraction across Football League First/Second Division boundary (rel=4 vs prom=2)'],
+  ['1994-95|T3/T4', 'Knock-on contraction across Football League Second/Third Division boundary (rel=5 vs prom=3)'],
+  ['2019-20|T3/T4', 'Bury expelled from League One prior to 2019-20 fixtures, so 4 promoted from League Two to restore 24 clubs (rel=3 vs prom=4)'],
+]);
+
+test('D1-D3: Boundary conservation, per-slot relegation counts, and sourced T4 exit fixtures hold', () => {
+  const bySlot = new Map(dataset.tierSeasons.map((s) => [s.slotId, s]));
+
+  // 1. Assert each slot's relegationSlots equals its relegated rows & matches independent fixture across all 176 slots
+  for (let sy = 1981; sy <= 2024; sy++) {
+    const season = `${sy}-${String((sy + 1) % 100).padStart(2, '0')}`;
+    const expectedVec = INDEPENDENT_EXPECTED_RELEGATIONS[sy];
+    assert.ok(expectedVec, `Missing independent fixture for ${season}`);
+    for (let tier = 1; tier <= 4; tier++) {
+      const slotId = `${season}-T${tier}`;
+      const s = bySlot.get(slotId);
+      assert.ok(s, `Missing slot ${slotId}`);
+      const relRows = s.table.filter((r) => r.relegated);
+      assert.equal(s.relegationSlots, relRows.length, `${slotId} relegationSlots must equal count of relegated rows`);
+      assert.equal(relRows.length, expectedVec[tier - 1], `${slotId} relegated count (${relRows.length}) mismatch vs independent source (${expectedVec[tier - 1]})`);
+      const mSlot = manifest.slots.find((ms) => ms.slotId === slotId);
+      assert.equal(mSlot.relegatedTeams.length, s.relegationSlots, `${slotId} manifest relegatedTeams count mismatch`);
+      if (relRows.length === 0) {
+        assert.equal(s.relegationLinePos, null, `${slotId} 0-relegation slot must have null relegationLinePos`);
+        assert.equal(s.survivalLinePos, null, `${slotId} 0-relegation slot must have null survivalLinePos`);
+      } else {
+        assert.equal(s.relegationLinePos, Math.min(...relRows.map((r) => r.pos)), `${slotId} relegationLinePos`);
+      }
+    }
+
+    // 2. Boundary conservation check: rel(T_k) == prom(T_{k+1}) unless in documented source exception list
+    for (let t = 1; t <= 3; t++) {
+      const up = bySlot.get(`${season}-T${t}`);
+      const dn = bySlot.get(`${season}-T${t + 1}`);
+      const relUp = up.table.filter((r) => r.relegated).length;
+      const promDn = dn.table.filter((r) => r.promoted).length;
+      const bKey = `${season}|T${t}/T${t + 1}`;
+      if (relUp !== promDn) {
+        assert.ok(DOCUMENTED_BOUNDARY_EXCEPTIONS.has(bKey), `Undocumented boundary mismatch at ${bKey}: relUp=${relUp}, promDn=${promDn}`);
+      } else {
+        assert.equal(DOCUMENTED_BOUNDARY_EXCEPTIONS.has(bKey), false, `Stale boundary exception ${bKey}`);
+      }
+    }
+  }
+
+  // 3. Specific sourced D1, D2 & Tier 4 exit spot checks + distinct Wimbledon / MK Dons / AFC Wimbledon identities
+  const wimSlot = bySlot.get('2003-04-T2');
+  const wim = wimSlot.table.find((r) => r.team === 'Wimbledon');
+  assert.equal(wim.pos, 24);
+  assert.equal(wim.relegated, true, 'D1: 2003-04 T2 Wimbledon (24th) must have relegated=true');
+  assert.equal(wimSlot.relegationSlots, 3);
+  assert.equal(wimSlot.relegationLinePos, 22);
+  assert.equal(wimSlot.survivalLinePos, 21);
+  const wimManifest = manifest.slots.find((ms) => ms.slotId === '2003-04-T2');
+  assert.equal(wimManifest.relegationSlots, 3);
+  assert.equal(wimManifest.relegationLinePos, 22);
+  assert.equal(wimManifest.survivalLinePos, 21);
+
+  const aldSlot = bySlot.get('1990-91-T4');
+  assert.equal(aldSlot.relegationSlots, 0, 'D2: 1990-91 T4 must have relegationSlots=0');
+  assert.equal(aldSlot.relegationLinePos, null);
+  assert.equal(aldSlot.survivalLinePos, null);
+  assert.equal(aldSlot.table.every((r) => r.relegated === false), true, 'D2: every row in 1990-91 T4 must have relegated=false');
+
+  for (const fx of EXPECTED_T4_EXIT_SOURCES) {
+    const s = bySlot.get(fx.slotId);
+    assert.equal(s.relegationSlots, fx.relCount, `T4 fixture ${fx.slotId}`);
+    if (fx.relegatedTeams) {
+      assert.deepEqual(s.table.filter((r) => r.relegated).map((r) => r.team), fx.relegatedTeams);
+    }
+    if (fx.promotedNonRel) {
+      const pr = s.table.find((r) => r.team === fx.promotedNonRel);
+      assert.equal(pr.promoted, true);
+      assert.equal(pr.relegated, false);
+    }
+    if (fx.safeAtBottom) {
+      assert.equal(s.table.find((r) => r.team === fx.safeAtBottom).relegated, false);
+    }
+  }
+
+  // Distinct club identities preserved for Wimbledon vs Milton Keynes Dons vs AFC Wimbledon
+  const clubIds = new Set(manifest.clubs.map((c) => c.clubId));
+  assert.ok(clubIds.has('wimbledon'));
+  assert.ok(clubIds.has('milton-keynes-dons'));
+  assert.ok(clubIds.has('afc-wimbledon'));
+  assert.ok(clubIds.has('aldershot'));
+  assert.ok(clubIds.has('aldershot-town'));
+});

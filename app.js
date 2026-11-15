@@ -1118,7 +1118,10 @@
         : `Normalised ${mult}-game point equivalent (PPG × ${mult}) across ${m.survivalSeries.length} relegation-active tables`;
     }
     if (noteEl) {
-      noteEl.textContent = `Excludes ${m.noRelegationSlots.length} zero-relegation slots cleanly (1981–86 T4 re-election & 1993–96 T4 reprieves). Horizontal rules mark 40/38g (${(40 / 38 * mult).toFixed(digits)}) and 50/46g (${(50 / 46 * mult).toFixed(digits)}).`;
+      const exclList = m.noRelegationSlots.map((x) => `${x.season} T${x.tier}`).join(', ');
+      noteEl.textContent = m.noRelegationSlots.length > 0
+        ? `Excludes ${m.noRelegationSlots.length} zero-relegation Tier 4 slots cleanly (${exclList}). Horizontal rules mark 1.053 PPG (40 points per 38 games: ${(40 / 38 * mult).toFixed(digits)}) and 1.087 PPG (50 points per 46 games: ${(50 / 46 * mult).toFixed(digits)}).`
+        : `Horizontal rules mark 1.053 PPG (40 points per 38 games: ${(40 / 38 * mult).toFixed(digits)}) and 1.087 PPG (50 points per 46 games: ${(50 / 46 * mult).toFixed(digits)}).`;
     }
 
     const years = Array.from(new Set(m.survivalSeries.map((s) => s.startYear))).sort((a, b) => a - b);
@@ -1643,7 +1646,10 @@
     if (dedNote) {
       const notes = [...(slot.exceptions || [])];
       if (slot.expelledClubs?.length) {
-        notes.push(`Administrative / expulsion notes: ${slot.expelledClubs.join(' | ')}`);
+        const expelledText = slot.expelledClubs
+          .map((c) => (typeof c === 'string' ? c : `${c.team || c.clubId || 'Club'}: ${c.outcome || 'Administrative ruling'}`))
+          .join(' | ');
+        notes.push(`Administrative / expulsion notes: ${expelledText}`);
       }
       const adminRows = slot.table.filter((r) => r.administrativeOutcome).map((r) => `${r.team}: ${r.administrativeOutcome}`);
       notes.push(...adminRows);

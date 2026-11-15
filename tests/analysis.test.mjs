@@ -92,9 +92,14 @@ test('4-Tier empirical findings: fewer-wins champions, no-relegation separation,
   assert.equal(m.champFewerWinsCases[0].slotId, '1981-82-T3');
   assert.equal(m.champFewerWinsCases[0].champion.team, 'Burnley');
 
-  // 9 zero-relegation T4 slots properly separated from survival cutoffs
-  assert.equal(m.noRelegationSlots.length, 9);
-  assert.equal(m.survivalStats.slotCount, 165);
+  // 10 zero-relegation T4 slots (1981-86, 1990-92, 1993-96) properly separated from 164 active survival cutoffs
+  assert.equal(m.noRelegationSlots.length, 10);
+  assert.ok(m.noRelegationSlots.some((x) => x.slotId === '1990-91-T4'));
+  assert.equal(m.survivalStats.slotCount, 164);
+  const s2003T2 = m.survivalSeries.find((x) => x.slotId === '2003-04-T2');
+  assert.ok(s2003T2);
+  assert.equal(s2003T2.survivingPos, 21);
+  assert.equal(s2003T2.relegatedPos, 22);
 
   // Within-slot GA/G vs GF/G
   assert.equal(m.withinSlot.gaBeatsGfCount, 92);

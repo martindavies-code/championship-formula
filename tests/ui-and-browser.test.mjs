@@ -390,3 +390,54 @@ test('Security & failure states: hostile XSS payloads never execute & corrupt JS
     sErr.server.close();
   }
 });
+
+test('D4: Zero [object, undefined, NaN, or Infinity strings appear in rendered UI across presets, curtailed & raw modes', { timeout: 45000 }, async () => {
+  const { server, baseUrl } = await startStaticServer();
+  const cdp = await launchCdpSession();
+  const badTokenRe = /\[object\b|\bundefined\b|\bNaN\b|\bInfinity\b/;
+  async function assertCleanRender(label) {
+    await new Promise((r) => setTimeout(r, 120));
+    const txt = await cdp.evalJs(`() => document.body.innerText`);
+    const m = badTokenRe.exec(txt);
+    assert.equal(m, null, `Found forbidden token "${m?.[0]}" in rendered UI during ${label}`);
+  }
+  try {
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+    await cdp.navigateAndWait(`${baseUrl}/`);
+    for (const preset of ['all-4-tiers', 'pl-1992-2025', 'tier1-full', 'efl-tiers-2-4']) {
+      await cdp.evalJs(`() => document.querySelector('[data-preset="${preset}"]').click()`);
+      await assertCleanRender(`preset:${preset}`);
+    }
+    await cdp.evalJs(`() => document.querySelector('[data-preset="all-4-tiers"]').click()`);
+    await cdp.evalJs(`() => {
+      const cb = document.getElementById('scope-include-curtailed');
+      if (!cb.checked) cb.click();
+    }`);
+    await cdp.evalJs(`() => {
+      const ts = document.getElementById('archive-tier-select');
+      ts.value = '3';
+      ts.dispatchEvent(new Event('change'));
+      const ss = document.getElementById('season-select');
+      ss.value = '2019-20';
+      ss.dispatchEvent(new Event('change'));
+    }`);
+    await assertCleanRender('curtailed:2019-20-T3');
+
+    await cdp.evalJs(`() => {
+      const ts = document.getElementById('archive-tier-select');
+      ts.value = '4';
+      ts.dispatchEvent(new Event('change'));
+      const ss = document.getElementById('season-select');
+      ss.value = '1991-92';
+      ss.dispatchEvent(new Event('change'));
+    }`);
+    await assertCleanRender('expelledClubs:1991-92-T4');
+
+    await cdp.evalJs(`() => document.querySelector('[data-points-mode="raw"]').click()`);
+    await assertCleanRender('rawMode+curtailed');
+    assert.equal(cdp.pageErrors.length, 0);
+  } finally {
+    await cdp.close();
+    server.close();
+  }
+});

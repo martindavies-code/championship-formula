@@ -794,7 +794,13 @@
           tier: s.tier,
           historicalDivisionName: s.historicalDivisionName,
           reElectionEra: Boolean(s.reElectionEra),
-          note: s.reElectionEra ? 'Football League re-election era (0 relegated)' : 'Zero teams relegated (Conference ground-grading / reprieve)',
+          note: s.reElectionEra
+            ? 'Football League re-election era (0 relegated)'
+            : s.startYear === 1990
+              ? 'League restructuring / expansion (0 relegated; Aldershot remained before 1991–92 withdrawal)'
+              : s.startYear === 1991
+                ? 'Aldershot expunged mid-season; zero bottom-place relegations'
+                : 'Zero teams relegated (Conference ground-grading reprieve)',
         });
         continue;
       }

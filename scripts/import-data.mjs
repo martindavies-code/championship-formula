@@ -38,6 +38,46 @@ const OUT_BUNDLE = path.join(REPO_DIR, 'data/england-tiers-1-4-1981-2025-bundle.
 const OUT_MANIFEST = path.join(REPO_DIR, 'data/coverage-manifest.json');
 const PL_BASELINE_PATH = path.join(REPO_DIR, 'data/premier-league-1992-2025.json');
 
+// Sourced outcomes for clubs with no next-season league membership (sy < END_YEAR && nextTier === null).
+// Tiers 1-3 missing next-season membership MUST appear here or the importer fails loudly.
+// Note: Wimbledon (2003-04) was renamed/relocated as Milton Keynes Dons in 2004-05; we keep
+// wimbledon, milton-keynes-dons, and afc-wimbledon as three distinct clubIds without settling naming disputes.
+const MISSING_NEXT_TIER_OUTCOMES = new Map([
+  ['2003|2|wimbledon', {
+    promoted: false,
+    relegated: true,
+    administrativeOutcome: 'Finished 24th (relegated to 2004-05 Football League One); renamed and relocated as Milton Keynes Dons ahead of 2004-05 (kept distinct from both MK Dons and AFC Wimbledon in club identity records).',
+    source: 'RSSSF 2003-04.html & Wikipedia 2003-04 Football League First Division',
+  }],
+  ['1990|4|aldershot', {
+    promoted: false,
+    relegated: false,
+    administrativeOutcome: 'Finished 23rd (not relegated during League restructuring); remained in 1991-92 Fourth Division before withdrawing/folding in March 1992 with all 1991-92 results expunged.',
+    source: 'RSSSF 1990-91.html & 1991-92.html',
+  }],
+  ['1991|4|maidstone united', {
+    promoted: false,
+    relegated: false,
+    administrativeOutcome: 'Finished 18th (not relegated); resigned from the Football League in August 1992 prior to 1992-93 fixtures.',
+    source: 'RSSSF 1991-92.html',
+  }],
+  ['2006|4|boston united', {
+    promoted: false,
+    relegated: true,
+    administrativeOutcome: 'Relegated two divisions to Conference North due to CVA/administration (-10 final-day penalty).',
+    source: 'RSSSF 2006-07.html & Wikipedia/EFL',
+  }],
+  ['2018|4|bury', {
+    promoted: true,
+    relegated: false,
+    administrativeOutcome: 'Finished 2nd (promoted on final table); expelled from EFL in August 2019 before playing in 2019-20 League One.',
+    source: 'RSSSF eng2019.html & Wikipedia/EFL',
+  }],
+]);
+
+// Known non-relegating Tier 4 seasons (0 clubs relegated to non-league)
+const NON_RELEGATING_TIER4_START_YEARS = new Set([1981, 1982, 1983, 1984, 1985, 1990, 1991, 1993, 1994, 1995]);
+
 // Verified adjustments where official EFL tables differ from RSSSF tablese/fla (audited against Wikipedia + EFL rulings):
 const VERIFIED_ADJUSTMENT_OVERRIDES = new Map([
   // key: `${startYear}|${tier}|${normKey}` -> { signedAdjustment, note }
@@ -60,7 +100,7 @@ const SLOT_EXCEPTION_NOTES = new Map([
   ['1990|1', 'Football League First Division bottom two (19th-20th) relegated as the top flight expanded back to 22 clubs for 1991-92.'],
   ['1990|2', 'Top three clubs promoted automatically plus 4th-placed play-off winner Notts County (four promotions total) as the top tier expanded from 20 to 22 clubs.'],
   ['1990|3', 'Top three clubs promoted automatically plus 5th-placed play-off winner Tranmere Rovers (four promotions) while 22nd-24th relegated (only 3 down) during restructuring.'],
-  ['1990|4', 'Four automatic promotion places plus 7th-placed play-off winner Torquay United (five promotions); no club relegated as tier expanded/restructured.'],
+  ['1990|4', '1990-91 League Division 4: Four automatic promotion places plus 7th-placed play-off winner Torquay United (five promotions); zero clubs relegated (23rd-placed Aldershot and 24th-placed Wrexham retained ahead of Aldershot\'s mid-1991-92 withdrawal).'],
   ['1991|4', 'Aldershot withdrew after 36 matches (folded 25 March 1992) and all their Football League results were expunged, leaving 22 completed teams (42 matches each) and no bottom-club relegation.'],
   ['1992|1', 'Inaugural FA Premier League season (22 clubs, 42 games); Football League Division One became Tier 2.'],
   ['1992|4', 'Maidstone United resigned from the Football League in August 1992 before playing a fixture, leaving Football League Third Division (Tier 4) with 22 teams (42 matches each). Tie-break in Football League Tiers 2-4 from 1992-93 to 1998-99 ranked GF ahead of GD.'],
@@ -464,20 +504,25 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
         if (tier < 4 && nextTier === tier + 1) {
           relegated = true;
         }
-        if (tier === 4 && nextTier === null) {
-          // Left the 4 League tiers in S+1 (Check against Maidstone 1992-93 withdrawal & Bury 2018-19 2nd-place promotion -> Aug 2019 expulsion!)
-          if (sy === 1991 && row.normKey === 'maidstone united') {
-            relegated = false;
-            administrativeOutcome = 'Withdrew from Football League in August 1992 prior to 1992-93';
-          } else if (sy === 2018 && tier === 4 && row.normKey === 'bury') {
-            promoted = true;
-            relegated = false;
-            administrativeOutcome = 'Finished 2nd (promoted on final table); expelled from EFL in August 2019 before playing in 2019-20 League One';
-          } else {
-            relegated = true;
-            if (sy === 2006 && row.normKey === 'boston united') {
-              administrativeOutcome = 'Relegated two divisions to Conference North due to CVA/administration';
+        if (nextTier === null) {
+          const missKey = `${sy}|${tier}|${row.normKey}`;
+          const documented = MISSING_NEXT_TIER_OUTCOMES.get(missKey);
+          if (tier < 4) {
+            if (!documented) {
+              throw new Error(`Unresolved next-season disappearance in Tier ${tier} at ${slotKey} (${row.team}): add sourced entry to MISSING_NEXT_TIER_OUTCOMES.`);
             }
+            promoted = Boolean(documented.promoted);
+            relegated = Boolean(documented.relegated);
+            if (documented.administrativeOutcome) administrativeOutcome = documented.administrativeOutcome;
+          } else if (documented) {
+            promoted = Boolean(documented.promoted);
+            relegated = Boolean(documented.relegated);
+            if (documented.administrativeOutcome) administrativeOutcome = documented.administrativeOutcome;
+          } else {
+            if (NON_RELEGATING_TIER4_START_YEARS.has(sy)) {
+              throw new Error(`Unexpected Tier 4 exit in non-relegating season ${slotKey} (${row.team}): document outcome explicitly.`);
+            }
+            relegated = true;
           }
         }
       } else {
@@ -631,6 +676,10 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
       participantCount: slotObj.participantCount,
       matchCount: slotObj.matchCount,
       totalGoals: slotObj.totalGoals,
+      promotionSlots: slotObj.promotionSlots,
+      relegationSlots: slotObj.relegationSlots,
+      relegationLinePos: slotObj.relegationLinePos,
+      survivalLinePos: slotObj.survivalLinePos,
       promotedTeams: rowsFinal.filter((r) => r.promoted).map((r) => `${r.team} (${r.pos}${r.promotionMethod === 'playoff' ? ', PO' : ''})`),
       relegatedTeams: rowsFinal.filter((r) => r.relegated).map((r) => `${r.team} (${r.pos})`),
       scorerCoverage: slotObj.scorerCoverage,
@@ -666,6 +715,35 @@ for (const slot of tierSeasons) {
     if (row.gd !== row.gf - row.ga) throw new Error(`GD fail in ${slot.slotId} ${row.team}`);
     if (row.rawPoints !== 3 * row.won + row.drawn) throw new Error(`RawPoints fail in ${slot.slotId} ${row.team}`);
     if (row.points !== row.rawPoints + row.signedAdjustment) throw new Error(`OfficialPoints fail in ${slot.slotId} ${row.team}`);
+  }
+  if (slot.relegationSlots !== slot.table.filter((r) => r.relegated).length) {
+    throw new Error(`RelegationSlots mismatch in ${slot.slotId}`);
+  }
+}
+
+const BUILD_BOUNDARY_EXCEPTIONS = new Set([
+  '1986-87|T1/T2',
+  '1987-88|T1/T2',
+  '1990-91|T1/T2',
+  '1990-91|T2/T3',
+  '1990-91|T3/T4',
+  '1994-95|T1/T2',
+  '1994-95|T2/T3',
+  '1994-95|T3/T4',
+  '2019-20|T3/T4',
+]);
+const slotLookup = new Map(tierSeasons.map((s) => [s.slotId, s]));
+for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
+  const lbl = formatSeasonLabel(sy);
+  for (let t = 1; t <= 3; t++) {
+    const up = slotLookup.get(`${lbl}-T${t}`);
+    const dn = slotLookup.get(`${lbl}-T${t + 1}`);
+    const relUp = up.table.filter((r) => r.relegated).length;
+    const promDn = dn.table.filter((r) => r.promoted).length;
+    const bKey = `${lbl}|T${t}/T${t + 1}`;
+    if (relUp !== promDn && !BUILD_BOUNDARY_EXCEPTIONS.has(bKey)) {
+      throw new Error(`Undocumented promotion/relegation boundary mismatch at ${bKey}: relUp=${relUp} vs promDn=${promDn}`);
+    }
   }
 }
 
@@ -783,6 +861,11 @@ const manifestObj = {
   },
   matchDiscrepancies,
   deductionAudit,
+  missingNextTierOutcomes: [...MISSING_NEXT_TIER_OUTCOMES.entries()].map(([key, v]) => ({ key, ...v })),
+  clubLineagePolicy: {
+    renamedOrRelocated: 'Contested sporting-identity continuity cases (e.g. Wimbledon -> Milton Keynes Dons in 2004, and reformed AFC Wimbledon) are stored as distinct clubId records (wimbledon, milton-keynes-dons, afc-wimbledon) rather than silently aliasing clubs across identities.',
+    historicalSplit: 'Aldershot (pre-1992 Football League club, folded 1992) and Aldershot Town (post-2008 League Two entrant) are likewise separated by distinct clubIds (aldershot vs. aldershot-town).',
+  },
   clubs: [...clubsRegistry.values()]
     .map((c) => ({ clubId: c.clubId, canonicalName: c.canonicalName, aliases: [...c.aliases].sort() }))
     .sort((a, b) => a.clubId.localeCompare(b.clubId)),
