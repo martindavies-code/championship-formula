@@ -348,6 +348,8 @@ function buildAnalyticalModel(dataset) {
   const surv38Stats = statsSummary(survival38.map((x) => x.survivingPts));
   const rel38Stats = statsSummary(survival38.map((x) => x.relegatedPts));
   const rel40Plus38 = survival38.filter((x) => x.relegatedPts >= 40);
+  const rel39Exact38 = survival38.filter((x) => x.relegatedPts === 39);
+  const rel35Plus38 = survival38.filter((x) => x.relegatedPts >= 35);
   const survUnder40_38 = survival38.filter((x) => x.survivingPts < 40);
   const recent10RelMean = mean(survival38.slice(-10).map((x) => x.relegatedPts));
 
@@ -450,6 +452,8 @@ function buildAnalyticalModel(dataset) {
     surv38Stats,
     rel38Stats,
     rel40Plus38,
+    rel39Exact38,
+    rel35Plus38,
     survUnder40_38,
     recent10RelMean,
     seasonDrawLeaders,
@@ -518,7 +522,7 @@ function renderEditorialCopy(m) {
       idx: '03 / Survival Threshold',
       stat: `${m.rel38Stats.mean.toFixed(1)} pts`,
       claim: 'Average 18th-place relegated total in the 38-game era.',
-      detail: `Median 18th-place points is ${m.rel38Stats.median.toFixed(0)} (requiring ${m.rel38Stats.median + 1} for guaranteed safety). Only ${m.rel40Plus38.length} of ${m.survival38.length} seasons saw a team relegated with 40+ points—and zero since 2002–03.`
+      detail: `Median 18th-place points is ${m.rel38Stats.median.toFixed(0)} (so ${m.rel38Stats.median + 1} points is the typical total needed to finish above 18th, not a guarantee: it would have fallen short in ${m.rel35Plus38.length} of ${m.survival38.length} seasons). Only ${m.rel40Plus38.length} of ${m.survival38.length} seasons saw a team relegated with 40+ points, and none since 2002–03.`
     },
     {
       idx: '04 / The Stalemate Penalty',
@@ -676,10 +680,10 @@ function renderEditorialCopy(m) {
   const rel40Names = m.rel40Plus38.map((x) => `${x.relegatedTeam} in ${x.season} (${x.relegatedPts} pts)`).join(', ');
   document.getElementById('sec3-prose').innerHTML = `
     <p>
-      The "40-point mark" is English football's most durable numerological myth. Across the <strong>${m.survival38.length} seasons of the 38-game era</strong> (1995–96 to 2024–25), the highest relegated team (18th place) has averaged just <strong>${m.rel38Stats.mean.toFixed(1)} points</strong> (median <strong>${m.rel38Stats.median.toFixed(0)} points</strong>, IQR ${m.rel38Stats.q1.toFixed(0)}–${m.rel38Stats.q3.toFixed(0)}, range ${m.rel38Stats.min} to ${m.rel38Stats.max}). That means the actual points total required to beat 18th place outright without relying on goal difference has averaged <strong>${(m.rel38Stats.mean + 1).toFixed(1)} points</strong> (median <strong>${m.rel38Stats.median + 1} points</strong>).Meanwhile, the lowest surviving team (17th place) has averaged <strong>${m.surv38Stats.mean.toFixed(1)} points</strong> (median <strong>${m.surv38Stats.median.toFixed(0)}</strong>), finishing below 40 points in <strong>${m.survUnder40_38.length} of ${m.survival38.length} seasons (${((m.survUnder40_38.length / m.survival38.length) * 100).toFixed(1)}%)</strong>.
+      The "40-point mark" is English football's most durable numerological myth. Across the <strong>${m.survival38.length} seasons of the 38-game era</strong> (1995–96 to 2024–25), the highest relegated team (18th place) has averaged just <strong>${m.rel38Stats.mean.toFixed(1)} points</strong> (median <strong>${m.rel38Stats.median.toFixed(0)} points</strong>, IQR ${m.rel38Stats.q1.toFixed(0)}–${m.rel38Stats.q3.toFixed(0)}, range ${m.rel38Stats.min} to ${m.rel38Stats.max}). That means the points total needed to finish above 18th place outright, without relying on goal difference, has averaged <strong>${(m.rel38Stats.mean + 1).toFixed(1)} points</strong> (median <strong>${m.rel38Stats.median + 1} points</strong>). Treat 35 as a typical mark, not a safe line: it would not have beaten 18th place in <strong>${m.rel35Plus38.length} of ${m.survival38.length} seasons</strong>. Meanwhile, the lowest surviving team (17th place) has averaged <strong>${m.surv38Stats.mean.toFixed(1)} points</strong> (median <strong>${m.surv38Stats.median.toFixed(0)}</strong>), finishing below 40 points in <strong>${m.survUnder40_38.length} of ${m.survival38.length} seasons (${((m.survUnder40_38.length / m.survival38.length) * 100).toFixed(1)}%)</strong>.
     </p>
     <p>
-      Has 40 points ever actually been needed in a 38-game season? Only <strong>${m.rel40Plus38.length} times in ${m.survival38.length} seasons (${((m.rel40Plus38.length / m.survival38.length) * 100).toFixed(1)}%)</strong>: ${rel40Names}. <strong>No club has been relegated with 40 or more points since 2002–03 (${m.survival38.length - 8} consecutive seasons)</strong>. As super-clubs have hoovered up points at the top of the pyramid, the bottom has compressed downward: over the last 10 seasons (2015–16 to 2024–25), the average 18th-place total has fallen to <strong>${m.recent10RelMean.toFixed(1)} points</strong>, bottoming out at 26 points (Luton Town, 2023–24) and 25 points (Leicester City, 2024–25).
+      How often has a club gone down on 40 points or more in a 38-game season? Only <strong>${m.rel40Plus38.length} times in ${m.survival38.length} seasons (${((m.rel40Plus38.length / m.survival38.length) * 100).toFixed(1)}%)</strong>: ${rel40Names}. One more club went down on 39 (${m.rel39Exact38.map((x) => `${x.relegatedTeam} in ${x.season}`).join(', ')}), when 40 points would have been enough to finish above 18th. <strong>No club has been relegated with 40 or more points since 2002–03 (${m.survival38.length - 8} consecutive seasons)</strong>. As super-clubs have hoovered up points at the top of the pyramid, the bottom has compressed downward: over the last 10 seasons (2015–16 to 2024–25), the average 18th-place total has fallen to <strong>${m.recent10RelMean.toFixed(1)} points</strong>, bottoming out at 26 points (Luton Town, 2023–24) and 25 points (Leicester City, 2024–25).
     </p>
   `;
 
@@ -688,8 +692,8 @@ function renderEditorialCopy(m) {
     <dd>${m.rel38Stats.mean.toFixed(1)} / ${m.rel38Stats.median.toFixed(0)} pts (range ${m.rel38Stats.min}–${m.rel38Stats.max})</dd>
     <dt>17th Place Mean / Median (38g)</dt>
     <dd>${m.surv38Stats.mean.toFixed(1)} / ${m.surv38Stats.median.toFixed(0)} pts (range ${m.surv38Stats.min}–${m.surv38Stats.max})</dd>
-    <dt>Guaranteed Safety (18th + 1)</dt>
-    <dd>${(m.rel38Stats.mean + 1).toFixed(1)} mean / ${m.rel38Stats.median + 1} median pts</dd>
+    <dt>Needed to Beat 18th (18th + 1)</dt>
+    <dd>${(m.rel38Stats.mean + 1).toFixed(1)} mean / ${m.rel38Stats.median + 1} median pts (not enough in ${m.rel35Plus38.length} of ${m.survival38.length} seasons at 35)</dd>
     <dt>Relegated with ≥ 40 pts (38g)</dt>
     <dd>${m.rel40Plus38.length} of ${m.survival38.length} seasons (0 since 2002–03)</dd>
     <dt>Survived with &lt; 40 pts (17th)</dt>
@@ -1089,15 +1093,15 @@ function renderSec2Timeline(m, metric = 'pts38') {
 function renderSec2Distributions(m) {
   const container = document.getElementById('chart-sec2-distributions');
   const panels = [
-    { label: 'Points / 38g', c: m.champStats.pts38, r: m.runnerStats.pts38, min: 64, max: 102 },
-    { label: 'Goals For / 38g', c: m.champStats.gf38, r: m.runnerStats.gf38, min: 50, max: 108 },
-    { label: 'Goals Against / 38g', c: m.champStats.ga38, r: m.runnerStats.ga38, min: 12, max: 52 },
-    { label: 'Goal Diff / 38g', c: m.champStats.gd38, r: m.runnerStats.gd38, min: 14, max: 82 }
+    { label: 'Points / 38g', key: 'pts38', c: m.champStats.pts38, r: m.runnerStats.pts38, min: 64, max: 102 },
+    { label: 'Goals For / 38g', key: 'gf38', c: m.champStats.gf38, r: m.runnerStats.gf38, min: 50, max: 108 },
+    { label: 'Goals Against / 38g', key: 'ga38', c: m.champStats.ga38, r: m.runnerStats.ga38, min: 12, max: 52 },
+    { label: 'Goal Diff / 38g', key: 'gd38', c: m.champStats.gd38, r: m.runnerStats.gd38, min: 14, max: 82 }
   ];
 
-  const W = 520;
-  const H = 310;
-  const pad = { top: 12, right: 24, bottom: 20, left: 132 };
+  const W = 560;
+  const H = 360;
+  const pad = { top: 34, right: 30, bottom: 16, left: 168 };
   const plotW = W - pad.left - pad.right;
   const blockH = (H - pad.top - pad.bottom) / panels.length;
 
@@ -1105,6 +1109,15 @@ function renderSec2Distributions(m) {
     .map((p, idx) => {
       const yTop = pad.top + idx * blockH;
       const sx = (v) => pad.left + ((v - p.min) / (p.max - p.min)) * plotW;
+
+      const drawStrip = (teams, yCenter, color) =>
+        teams
+          .map((t, i) => {
+            const jitter = ((i * 7) % 11 - 5) * 0.9;
+            const tip = `<strong>${t.season} ${t.team} (${t.pos === 1 ? 'champion' : 'runner-up'})</strong>${p.label}: ${t[p.key].toFixed(1)}`;
+            return `<circle cx="${sx(t[p.key]).toFixed(1)}" cy="${(yCenter + jitter).toFixed(1)}" r="2" fill="${color}" fill-opacity="0.45" data-tip="${tip.replace(/"/g, '&quot;')}" />`;
+          })
+          .join('');
 
       const drawBox = (stats, yCenter, color, fillSoft) => `
         <line x1="${sx(stats.min).toFixed(1)}" y1="${yCenter}" x2="${sx(stats.max).toFixed(1)}" y2="${yCenter}" stroke="${color}" stroke-width="1.4" />
@@ -1119,9 +1132,11 @@ function renderSec2Distributions(m) {
         <g>
           ${idx > 0 ? `<line x1="10" y1="${yTop}" x2="${W - 10}" y2="${yTop}" stroke="var(--rule-light)" />` : ''}
           <text x="${pad.left - 12}" y="${yTop + blockH / 2 - 4}" text-anchor="end" font-family="var(--font-mono)" font-size="11" font-weight="600" fill="var(--ink-primary)">${p.label}</text>
-          <text x="${pad.left - 12}" y="${yTop + blockH / 2 + 11}" text-anchor="end" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-muted)">1st: ${p.c.mean.toFixed(1)} | 2nd: ${p.r.mean.toFixed(1)}</text>
+          <text x="${pad.left - 12}" y="${yTop + blockH / 2 + 11}" text-anchor="end" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-muted)">Means: 1st ${p.c.mean.toFixed(1)} | 2nd ${p.r.mean.toFixed(1)}</text>
           ${drawBox(p.c, yTop + blockH * 0.34, 'var(--accent-champ)', 'var(--accent-champ-soft)')}
+          ${drawStrip(m.champs, yTop + blockH * 0.34, 'var(--accent-champ)')}
           ${drawBox(p.r, yTop + blockH * 0.68, 'var(--accent-runner)', 'var(--accent-runner-soft)')}
+          ${drawStrip(m.runnersUp, yTop + blockH * 0.68, 'var(--accent-runner)')}
         </g>
       `;
     })
@@ -1129,9 +1144,18 @@ function renderSec2Distributions(m) {
 
   container.innerHTML = `
     <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Box-and-whisker quantile comparison between Champions and Runners-Up across Points, Goals For, Goals Against, and Goal Difference">
+      <g font-family="var(--font-mono)" font-size="10" fill="var(--ink-secondary)">
+        <rect x="${pad.left}" y="9" width="12" height="10" fill="var(--accent-champ-soft)" stroke="var(--accent-champ)" stroke-width="1.5" />
+        <text x="${pad.left + 18}" y="18">Champions (1st)</text>
+        <rect x="${pad.left + 120}" y="9" width="12" height="10" fill="var(--accent-runner-soft)" stroke="var(--accent-runner)" stroke-width="1.5" />
+        <text x="${pad.left + 138}" y="18">Runners-up (2nd)</text>
+        <circle cx="${pad.left + 252}" cy="14" r="2" fill="var(--ink-secondary)" fill-opacity="0.5" />
+        <text x="${pad.left + 260}" y="18">One dot per season</text>
+      </g>
       ${rowsSvg}
     </svg>
   `;
+  wireSvgTooltips(container);
 }
 
 /* ==========================================================================
