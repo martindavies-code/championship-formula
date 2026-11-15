@@ -1,135 +1,134 @@
 # The Championship Formula
 
-**An empirical study of every completed Premier League final table and top-scorer chart from 1992–93 through 2024–25 (33 seasons, 666 team-seasons, 12,786 matches, 34,433 goals).**
+**An empirical study of English professional league tables across Tiers 1–4 in the three-points-for-a-win era (`1981–82` through `2024–25`) — asking what separates champions, contenders, and survivors from everyone else.**
 
-This repository contains a static, zero-dependency single-page web application (`index.html`, `styles.css`, `app.js`) and its verified local dataset (`data/premier-league-1992-2025.json`). Every statistic, correlation, quantile, table cell, and SVG chart rendered on the page is computed at runtime in the browser directly from `data/premier-league-1992-2025.json`.
-
----
-
-## 1. Data Sources & Verification
-
-### Primary Source
-- **Wikipedia Premier League Season Articles (`1992–93 FA Premier League` through `2024–25 Premier League`)**:
-  - Final league standings (`Pos`, `Team`, `Pld`, `W`, `D`, `L`, `GF`, `GA`, `GD`, `Pts`, relegation status, and official points deductions).
-  - Top-scorer tables (`Rank`, `Player`, `Club(s)`, `Goals`), including split-club goal breakdowns for players transferred mid-season (e.g., Teddy Sheringham 1992–93, Andy Cole 1994–95, Louis Saha 2003–04, Darren Bent 2010–11, Demba Ba 2012–13).
-  - For the 20 out of 132 Top-Four team-seasons where a club's leading league goalscorer finished below the league-wide Top 10 cutoff (such as 2024–25 Arsenal with Kai Havertz on 9 goals, or 2020–21 Chelsea with Jorginho on 7 goals), exact club-level leading league scorers were retrieved from the corresponding club season articles so that Top-Four goal-concentration figures suffer zero survivorship bias.
-
-### Independent Match-Level Verification (Spot-Checks)
-- **Football-Data.co.uk Historical Match CSVs (`E0.csv`)**:
-  - Four full seasons spanning the dataset's history were independently reconstructed from raw match-by-match full-time scores (`FTHG`, `FTAG`):
-    1. **`1993-94`** (42-game era, 22 clubs, 462 matches): **0 discrepancies** across all 22 rows (`Pld`, `W`, `D`, `L`, `GF`, `GA`, `GD`, `Pts`).
-    2. **`2003-04`** (38-game era, 20 clubs, 380 matches — Arsenal's unbeaten campaign): **0 discrepancies** across all 20 rows.
-    3. **`2017-18`** (38-game era, 20 clubs, 380 matches — Manchester City's 100-point campaign): **0 discrepancies** across all 20 rows.
-    4. **`2024-25`** (38-game era, 20 clubs, 380 matches — Liverpool's title campaign): **0 discrepancies** across all 20 rows.
-  - Across all 33 seasons (666 team-seasons), automated conservation checks verified `W + D + L == Pld`, `GF - GA == GD`, `3W + D - pointsDeducted == Pts`, `∑W == ∑L`, and `∑GF == ∑GA`.
+This is a static, zero-runtime-dependency web application built on reconciled local data with no backend, no accounts, and no runtime API scraping. It extends the original Premier League (`1992–93` to `2024–25`) study across all four tiers of the English pyramid back to the 1981–82 introduction of three points for a win—spanning **176 tier-season slots**, **4,047 team-seasons**, **89,234 matches**, and **233,356 goals** (or **174 completed full-season tables**, **4,000 team-seasons**, **88,394 matches**, and **231,204 goals** with the two COVID-curtailed `2019–20` EFL League One and League Two tables excluded by default).
 
 ---
 
-## 2. Structural Gotchas & Normalisation Decisions
+## Live Architecture & Files
 
-1. **Season Length (42 Games vs. 38 Games)**:
-   - **1992–93, 1993–94, and 1994–95** featured **22 clubs** playing **42 matches** each (66 team-seasons; 462 matches per season).
-   - **1995–96 through 2024–25 (30 seasons)** featured **20 clubs** playing **38 matches** each (600 team-seasons; 380 matches per season).
-   - **Normalisation Rule**: All cross-era correlations (`n = 666`) are computed on **per-game rates** (`Points/G`, `Wins/G`, `Draws/G`, `GF/G`, `GA/G`, `GD/G`). Where cross-era distributions or timelines are expressed in full-season units for intuitive reading, 42-game seasons are scaled to a **38-game equivalent** (`rate × 38`).
-
-2. **Relegation Line Shifts**:
-   - In **1992–93 and 1993–94**, 3 clubs were relegated from a 22-team table (19th survived; 20th–22nd relegated).
-   - In **1994–95**, **4 clubs were relegated** (18th survived; 19th–22nd relegated) to contract the division from 22 to 20 clubs.
-   - From **1995–96 onwards**, 3 clubs were relegated each season (17th survived; 18th–20th relegated).
-   - The survival analysis presents both the **30-season 38-game era** (where the "40-point mark" cliché applies directly to a 38-game schedule) and the **all-33-season 38-game normalised series**.
-
-3. **Three Points for a Win**:
-   - Constant across all 33 Premier League seasons (no adjustment required).
-
-4. **Official Points Deductions**:
-   - Four points deductions occurred across the 33 seasons and are explicitly recorded in the JSON (`points`, `rawPoints`, `pointsDeducted`, `deductionReason`):
-     - `1996-97` Middlesbrough: **−3 pts** (failed to fulfil fixture)
-     - `2009-10` Portsmouth: **−9 pts** (entering administration)
-     - `2023-24` Everton: **−8 pts** (PSR breaches, 6 + 2 pts)
-     - `2023-24` Nottingham Forest: **−4 pts** (PSR breach)
+- [`index.html`](index.html) — Editorial single-page layout (`<script defer>` classic scripts, no `type="module"`), interactive global scope bar (presets, Official vs. Raw Sporting Points toggle, Tier 1–4 filter, configurable `1981–82..2024–25` range, COVID curtailment opt-in), and accessible fallback states.
+- [`analysis.js`](analysis.js) — Pure statistical calculation engine (`window.ChampionshipAnalysis` / UMD-style browser & Node test compatibility) implementing dataset schema validation, within-slot correlations, era and tier breakdowns, deduction sensitivity (`official` vs `raw`), non-relegating slot separation, and scorer availability checks.
+- [`app.js`](app.js) — DOM & inline SVG visualization controller built exclusively with safe DOM/SVG node constructors (`textContent` only; zero `.innerHTML`), responsive interactive tooltips, and sortable full-archive tables.
+- [`styles.css`](styles.css) — High-density newspaper/sports-analytics styling, tabular numerals, responsive layouts tested down to `360px` / `390px` viewports.
+- [`data/england-tiers-1-4-1981-2025.json`](data/england-tiers-1-4-1981-2025.json) — Canonical dataset (`schemaVersion: "2.0.0"`, `3,467,601` bytes, canonical SHA-256 `e5b2a9f1d4eff2965d6149c249cb5d84b102c5ab79b34995da122711330c4813`).
+- [`data/england-tiers-1-4-1981-2025-bundle.js`](data/england-tiers-1-4-1981-2025-bundle.js) — Pre-bundled `window.__CHAMPIONSHIP_DATASET__` mirror (`3,467,795` bytes) matching canonical SHA-256 so the app works identically when opened directly via `file://` without a local server.
+- [`data/coverage-manifest.json`](data/coverage-manifest.json) — Full reconciliation manifest recording all `176` slots, `59` historical deduction audit records, `46` minor single-goal match-level discrepancies vs RSSSF retained transparently (`0` Premier League discrepancies), `118` club identity records, and the `33`-season Premier League parity check.
+- [`data/premier-league-1992-2025.json`](data/premier-league-1992-2025.json) — Original audited Premier League baseline retained for regression parity and verified Golden Boot / club top-scorer attribution.
+- [`scripts/import-data.mjs`](scripts/import-data.mjs) & [`scripts/reconcile-helpers.mjs`](scripts/reconcile-helpers.mjs) — Deterministic local ETL pipeline (supporting `--from-cache`, `--fetch`, and configurable `--end-year=YYYY` up to `2025`).
+- [`tests/`](tests/) — Automated Node test suite covering schema validation, statistical edge cases, mathematical conservation laws, Premier League parity, offline `file://` rendering, interactive HTTP UI flows, XSS resilience, and viewport overflow checks.
 
 ---
 
-## 3. Computed Headline Findings
+## Sources, Attribution & Reconciliation Audit
 
-### I. Predictor Hierarchy Across All 666 Team-Seasons (Per-Game Normalised)
+### 1. Primary & Cross-Check Data Sources
 
-| Rank | Metric (Per Game) | Pearson `r` (PPG) | Variance Explained `R²` (PPG) | Pearson `r` (Pos) | Spearman `ρ` (Pos) |
-| :--- | :--- | ---: | ---: | ---: | ---: |
-| **1** | **Wins / Game (`W/G`)** | **+0.9859** | **97.2%** | **−0.9238** | **−0.9572** |
-| **2** | **Goal Difference / Game (`GD/G`)** | **+0.9623** | **92.6%** | **−0.9049** | **−0.9297** |
-| **3** | **Goals For / Game (`GF/G`)** | **+0.8785** | **77.2%** | **−0.8053** | **−0.8249** |
-| **4** | **Goals Against / Game (`GA/G`)** | **−0.8232** | **67.8%** | **+0.7984** | **+0.8074** |
-| **5** | **Draws / Game (`D/G`)** | **−0.1915** | **3.7%** | **+0.1536** | **+0.1427** |
-
-- **100% Win-Leader Rule**: In **33 of 33 seasons (100.0%)**, the champion led (or co-led) the league in wins. No club has ever won the Premier League with fewer wins than another team.
-- **Goals For Beats Goals Against**: `GF/G` explains **9.4 percentage points more variance** in Points per Game than `GA/G` (`77.2%` vs `67.8%`). Moreover, **22 of 33 champions (66.7%)** had the league's #1 attack (most GF), whereas only **15 of 33 (45.5%)** had the #1 defence (fewest GA).
-- **Draws Rank Dead Last**: `Draws/G` explains just **3.7%** of PPG variance (`2.4%` of position variance) and is *negatively* correlated with points (`r = −0.1915`).
-
----
-
-### II. The Champion Profile vs. Runners-Up (38-Game Normalised, `n = 33`)
-
-| Metric (per 38 Games) | Champion Mean | Champion Median (IQR) | Runner-Up Mean | Runner-Up Median (IQR) | Separation (1st − 2nd) |
-| :--- | ---: | ---: | ---: | ---: | ---: |
-| **Points / 38g** | **86.9** (`2.29 PPG`) | **87.0** (`82.0–91.0`) | **80.0** (`2.10 PPG`) | **79.6** (`76.0–84.0`) | **+6.9 pts** (`+0.18 PPG`) |
-| **Wins / 38g** | **26.6** | **27.0** (`24.4–28.0`) | **23.9** | **24.0** (`22.0–26.0`) | **+2.7 wins** |
-| **Goals For / 38g** | **82.2** | **80.0** (`73.0–93.0`) | **75.4** | **73.0** (`66.0–86.0`) | **+6.8 goals** |
-| **Goals Against / 38g** | **32.0** | **33.0** (`27.0–36.0`) | **32.8** | **33.0** (`27.0–37.0`) | **−0.8 goals** |
-| **Goal Difference / 38g** | **+50.1** | **+48.0** (`+41.0–+58.0`) | **+42.6** | **+40.0** (`+33.0–+51.0`) | **+7.6 GD** |
-
-- **Champions and Runners-Up Have the Same Defence**: Both average `~32–33` goals conceded per 38 games (exact median `33.0` for both; mean difference just `0.8` goals over 38 games). In **17 of 33 seasons (51.5%)**, the runner-up conceded as few or fewer goals than the champion.
-- **Era Inflation**: Splitting the 33 seasons into three 11-season eras shows a relentless escalation in the title standard:
-  - **Era I (1992–93 to 2002–03)**: Champion mean **81.3 pts/38g** (`2.14 PPG`, `24.1 W/38g`, `+39.9 GD/38g`)
-  - **Era II (2003–04 to 2013–14)**: Champion mean **88.4 pts/38g** (`2.33 PPG`, `27.3 W/38g`, `+54.2 GD/38g`)
-  - **Era III (2014–15 to 2024–25)**: Champion mean **91.0 pts/38g** (`2.39 PPG`, `28.4 W/38g`, `+56.4 GD/38g`)
+1. **Sean Elvidge — `England-football-results` (CC BY 4.0)**
+   Pinned repository commit `fb4c796d5faffd7098d481bfc041778b80a2286c`:
+   - `EnglandLeagueResults.csv` (SHA-256 `3de4a6938ebab33cf4fc47c545ad9de56690a523c561e7e880ef65ababcceab6`) — Match results aggregated directly to P/W/D/L/GF/GA without using rating or forecast columns. Ongoing/post-`2024–25` seasons (`2025/2026`, `2026/2027`) are explicitly excluded from the principal `1981–82..2024–25` endpoint.
+   - `EnglishTeamPointDeductions.csv` (SHA-256 `bd03b1079cfc624f9648c2aa706b0382f36f98765d5983bd2521f127f48a5f14`) — Point deduction and appeal ledger.
+   - `EnglishTeamNamePeriods.csv` (SHA-256 `61629e954c5bac4fbf04aa76a3393f238a9b4556a867bb8fe2ef412473038987`) — Club name lineage.
+   - Attribution: *Match results and deduction logs derived in part from Sean Elvidge (`England-football-results`), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (whose compilation cites RSSSF, Curley 2016, ENFA, footballcsv, Wikipedia, Statto, 11v11, football-data.co.uk, and BBC).*
+2. **RSSSF — England Football Statistics Archive (`engpaul/FLA/` & `tablese/`)**
+   Independent cross-check across all `176` tables for final positions, automatic promotions, play-off winners, relegations, and deductions.
+3. **Football-Data.co.uk (`E0`–`E3` CSVs)**
+   Independent match-level cross-check across all four tiers from `1993–94` through `2024–25` (`128` tier-seasons).
+4. **Wikipedia / Official EFL Statements**
+   Verification of the COVID-curtailed `2019–20` EFL League One and League Two unweighted-PPG tables, Bury’s `2019` expulsion (preserving Bury’s `2018–19` Tier 4 2nd-place on-field promotion while noting their August 2019 EFL expulsion), and eight resolved omissions/discrepancies where RSSSF lagged official EFL rulings:
+   - `2005–06` Tier 4 **Bury** (`-1` unregistered loanee)
+   - `2006–07` Tier 4 **Boston United** (`-10` administration deduction; relegated to Conference North)
+   - `2008–09` Tier 2 **Crystal Palace** (`-1` ineligible player)
+   - `2009–10` Tier 3 **Hartlepool United** (`-3` ineligible player and table rank ordering)
+   - `2012–13` Tier 3 **Portsmouth** (`-10` administration exit penalty)
+   - `2015–16` Tier 3 **Bury** (`-3` retrospective registration penalty)
+   - `2022–23` Tier 2 **Wigan Athletic** (`-6` combined from two `-3` penalties where RSSSF listed `-3`)
+   - `2023–24` Tier 4 **Morecambe** (`-3` wage payment penalty)
+5. **Premier League Baseline Regression Parity (`data/premier-league-1992-2025.json`)**
+   All `33` Premier League seasons (`666` team-seasons, `12,786` matches, `34,433` goals) match cell-for-cell with zero discrepancies across table totals, official positions, deductions, relegations, and top-scorer awards.
 
 ---
 
-### III. The 40-Point Myth (30 Seasons of the 38-Game Era, 1995–96 to 2024–25)
+## Structural Method & Scope Rules
 
-- **Highest Relegated Total (18th Place)**: Mean **34.5 points**, median **34.0 points** (IQR `33–37`, range `25` [2024–25 Leicester City] to `42` [2002–03 West Ham United]).
-- **Needed to Finish Above 18th Outright (`18th + 1`)**: Mean **35.5 points**, median **35 points**. This is a typical figure, not a guarantee: 35 points would not have beaten 18th place in **14 of 30 seasons**.
-- **Lowest Surviving Total (17th Place)**: Mean **37.9 points**, median **38.0 points** (range `32` to `44`). In **22 of 30 seasons (73.3%)**, 17th place survived with **fewer than 40 points**.
-- **How Often Was a Club Relegated on 40+ Points?**: Only **3 times in 30 seasons (10.0%)**—`1996-97` Sunderland (`40 pts`), `1997-98` Bolton Wanderers (`40 pts`, relegated on GD), and `2002-03` West Ham United (`42 pts`). A fourth club, `2010-11` Birmingham City, went down on **39 points**, when 40 would have been enough to finish above 18th. **Zero teams have been relegated with 40+ points in the last 22 seasons (since 2002–03)**, and the 18th-place average over the last 10 seasons (2015–16 to 2024–25) has fallen to **32.1 points**.
-
----
-
-### IV. Draws Profile
-
-- Across 33 seasons, **49 club-seasons** led or co-led their campaign in draws (`12` to `18` draws):
-  - **Mean Finishing Position**: **12.0** | **Median Finishing Position**: **11th**.
-  - **Finished 1st or 2nd**: **0 of 49 (0.0%)**.
-  - **Finished Top 4**: **3 of 49 (6.1%)** — `1998-99` Chelsea (3rd, 15D), `2007-08` Liverpool (4th, 13D), and `2022-23` Newcastle United (4th, 14D).
-  - **Finished Bottom Half (11th or lower)**: **31 of 49 (63.3%)**, including **4 relegations** (`1992-93` Crystal Palace, `1993-94` Sheffield United, `1996-97` Nottingham Forest, `2008-09` Newcastle United).
+- **Three-Points-for-a-Win Floor (`1981–82`)**: Prior to `1981–82`, English Football League divisions awarded two points for a win. Pre-`1981` two-point tables are omitted rather than rescaled because multiplying past wins by `1.5` invents outcomes without changing historical match incentives.
+- **Invariant Tier + Historical Division Naming**: Tables always join on pyramid `tier` (`1` = top flight through `4` = fourth tier), while displaying the historically accurate division name for each season (e.g., `Football League First Division` in Tier 1 before `1992–93` vs. `Football League First Division` in Tier 2 from `1992–93` through `2003–04`; `Championship / League One / League Two` rebrand from `2004–05`; `EFL` prefix from `2016–17`).
+- **Per-Game, Normalised Finish Score & `median(|r|)` vs. Pooled `R²(PPG)`**: League sizes vary across `20`, `21`, `22`, `23`, and `24` clubs and schedules span `38`, `40`, `42`, `44`, and `46` games per team. Primary predictor ranking uses within-slot Pearson correlation against a normalised finish score $1 - (\text{pos} - 1)/(N - 1)$ (`1.00` = Champion, `0.00` = Bottom), reported both as **median signed `r`** and **median of `|r|`** across tables (note that $\text{median}(|r|) \ge |\text{median}(r)|$ whenever signs flip across tables, as occurs for draws), alongside **pooled `R²(PPG)`** across stacked club-seasons.
+- **COVID-19 Curtailed `2019–20` Tables**: `2019–20` EFL League One (`400` matches across `23` remaining active clubs after Bury’s expulsion) and `2019–20` EFL League Two (`440` matches) ended on unweighted points per game (`34–37` played per club). Both are excluded from default full-season baselines (`174` slots) and toggleable via **Include curtailed 2019–20 League One & League Two**.
+- **Official Table vs. Raw Sporting Points (`3W + D`) Toggle Semantics**: Across the `174` completed default tables, `56` team-seasons experienced net point adjustments or deduction rulings (`58` across all `176` tables; `59` historical audit entries including Tottenham’s overturned `1994–95` deduction). Switching **Points Basis** to **Raw (3W+D)** recomputes on-pitch points (`rawPoints`), `PPG` (`rawPpg`), `rawPos`, and `finishScore` (affecting Section 1 correlations/scatter and deduction sensitivity, shifting `188` finishes and lifting `10` relegated clubs above the relegation zone: *Middlesbrough 1996–97, Wrexham 2004–05, AFC Bournemouth 2007–08, Luton Town 2008–09, Plymouth Argyle 2010–11, Portsmouth 2011–12, Wigan Athletic 2019–20, Sheffield Wednesday 2020–21, Derby County 2021–22, Reading 2022–23*). Official league positions (`rPos` / `pos`), champions, runners-up, promotion/play-off outcomes, survival/relegation cutoffs, draw-leader finishes, and Top-4 scorer outcomes always retain official league tables.
+- **Typed `outcomeType` Separation of Non-Relegating & Reprieved Boundary Clubs**: Every club row carries a closed-set `outcomeType` (`none`, `reprieved`, `expelled`, `withdrew`, `administration_relegation`). Ten Tier 4 seasons had zero automatic relegation (`1981–82` through `1985–86` re-election era; `1990–91` restructuring; `1991–92` after Aldershot withdrew and Maidstone later resigned; plus ground-grading reprieves in `1993–94`, `1994–95`, and `1995–96`), leaving `164` relegation-active tables. Within relegation-active tables, `outcomeType` excludes non-merit survivors such as `2019–20` Tier 4 23rd-placed **Stevenage** (`reprieved` due to Bury’s Tier 3 expulsion) so **Morecambe** (22nd, `0.865 PPG`) is reported cleanly as the merit survivor.
+- **Club Identity & Lineage Policy**: Contested or discontinued club transitions (`Wimbledon` relegated in `2003–04` -> renamed/relocated `Milton Keynes Dons` from `2004–05` vs. `AFC Wimbledon`; pre-1992 `Aldershot` vs. `Aldershot Town`) remain distinct `clubId` records in `coverage-manifest.json` with explicit per-season outcomes resolved from sources (`MISSING_NEXT_TIER_OUTCOMES` fails loudly on any unrecorded Tiers 1–3 exit).
+- **Historical Tie-Break Rules**: From `1992–93` through `1998–99`, Football League Divisions One, Two, and Three (Tiers 2–4) broke ties on **Goals For (`GF`) ahead of Goal Difference (`GD`)**. Table sorting honors historical tie-break rules per division-season.
+- **Explicit Scorer Coverage Boundary**: Verified Golden Boot and leading club-scorer figures cover **Premier League (`Tier 1, 1992–93 to 2024–25`, 33 seasons)** only. Pre-`1992` First Division seasons and Tiers 2–4 (`143` of `176` slots) mark scorer coverage explicitly as `unavailable` rather than fabricating figures or setting missing values to zero.
 
 ---
 
-### V. The Golden Boot Question & Goal Concentration
+## Headline Empirical Findings
 
-- **How Often Has the Champion Contained the League's Top Scorer?**: **12 of 33 seasons (36.4%)**. In **21 of 33 seasons (63.6%)**, the Golden Boot winner did not win the league.
-- **Where All 41 Golden Boot Winner-Seasons Finished** (including shared awards):
-  - **1st Place (Champion)**: **12** (`29.3%`)
-  - **2nd Place (Runner-Up)**: **9** (`22.0%`)
-  - **3rd–4th Place**: **10** (`24.4%`)
-  - **5th–11th Place (Outside Top 4)**: **10** (`24.4%`)
-- **Club Top Scorer's Share of Team League Goals Across the Top Four (`n = 132`)**:
-  - **Champions (1st, `n = 33`)**: Mean **26.0%**, median **23.5%** (range `15.2%` [2021–22 Man City, De Bruyne 15/99] to `42.5%` [1994–95 Blackburn, Shearer 34/80]).
-  - **Runners-Up (2nd, `n = 33`)**: Mean **25.7%**, median **24.7%** (range `13.0%` [2024–25 Arsenal, Havertz 9/69] to `49.2%` [1993–94 Blackburn, Shearer 31/63]).
-  - **3rd & 4th Place (`n = 66`)**: Mean **27.0%**, median **26.1%**.
-  - **All Top Four (`n = 132`)**: Mean **26.4%**, median **25.2%**.
-- **Correlation with Winning**:
-  - Across all 666 team-seasons, having the Golden Boot winner correlates modestly with PPG (`r = +0.342`, `R² = 11.7%`) and winning the title (`r = +0.287`) because Golden Boot winners belong to high-scoring squads.
-  - **Within the Top Four (`n = 132`), higher single-scorer share of team goals correlates slightly negatively with PPG (`r = −0.128`) and with team scoring rate (`r = −0.115`)**—demonstrating that spreading goals across the squad is slightly more common among high-point modern champions than relying on a single 30-goal spearhead.
+### 1. Predictor Hierarchy (`174` Completed Tables, `4,000` Team-Seasons)
+
+| Predictor (Per Game) | Within-Slot Med. Signed `r` | Within-Slot Med. `\|r\|` `[Q1, Q3]` | Within-Slot Med. `r` (PPG) | Pooled `R²(PPG)` | Why It Ranks Here |
+| --- | --- | --- | --- | --- | --- |
+| **1. Win Rate (`W/G`)** | **`+0.9481`** | **`0.9481`** `[0.9311, 0.9599]` | `+0.9825` | `95.7%` | Structural identity ($\text{PPG} = 3\cdot W/G + D/G$) |
+| **2. Goal Difference (`GD/G`)** | **`+0.9247`** | **`0.9247`** `[0.9006, 0.9401]` | `+0.9478` | `89.6%` | Net scoring balance per match |
+| **3. Goals Against (`GA/G`)** | **`-0.7995`** | **`0.7995`** `[0.7453, 0.8329]` | `-0.8187` | `61.0%` | Edges `GF/G` within-slot in **92 of 174** tables |
+| **4. Goals For (`GF/G`)** | **`+0.7947`** | **`0.7947`** `[0.7371, 0.8410]` | `+0.8209` | **`65.5%`** | Leads pooled `R²(PPG)` and full T1 within-slot (`0.8363` vs `0.8235`) |
+| **5. Draws (`D/G`)** | **`-0.0824`** (`[−0.1868, +0.0811]`) | **`0.1564`** `[0.0750, 0.2564]` | `-0.0993` | `1.0%` | Ranks 5/5 in every tier; 22 games: 11W+11L = 33 pts vs 22D = 22 pts (11D = 11 pts) |
+
+Attack vs. defence depends legitimately on which metric is asked: **within-slot median `|r|` (finish rank)** puts `GA/G` slightly ahead (`0.7995` vs `0.7947`, winning `92` vs `82` tables — and similarly `0.8516` vs `0.8478` in `pl-1992-2025`), whereas **pooled `R²(PPG)`** puts `GF/G` ahead (`65.5%` from `r = +0.8096` vs `61.0%` from `r = -0.7810` across all 4 tiers, and `77.2%` vs `67.8%` in `pl-1992-2025`). The measures use different outcomes and aggregation methods, so their rankings can differ. Across all 44 Tier 1 seasons (`1981–2025`), `GF/G` leads both metrics (`0.8363` vs `0.8235`; `75.2%` vs `66.0%`), while `GA/G` leads within-slot in Tiers 2 and 3. Switching to **Raw Sporting Points (`3W + D`)** yields virtually identical within-slot medians (`W/G` `+0.9499`, `GD/G` `+0.9270`, `GA/G` `-0.8015`, `GF/G` `+0.7972`, `D/G` signed `-0.0832` / `|r|` `0.1555`).
+
+### 2. Champion vs. Runner-Up & Era Drift (`174` Title Races)
+
+- **Champions** average **`2.063 PPG`** (median `2.043`, IQR `1.939–2.164`, range `1.739–2.632`), **`61.0%`** win rate, **`1.845 GF/G`**, **`0.888 GA/G`**, and **`+0.957 GD/G`**.
+- **Runners-up** average **`1.923 PPG`** (median `1.898`, IQR `1.826–2.000`, range `1.690–2.553`), **`56.0%`** win rate, **`1.692 GF/G`**, **`0.937 GA/G`**, and **`+0.755 GD/G`**.
+- **Era Inflation**: Champion average `PPG` rose monotonically across all four 11-year slices:
+  - `1981–82 to 1991–92` (`44` titles): **`2.009 PPG`** (`1.840 GF/G`, `0.937 GA/G`)
+  - `1992–93 to 2002–03` (`44` titles): **`2.043 PPG`** (`1.767 GF/G`, `0.883 GA/G`)
+  - `2003–04 to 2013–14` (`44` titles): **`2.073 PPG`** (`1.845 GF/G`, `0.856 GA/G`)
+  - `2014–15 to 2024–25` (`42` titles): **`2.132 PPG`** (`1.932 GF/G`, `0.875 GA/G`)
+- **Tier Gradient**: Top-flight champions separate more sharply (`2.231 PPG` mean vs `2.054` 2nd) than Tier 2 (`2.030`), Tier 3 (`2.025`), or Tier 4 (`1.964`) title winners.
+- **12 Champions Won Fewer Matches Than a Rival**: While every Tier 1 champion (`44/44`) won or shared the league lead in wins, **12 EFL champions (`12/174`) finished first with fewer wins than another club** (`2` in Tier 2, `5` in Tier 3, `5` in Tier 4), starting with **`1981–82` Third Division champions Burnley** (`21W, 17D, 8L = 80 pts` ahead of Carlisle United's `23W = 80 pts`) and including `1983–84` Chelsea, `1989–90` Bristol Rovers, `1990–91` Cambridge United & Darlington, `1997–98` Watford, `1999–00` Swansea City, `2006–07` Walsall, `2012–13` Gillingham, `2013–14` Chesterfield, `2014–15` AFC Bournemouth, and `2015–16` Wigan Athletic.
+
+### 3. Survival & Promotion Cutoffs (`164` Relegation-Active Slots)
+
+- **Overall Survival Baseline**: Across `164` relegation-active tables (`10` zero-relegation Tier 4 seasons excluded), the median lowest surviving side earned **`1.065 PPG`** (`40.5 pts` per 38 games; `49.0 pts` per 46 games), while the median highest relegated club finished on **`1.000 PPG`**.
+- **Rule-of-Thumb Benchmarks Fail Across Tiers**: Relegated teams reached **`>= 1.053 PPG` (`40/38g`) in 46 of 164 tables (`28.0%`)** and **`>= 1.087 PPG` (`50/46g`) in 35 tables (`21.3%`)**.
+  - **Highest relegated PPG**: **`1.174 PPG`** — `1988–89` Third Division **Southend United** (`54 pts / 46g`) and `2012–13` Championship **Peterborough United** (`54 pts / 46g`).
+  - **Lowest safe PPG**: **`0.761 PPG`** — `1997–98` Football League Third Division (Tier 4) **Brighton & Hove Albion** (`35 pts / 46g`).
+  - **Per-tier median lowest survivor**: Tier 1 **`1.026 PPG`** (`min 0.842`), Tier 2 **`1.067 PPG`** (`min 0.891`), Tier 3 **`1.087 PPG`** (`min 0.870`), Tier 4 **`1.022 PPG`** (`min 0.761`).
+- **Premier League Preset Baseline Note (`pl-1992-2025`)**: The `pl-1992-2025` preset spans all **`33`** Premier League tables (`1992–93` to `2024–25`), including the three `42`-game `1992–95` seasons, whereas the original Premier League app's survival baseline used the **`30`** `38`-game seasons (`1995–96` to `2024–25`) only (`34.5` mean / `34` median pts for 18th place, `3/30` relegated on `40+` pts, `14/30` relegated at `>= 35` pts, `22/30` 17th place below `40` pts). The figures differ for that intentional scope definition rather than any data change, and Section 03 renders the computed 38-game Premier League baseline line alongside PL scopes that include `1992–95`.
+- **Automatic Promotion & Play-Offs (`Tiers 2–4`)**: Median final automatic promotion floors sit at **`1.891 PPG`** (Tier 2), **`1.870 PPG`** (Tier 3), and **`1.761 PPG`** (Tier 4). Across `38` completed play-off tournaments per EFL tier (`1987–2025` excl. curtailed `2019–20` L1/L2), the top play-off seed promoted `14/38` times in Tier 2, `14/38` in Tier 3, and just `1/38` in Tier 4 (`8/38` won by the lowest seed in Tiers 3 and 4, `6/38` in Tier 2).
+
+### 4. Draws (`233` Division Draw-Leader Club-Seasons Across `174` Tables)
+
+- Draw leaders cluster in the middle half rather than occupying mid-table exclusively: **`147 of 233` (`63.1%`) finished in the middle half (`25%–75%` finish percentile)**, **`57` (`24.5%`) in the bottom quarter (`<25%`)**, and **`29` (`12.4%`) in the top quarter (`>75%`)**. Median finish percentile is **`43.5%`** (`13th` raw rank across 20–24 club divisions; `99/233` top half). Because `46` of the `174` tables had tied co-leaders, these `233` campaigns are not independent observations.
+- **14** draw-leading clubs were relegated, **7** were promoted, and only **1** won a league title: **`1995–96` Football League Second Division (Tier 3) Swindon Town** (`25W–17D–4L`).
+- Four completed sides in scope drew exactly half their matches (`50.0%`): Exeter City (`1986–87` T4, `23/46`), Hartlepool United (`1997–98` T4, `23/46`), Cardiff City (`1997–98` T4, `23/46`), and Leeds United (`1982–83` T2, `21/42`, finishing 8th).
+
+### 5. Verified Premier League Scorer Concentration (`1992–93` to `2024–25`, `33` Seasons)
+
+- Only **`12 of 33` Premier League champions** housed the league Golden Boot winner (correlation across all `666` PL team-seasons: `r = 0.287` with winning the title; `r = 0.342` with PPG).
+- Among Top-4 sides (`n = 33` champions, `n = 33` runners-up, `n = 66` 3rd–4th finishers), champions show a slightly lower median leading-scorer share of team goals (**`23.53%`**) than runners-up (**`24.66%`**) and 3rd–4th finishers (**`26.10%`**), with a modest negative correlation between concentration share and official PPG (`r = -0.128`; descriptive association only).
 
 ---
 
-## 4. Running Locally / Deploying to GitHub Pages
+## Development, Regeneration & Verification
 
-No build step or runtime dependencies are required. Serve the root directory with any static HTTP server (or push directly to a GitHub Pages branch):
+Require **Node.js `>= 22.0.0`**. Zero npm runtime or build dependencies are needed.
 
-```bash
-npx serve .
-# or
-python -m http.server 8080
+```powershell
+# Run the full test suite (data integrity, statistical engine, file://, HTTP UI & XSS tests)
+npm test
+
+# Rebuild dataset, browser bundle, and manifest deterministically from cached sources
+npm run import
+
+# Re-fetch upstream CSVs/HTML tables from network (respecting fixed 2024-25 endpoint)
+npm run import:fetch
 ```
+
+### Viewing Locally
+
+- **Zero-server offline preview**: Double-click [`index.html`](index.html) (`file://`) — reads `data/england-tiers-1-4-1981-2025-bundle.js` automatically.
+- **Static HTTP preview** (recommended for Chrome DevTools / JSON `fetch`): serve the repository root over HTTP (e.g., `npx --yes serve .` or any static server; loads [`data/england-tiers-1-4-1981-2025.json`](data/england-tiers-1-4-1981-2025.json) with strict schema validation).
