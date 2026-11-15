@@ -46,32 +46,33 @@ const MISSING_NEXT_TIER_OUTCOMES = new Map([
   ['2003|2|wimbledon', {
     promoted: false,
     relegated: true,
-    administrativeOutcome: 'Finished 24th (relegated to 2004-05 Football League One); renamed and relocated as Milton Keynes Dons ahead of 2004-05 (kept distinct from both MK Dons and AFC Wimbledon in club identity records).',
-    source: 'RSSSF 2003-04.html & Wikipedia 2003-04 Football League First Division',
+    administrativeOutcome: null,
+    sourceNote: 'Renamed and relocated as Milton Keynes Dons ahead of 2004-05.',
+    source: 'https://www.rsssf.org/engpaul/FLA/2003-04.html & https://en.wikipedia.org/wiki/2003%E2%80%9304_Football_League_First_Division',
   }],
   ['1990|4|aldershot', {
     promoted: false,
     relegated: false,
     administrativeOutcome: 'Finished 23rd (not relegated during League restructuring); remained in 1991-92 Fourth Division before withdrawing/folding in March 1992 with all 1991-92 results expunged.',
-    source: 'RSSSF 1990-91.html & 1991-92.html',
+    source: 'https://www.rsssf.org/engpaul/FLA/1990-91.html & https://www.rsssf.org/engpaul/FLA/1991-92.html',
   }],
   ['1991|4|maidstone united', {
     promoted: false,
     relegated: false,
     administrativeOutcome: 'Finished 18th (not relegated); resigned from the Football League in August 1992 prior to 1992-93 fixtures.',
-    source: 'RSSSF 1991-92.html',
+    source: 'https://www.rsssf.org/engpaul/FLA/1991-92.html',
   }],
   ['2006|4|boston united', {
     promoted: false,
     relegated: true,
     administrativeOutcome: 'Relegated two divisions to Conference North due to CVA/administration (-10 final-day penalty).',
-    source: 'RSSSF 2006-07.html & Wikipedia/EFL',
+    source: 'https://en.wikipedia.org/wiki/2006%E2%80%9307_Football_League_Two',
   }],
   ['2018|4|bury', {
     promoted: true,
     relegated: false,
     administrativeOutcome: 'Finished 2nd (promoted on final table); expelled from EFL in August 2019 before playing in 2019-20 League One.',
-    source: 'RSSSF eng2019.html & Wikipedia/EFL',
+    source: 'https://www.rsssf.org/tablese/eng2019.html & https://en.wikipedia.org/wiki/2019%E2%80%9320_EFL_League_One',
   }],
 ]);
 
@@ -495,6 +496,7 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
       let promoted = false;
       let relegated = false;
       let administrativeOutcome = null;
+      let sourceNote = null;
 
       if (nextYearCutoff) {
         const nextTier = clubTierByYear.get(`${sy + 1}|${row.normKey}`) ?? null;
@@ -514,10 +516,12 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
             promoted = Boolean(documented.promoted);
             relegated = Boolean(documented.relegated);
             if (documented.administrativeOutcome) administrativeOutcome = documented.administrativeOutcome;
+            if (documented.sourceNote) sourceNote = documented.sourceNote;
           } else if (documented) {
             promoted = Boolean(documented.promoted);
             relegated = Boolean(documented.relegated);
             if (documented.administrativeOutcome) administrativeOutcome = documented.administrativeOutcome;
+            if (documented.sourceNote) sourceNote = documented.sourceNote;
           } else {
             if (NON_RELEGATING_TIER4_START_YEARS.has(sy)) {
               throw new Error(`Unexpected Tier 4 exit in non-relegating season ${slotKey} (${row.team}): document outcome explicitly.`);
@@ -544,7 +548,7 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
       if ((sy === 1993 && tier === 4 && row.pos === 22) || (sy === 1994 && tier === 4 && row.pos === 22) || (sy === 1995 && tier === 4 && row.pos === 24)) {
         administrativeOutcome = 'Reprieved from relegation because Conference champions failed League ground-grading requirements';
       }
-      return { row, isChamp, promoted, relegated, administrativeOutcome };
+      return { row, isChamp, promoted, relegated, administrativeOutcome, sourceNote };
     });
 
     // Determine authoritative play-off winner key: parsed RSSSF final if promoted, else lowest-placed promoted club when play-offs were contested (excl. 1986-87 T2 where T1 Charlton stayed up)
@@ -554,7 +558,7 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
       effectivePoWinnerKey = promotedPrelim[promotedPrelim.length - 1].row.normKey;
     }
 
-    const rowsFinal = rowsPrelim.map(({ row, isChamp, promoted, relegated, administrativeOutcome }) => {
+    const rowsFinal = rowsPrelim.map(({ row, isChamp, promoted, relegated, administrativeOutcome, sourceNote }) => {
       let promotionMethod = null;
       if (promoted) {
         promotedCount++;
@@ -585,6 +589,7 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
         promotionMethod,
         relegated,
         administrativeOutcome,
+        ...(sourceNote ? { sourceNote } : {}),
         topScorer: row.topScorer,
         hasGoldenBootWinner: row.hasGoldenBootWinner,
       };

@@ -73,7 +73,7 @@
       "divisionSizes": "Varying division sizes: 20, 21 (1987-88 T1), 22 (1981-87 T1/T2, 1991-95 T1/T4), 23 (1987-88 T2, 2019-20 T3 active clubs after Bury expulsion), and 24 teams (most T2–T4 seasons). Per-game normalisation uses actual matches played.",
       "exclusionPolicy": "2019-20 League One & League Two (status: curtailed) are excluded from default completed-season aggregates and toggleable explicitly in UI controls."
     },
-    "canonicalJsonSha256": "e86f6c8a134e8ab5c07bf11f8eb2412cab02550a07b300034af032e631a4e9a7"
+    "canonicalJsonSha256": "232a8694955420f02b16e4496b58409d3e8a28b1b99daea727530c88204f52b7"
   },
   "tierSeasons": [
     {
@@ -62056,7 +62056,8 @@
           "promoted": false,
           "promotionMethod": null,
           "relegated": true,
-          "administrativeOutcome": "Finished 24th (relegated to 2004-05 Football League One); renamed and relocated as Milton Keynes Dons ahead of 2004-05 (kept distinct from both MK Dons and AFC Wimbledon in club identity records).",
+          "administrativeOutcome": null,
+          "sourceNote": "Renamed and relocated as Milton Keynes Dons ahead of 2004-05.",
           "topScorer": null,
           "hasGoldenBootWinner": null
         }
