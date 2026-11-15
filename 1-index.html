@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Championship Formula — 33 Seasons of Premier League Final Tables</title>
+  <meta name="description" content="An empirical study of every completed Premier League final table and top-scorer chart from 1992–93 through 2024–25: what actually separates first place from everyone else.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <!-- Screen-reader live status region for table sorting announcements -->
+  <div id="table-sort-status" role="status" class="sr-only"></div>
+  <!-- Floating tooltip for SVG charts -->
+  <div id="chart-tooltip" class="chart-tooltip" role="tooltip" aria-hidden="true"></div>
+
+  <div class="page-shell">
+    <header class="masthead">
+      <div class="masthead-meta">
+        <span class="masthead-kicker">Empirical League Study</span>
+        <span class="num" id="meta-coverage">Loading dataset…</span>
+        <span class="num" id="meta-matches"></span>
+        <span class="num" id="meta-goals"></span>
+      </div>
+      <h1 class="masthead-title">The Championship Formula</h1>
+      <p class="masthead-deck" id="masthead-deck">
+        Every final table and top-scorer chart across the history of the Premier League, normalised for era length to answer a single question: what actually separates first place from the rest of English football?
+      </p>
+      <div class="normalisation-banner" id="normalisation-banner">
+        <!-- Populated from JSON metadata and computed counts -->
+      </div>
+    </header>
+
+    <nav class="section-nav" aria-label="Article sections">
+      <ul class="section-nav-list">
+        <li><a href="#ledger">Executive Ledger</a></li>
+        <li><a href="#sec-predictors">01. Predictor Hierarchy</a></li>
+        <li><a href="#sec-champion">02. Champion vs. Runner-Up</a></li>
+        <li><a href="#sec-survival">03. The 40-Point Myth</a></li>
+        <li><a href="#sec-draws">04. The Draw Trap</a></li>
+        <li><a href="#sec-golden-boot">05. The Golden Boot Question</a></li>
+        <li><a href="#sec-archive">06. Full 33-Season Archive</a></li>
+      </ul>
+    </nav>
+
+    <main>
+      <!-- EXECUTIVE LEDGER -->
+      <section id="ledger" class="ledger-section" aria-labelledby="ledger-heading">
+        <div class="ledger-header">
+          <h2 id="ledger-heading" class="ledger-title">Headline Findings — Computed Live from JSON</h2>
+          <span class="ledger-subtitle num" id="ledger-sample-note"></span>
+        </div>
+        <div class="ledger-grid" id="ledger-grid">
+          <!-- Populated dynamically by app.js from JSON -->
+        </div>
+      </section>
+
+      <!-- SECTION 1: CORRELATIONS & PREDICTOR HIERARCHY -->
+      <section id="sec-predictors" class="analysis-section" aria-labelledby="sec1-title">
+        <div class="section-header-grid">
+          <div>
+            <p class="section-kicker">01 / The Hierarchy of Predictors</p>
+            <h2 id="sec1-title" class="section-title">Goals For Beats Goals Against—And Draws Rank Dead Last</h2>
+            <div class="section-prose" id="sec1-prose">
+              <!-- Populated dynamically from JSON -->
+            </div>
+          </div>
+          <aside class="finding-callout" aria-label="Predictor correlation summary">
+            <h3 class="finding-callout-title">Correlation Rank (Per-Game Normalised)</h3>
+            <dl class="finding-kv-list" id="sec1-callout-list">
+              <!-- Populated dynamically from JSON -->
+            </dl>
+          </aside>
+        </div>
+
+        <div class="split-grid wide-left">
+          <div class="chart-panel">
+            <div class="chart-panel-header">
+              <div>
+                <h3 class="chart-title">Team-Season Scatter &amp; OLS Fit</h3>
+                <p class="chart-subtitle" id="sec1-scatter-subtitle"></p>
+              </div>
+              <div class="chart-controls" role="group" aria-label="Select predictor variable">
+                <span class="control-group-label">X-Axis:</span>
+                <button type="button" class="btn-toggle" data-sec1-metric="gfPerGame" aria-pressed="true">GF / Game</button>
+                <button type="button" class="btn-toggle" data-sec1-metric="gaPerGame" aria-pressed="false">GA / Game</button>
+                <button type="button" class="btn-toggle" data-sec1-metric="gdPerGame" aria-pressed="false">GD / Game</button>
+                <button type="button" class="btn-toggle" data-sec1-metric="winRate" aria-pressed="false">Wins / Game</button>
+                <button type="button" class="btn-toggle" data-sec1-metric="drawRate" aria-pressed="false">Draws / Game</button>
+              </div>
+            </div>
+            <div class="chart-controls" style="margin-block-end: 0.75rem;" role="group" aria-label="Select target variable">
+              <span class="control-group-label">Target (Y-Axis):</span>
+              <button type="button" class="btn-toggle" data-sec1-target="ppg" aria-pressed="true">Points / Game (PPG)</button>
+              <button type="button" class="btn-toggle" data-sec1-target="pos" aria-pressed="false">Finishing Position</button>
+            </div>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-champ);"></span>Champion (1st)</span>
+              <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-runner);"></span>Runner-Up (2nd)</span>
+              <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-top4);"></span>3rd–4th</span>
+              <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-neutral);"></span>Mid-Table</span>
+              <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-rel);"></span>Relegated</span>
+            </div>
+            <div id="chart-sec1-scatter"></div>
+            <p class="chart-note" id="sec1-scatter-note"></p>
+          </div>
+
+          <div class="chart-panel">
+            <div class="chart-panel-header">
+              <div>
+                <h3 class="chart-title">Predictive Power Ranking</h3>
+                <p class="chart-subtitle">Explained variance (R²) and Pearson r across all team-seasons</p>
+              </div>
+            </div>
+            <div id="chart-sec1-bars"></div>
+            <div tabindex="0" role="region" aria-labelledby="sec1-table-caption" class="table-wrapper" style="margin-block-top: 1rem;">
+              <table class="data-table" id="sec1-corr-table">
+                <caption id="sec1-table-caption">Predictor Matrix (All 33 Seasons vs. 38-Game Era)</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-col">Metric (Per Game)</th>
+                    <th scope="col">r (PPG)</th>
+                    <th scope="col">R² (PPG)</th>
+                    <th scope="col">r (Pos)</th>
+                    <th scope="col">ρ (Pos)</th>
+                  </tr>
+                </thead>
+                <tbody id="sec1-corr-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: CHAMPION PROFILE vs RUNNERS-UP -->
+      <section id="sec-champion" class="analysis-section" aria-labelledby="sec2-title">
+        <div class="section-header-grid">
+          <div>
+            <p class="section-kicker">02 / The Champion Profile &amp; Era Inflation</p>
+            <h2 id="sec2-title" class="section-title">Champions and Runners-Up Have the Same Defence—The Title Is Won by Firepower</h2>
+            <div class="section-prose" id="sec2-prose">
+              <!-- Populated dynamically from JSON -->
+            </div>
+          </div>
+          <aside class="finding-callout" aria-label="Champion vs Runner-Up averages">
+            <h3 class="finding-callout-title">38-Game Normalised Profile (Mean / Median)</h3>
+            <dl class="finding-kv-list" id="sec2-callout-list">
+              <!-- Populated dynamically from JSON -->
+            </dl>
+          </aside>
+        </div>
+
+        <div class="chart-panel">
+          <div class="chart-panel-header">
+            <div>
+              <h3 class="chart-title">33 Years of Title Races: Champion vs. Runner-Up Trajectory</h3>
+              <p class="chart-subtitle" id="sec2-timeline-subtitle"></p>
+            </div>
+            <div class="chart-controls" role="group" aria-label="Select timeline metric">
+              <span class="control-group-label">Metric (38-Game Scale):</span>
+              <button type="button" class="btn-toggle" data-sec2-metric="pts38" aria-pressed="true">Points / 38g</button>
+              <button type="button" class="btn-toggle" data-sec2-metric="wins38" aria-pressed="false">Wins / 38g</button>
+              <button type="button" class="btn-toggle" data-sec2-metric="gf38" aria-pressed="false">Goals For / 38g</button>
+              <button type="button" class="btn-toggle" data-sec2-metric="ga38" aria-pressed="false">Goals Against / 38g</button>
+              <button type="button" class="btn-toggle" data-sec2-metric="gd38" aria-pressed="false">Goal Diff / 38g</button>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-champ);"></span>Champion (1st)</span>
+            <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-runner);"></span>Runner-Up (2nd)</span>
+            <span class="legend-item"><span class="legend-swatch" style="background: var(--accent-champ); block-size: 2px; inline-size: 16px;"></span>11-Season Era Mean (Champion)</span>
+          </div>
+          <div id="chart-sec2-timeline"></div>
+          <div class="era-cards" id="sec2-era-cards">
+            <!-- Populated dynamically from JSON -->
+          </div>
+        </div>
+
+        <div class="split-grid">
+          <div class="chart-panel">
+            <div class="chart-panel-header">
+              <div>
+                <h3 class="chart-title">Distribution Comparison: 1st vs. 2nd Place</h3>
+                <p class="chart-subtitle">Quantile box (Q1, Median, Q3) and individual season strip (38-game scale)</p>
+              </div>
+            </div>
+            <div id="chart-sec2-distributions"></div>
+          </div>
+
+          <div class="chart-panel">
+            <div class="chart-panel-header">
+              <div>
+                <h3 class="chart-title">Distribution Summary Table</h3>
+                <p class="chart-subtitle">All figures computed on a 38-game normalised basis across 33 seasons</p>
+              </div>
+            </div>
+            <div tabindex="0" role="region" aria-labelledby="sec2-table-caption" class="table-wrapper">
+              <table class="data-table" id="sec2-dist-table">
+                <caption id="sec2-table-caption">Champion vs. Runner-Up Quantiles (1992–93 to 2024–25)</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-col">Metric (per 38g)</th>
+                    <th scope="col" class="text-col">Finish</th>
+                    <th scope="col">Mean</th>
+                    <th scope="col">Median</th>
+                    <th scope="col">IQR (Q1–Q3)</th>
+                    <th scope="col">Min–Max</th>
+                  </tr>
+                </thead>
+                <tbody id="sec2-dist-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: THE 40-POINT MYTH -->
+      <section id="sec-survival" class="analysis-section" aria-labelledby="sec3-title">
+        <div class="section-header-grid">
+          <div>
+            <p class="section-kicker">03 / Relegation Mathematics</p>
+            <h2 id="sec3-title" class="section-title">The 40-Point Myth: Why 35 Points Is the Real Survival Line</h2>
+            <div class="section-prose" id="sec3-prose">
+              <!-- Populated dynamically from JSON -->
+            </div>
+          </div>
+          <aside class="finding-callout" aria-label="Relegation threshold metrics">
+            <h3 class="finding-callout-title">38-Game Era Survival Reality (1995–96 to 2024–25)</h3>
+            <dl class="finding-kv-list" id="sec3-callout-list">
+              <!-- Populated dynamically from JSON -->
+            </dl>
+          </aside>
+        </div>
+
+        <div class="chart-panel">
+          <div class="chart-panel-header">
+            <div>
+              <h3 class="chart-title">The Survival Boundary vs. The 40-Point Cliché</h3>
+              <p class="chart-subtitle" id="sec3-chart-subtitle"></p>
+            </div>
+            <div class="chart-controls" role="group" aria-label="Select survival chart era mode">
+              <span class="control-group-label">Scope:</span>
+              <button type="button" class="btn-toggle" data-sec3-mode="era38" aria-pressed="true">38-Game Era Raw Points (30 Seasons)</button>
+              <button type="button" class="btn-toggle" data-sec3-mode="all38" aria-pressed="false">All 33 Seasons (Normalised to 38g)</button>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-top4);"></span>Lowest Surviving Team (17th / 19th / 18th)</span>
+            <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-rel);"></span>Highest Relegated Team (18th / 20th / 19th)</span>
+            <span class="legend-item"><span class="legend-swatch" style="background: var(--accent-warn); block-size: 2px; inline-size: 16px;"></span>The 40-Point Myth Line</span>
+            <span class="legend-item"><span class="legend-swatch" style="background: var(--accent-rel); block-size: 2px; inline-size: 16px;"></span>Median Relegated Total</span>
+          </div>
+          <div id="chart-sec3-survival"></div>
+          <p class="chart-note" id="sec3-chart-note"></p>
+        </div>
+      </section>
+
+      <!-- SECTION 4: DRAWS PROFILE -->
+      <section id="sec-draws" class="analysis-section" aria-labelledby="sec4-title">
+        <div class="section-header-grid">
+          <div>
+            <p class="section-kicker">04 / The Geometry of Stalemates</p>
+            <h2 id="sec4-title" class="section-title">Leading the League in Draws Sentences a Club to 12th Place</h2>
+            <div class="section-prose" id="sec4-prose">
+              <!-- Populated dynamically from JSON -->
+            </div>
+          </div>
+          <aside class="finding-callout" aria-label="High-draw teams summary">
+            <h3 class="finding-callout-title">Season Draw Leaders Profile</h3>
+            <dl class="finding-kv-list" id="sec4-callout-list">
+              <!-- Populated dynamically from JSON -->
+            </dl>
+          </aside>
+        </div>
+
+        <div class="split-grid">
+          <div class="chart-panel">
+            <div class="chart-panel-header">
+              <div>
+                <h3 class="chart-title">Where Season Draw-Leaders Finish</h3>
+                <p class="chart-subtitle">Finishing position of every team that led or co-led its season in draws</p>
+              </div>
+            </div>
+            <div id="chart-sec4-draws-pos"></div>
+            <p class="chart-note" id="sec4-chart-note"></p>
+          </div>
+
+          <div class="chart-panel">
+            <div class="chart-panel-header">
+              <div>
+                <h3 class="chart-title">All-Time Highest Draw Seasons</h3>
+                <p class="chart-subtitle">Every team-season with a draw rate ≥ 36.8% (14+ draws in 38g or 16+ in 42g)</p>
+              </div>
+            </div>
+            <div tabindex="0" role="region" aria-labelledby="sec4-table-caption" class="table-wrapper">
+              <table class="data-table" id="sec4-draws-table">
+                <caption id="sec4-table-caption">Highest Draw Rate Campaigns (1992–93 to 2024–25)</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-col">Season</th>
+                    <th scope="col" class="text-col">Club</th>
+                    <th scope="col">Pos</th>
+                    <th scope="col">Draws</th>
+                    <th scope="col">Draw %</th>
+                    <th scope="col">W–D–L</th>
+                    <th scope="col">Pts</th>
+                  </tr>
+                </thead>
+                <tbody id="sec4-draws-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 5: THE GOLDEN BOOT QUESTION -->
+      <section id="sec-golden-boot" class="analysis-section" aria-labelledby="sec5-title">
+        <div class="section-header-grid">
+          <div>
+            <p class="section-kicker">05 / The Golden Boot Question &amp; Goal Concentration</p>
+            <h2 id="sec5-title" class="section-title">Two-Thirds of Champions Do Not Employ the Golden Boot Winner</h2>
+            <div class="section-prose" id="sec5-prose">
+              <!-- Populated dynamically from JSON -->
+            </div>
+          </div>
+          <aside class="finding-callout" aria-label="Golden Boot and goal share metrics">
+            <h3 class="finding-callout-title">Goal Concentration &amp; Golden Boot Split</h3>
+            <dl class="finding-kv-list" id="sec5-callout-list">
+              <!-- Populated dynamically from JSON -->
+            </dl>
+          </aside>
+        </div>
+
+        <div class="split-grid wide-left">
+          <div class="chart-panel">
+            <div class="chart-panel-header">
+              <div>
+                <h3 class="chart-title">Club Top-Scorer Share of Team Goals vs. Points Per Game</h3>
+                <p class="chart-subtitle">All 132 Top-Four team-seasons (1st, 2nd, 3rd, 4th) from 1992–93 to 2024–25</p>
+              </div>
+            </div>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-champ);"></span>Champion (1st)</span>
+              <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-runner);"></span>Runner-Up (2nd)</span>
+              <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-top4);"></span>3rd &amp; 4th Place</span>
+              <span class="legend-item"><span class="legend-swatch circle" style="border: 2px solid var(--ink-primary); background: transparent;"></span>Ring = League Golden Boot Winner</span>
+            </div>
+            <div id="chart-sec5-share"></div>
+            <p class="chart-note" id="sec5-share-note"></p>
+          </div>
+
+          <div class="chart-panel">
+            <div class="chart-panel-header">
+              <div>
+                <h3 class="chart-title">Where Golden Boot Winners Finish</h3>
+                <p class="chart-subtitle">33 Seasons (41 winner-seasons including ties)</p>
+              </div>
+            </div>
+            <div id="chart-sec5-gb-finishes"></div>
+            <div tabindex="0" role="region" aria-labelledby="sec5-gb-caption" class="table-wrapper" style="margin-block-top: 1rem; max-block-size: 360px;">
+              <table class="data-table" id="sec5-gb-table">
+                <caption id="sec5-gb-caption">Every Season's Golden Boot vs. Champion</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-col">Season</th>
+                    <th scope="col" class="text-col">Golden Boot Winner(s)</th>
+                    <th scope="col">Goals</th>
+                    <th scope="col" class="text-col">Club Finish</th>
+                    <th scope="col" class="text-col">Champion (Top Scorer)</th>
+                  </tr>
+                </thead>
+                <tbody id="sec5-gb-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 6: INTERACTIVE 33-SEASON ARCHIVE -->
+      <section id="sec-archive" class="analysis-section" aria-labelledby="sec6-title">
+        <div class="section-header-grid">
+          <div>
+            <p class="section-kicker">06 / Complete Verified Dataset Explorer</p>
+            <h2 id="sec6-title" class="section-title">33-Season Final Table &amp; Top-Scorer Archive</h2>
+            <div class="section-prose">
+              <p>
+                Inspect any of the <strong id="archive-season-count"></strong> completed Premier League seasons below. Click any column header to sort the final table while preserving row identity, or switch between official raw totals and per-game normalised rates.
+              </p>
+            </div>
+          </div>
+          <aside class="finding-callout" aria-label="Selected season overview">
+            <h3 class="finding-callout-title" id="archive-summary-title">Selected Season Summary</h3>
+            <dl class="finding-kv-list" id="archive-summary-list">
+              <!-- Populated dynamically when season changes -->
+            </dl>
+          </aside>
+        </div>
+
+        <div class="chart-panel">
+          <div class="chart-panel-header">
+            <div class="chart-controls">
+              <label for="season-select" class="control-group-label">Season:</label>
+              <select id="season-select" class="select-control"></select>
+            </div>
+            <div class="chart-controls" role="group" aria-label="Table display mode">
+              <span class="control-group-label">Display:</span>
+              <button type="button" class="btn-toggle" data-archive-mode="raw" aria-pressed="true">Official Season Totals</button>
+              <button type="button" class="btn-toggle" data-archive-mode="perGame" aria-pressed="false">Per-Game Rates</button>
+              <button type="button" class="btn-toggle" data-archive-mode="norm38" aria-pressed="false">38-Game Equivalent</button>
+            </div>
+          </div>
+
+          <div class="split-grid wide-left">
+            <div tabindex="0" role="region" aria-labelledby="archive-league-caption" class="table-wrapper">
+              <table class="data-table" id="archive-league-table">
+                <caption id="archive-league-caption">Final League Standings</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" data-type="number" aria-sort="ascending">
+                      <button type="button" data-sort-col="0">Pos <span class="sort-icon" aria-hidden="true">▼</span></button>
+                    </th>
+                    <th scope="col" class="text-col" data-type="text">
+                      <button type="button" data-sort-col="1">Club <span class="sort-icon" aria-hidden="true">▼</span></button>
+                    </th>
+                    <th scope="col" data-type="number">Pld</th>
+                    <th scope="col" data-type="number">
+                      <button type="button" data-sort-col="3">W <span class="sort-icon" aria-hidden="true">▼</span></button>
+                    </th>
+                    <th scope="col" data-type="number">
+                      <button type="button" data-sort-col="4">D <span class="sort-icon" aria-hidden="true">▼</span></button>
+                    </th>
+                    <th scope="col" data-type="number">
+                      <button type="button" data-sort-col="5">L <span class="sort-icon" aria-hidden="true">▼</span></button>
+                    </th>
+                    <th scope="col" data-type="number">
+                      <button type="button" data-sort-col="6">GF <span class="sort-icon" aria-hidden="true">▼</span></button>
+                    </th>
+                    <th scope="col" data-type="number">
+                      <button type="button" data-sort-col="7">GA <span class="sort-icon" aria-hidden="true">▼</span></button>
+                    </th>
+                    <th scope="col" data-type="number">
+                      <button type="button" data-sort-col="8">GD <span class="sort-icon" aria-hidden="true">▼</span></button>
+                    </th>
+                    <th scope="col" data-type="number">
+                      <button type="button" data-sort-col="9">Pts <span class="sort-icon" aria-hidden="true">▼</span></button>
+                    </th>
+                    <th scope="col" data-type="number">
+                      <button type="button" data-sort-col="10">PPG <span class="sort-icon" aria-hidden="true">▼</span></button>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="archive-league-tbody"></tbody>
+              </table>
+            </div>
+
+            <div tabindex="0" role="region" aria-labelledby="archive-scorers-caption" class="table-wrapper">
+              <table class="data-table" id="archive-scorers-table" style="min-inline-size: 360px;">
+                <caption id="archive-scorers-caption">Season Top Scorers</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Rank</th>
+                    <th scope="col" class="text-col">Player</th>
+                    <th scope="col" class="text-col">Club(s)</th>
+                    <th scope="col">Goals</th>
+                    <th scope="col">G/38</th>
+                  </tr>
+                </thead>
+                <tbody id="archive-scorers-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <p class="chart-note" id="archive-deduction-note"></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <strong>The Championship Formula</strong> — Static analytical study of Premier League seasons 1992–93 through 2024–25.
+      </div>
+      <div id="footer-verification-note"></div>
+    </footer>
+  </div>
+
+  <script src="./data/premier-league-1992-2025-bundle.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
