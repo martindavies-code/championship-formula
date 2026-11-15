@@ -1,0 +1,15 @@
+{
+  "name": "championship-formula",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The Championship Formula: static statistical exploration of completed English league football tables (Tiers 1-4, 1981-82 through 2024-25).",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "import": "node scripts/import-data.mjs --from-cache",
+    "import:fetch": "node scripts/import-data.mjs --fetch",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

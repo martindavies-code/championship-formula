@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Championship Formula — 33 Seasons of Premier League Final Tables</title>
-  <meta name="description" content="An empirical study of every completed Premier League final table and top-scorer chart from 1992–93 through 2024–25: what actually separates first place from everyone else.">
+  <title>The Championship Formula — English League Tiers 1–4 (1981–82 to 2024–25)</title>
+  <meta name="description" content="A descriptive empirical study of 176 league tables across the top four English divisions in the three-points-for-a-win era (1981–82 through 2024–25): what separates first place from everyone else.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
@@ -12,49 +12,114 @@
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <!-- Screen-reader live status region for table sorting announcements -->
+  <!-- Screen-reader live status region for table sorting & filter announcements -->
   <div id="table-sort-status" role="status" class="sr-only"></div>
-  <!-- Floating tooltip for SVG charts -->
+  <!-- Floating structured tooltip for SVG charts -->
   <div id="chart-tooltip" class="chart-tooltip" role="tooltip" aria-hidden="true"></div>
 
   <div class="page-shell">
     <header class="masthead">
       <div class="masthead-meta">
-        <span class="masthead-kicker">Empirical League Study</span>
+        <span class="masthead-kicker">Empirical League Study · Three-Points Era</span>
         <span class="num" id="meta-coverage">Loading dataset…</span>
         <span class="num" id="meta-matches"></span>
         <span class="num" id="meta-goals"></span>
       </div>
       <h1 class="masthead-title">The Championship Formula</h1>
       <p class="masthead-deck" id="masthead-deck">
-        Every final table and top-scorer chart across the history of the Premier League, normalised for era length to answer a single question: what actually separates first place from the rest of English football?
+        Every final league table across England’s top four professional tiers from the 1981–82 introduction of three points for a win through 2024–25—normalised per game to ask what separates champions, contenders and survivors across eras and divisions.
       </p>
       <div class="normalisation-banner" id="normalisation-banner">
-        <!-- Populated from JSON metadata and computed counts -->
+        <!-- Populated safely from dataset metadata and active scope -->
       </div>
     </header>
+
+    <section id="fatal-error-panel" class="fatal-error-panel" role="alert" hidden>
+      <h2 class="fatal-error-title">Dataset Load Error</h2>
+      <p id="fatal-error-message"></p>
+    </section>
+
+    <section class="scope-bar" aria-label="Analytical scope controls">
+      <div class="scope-bar-top">
+        <div class="scope-presets" role="group" aria-label="Scope presets">
+          <span class="control-group-label">Preset Scopes:</span>
+          <button type="button" class="btn-toggle" data-preset="all-4-tiers" aria-pressed="true">All 4 Tiers (1981–2025)</button>
+          <button type="button" class="btn-toggle" data-preset="pl-1992-2025" aria-pressed="false">Original PL Scope (1992–2025)</button>
+          <button type="button" class="btn-toggle" data-preset="tier1-full" aria-pressed="false">Tier 1 Full Era (1981–2025)</button>
+          <button type="button" class="btn-toggle" data-preset="efl-tiers-2-4" aria-pressed="false">EFL Tiers 2–4 (1981–2025)</button>
+        </div>
+        <div class="scope-points-mode" role="group" aria-label="Points calculation basis">
+          <span class="control-group-label">Points Basis:</span>
+          <button type="button" class="btn-toggle" data-points-mode="official" aria-pressed="true">Official Table (incl. deductions)</button>
+          <button type="button" class="btn-toggle" data-points-mode="raw" aria-pressed="false">Raw Sporting Points (3W+D)</button>
+        </div>
+      </div>
+
+      <div class="scope-bar-controls">
+        <fieldset class="scope-fieldset">
+          <legend class="scope-legend">Divisions by Pyramid Tier (present-day orientation; tables show historical names)</legend>
+          <div class="tier-checkbox-row" id="scope-tier-checkboxes">
+            <label class="tier-check"><input type="checkbox" value="1" checked> <span>Tier 1 · First Div / Premier League</span></label>
+            <label class="tier-check"><input type="checkbox" value="2" checked> <span>Tier 2 · Second Div / Championship</span></label>
+            <label class="tier-check"><input type="checkbox" value="3" checked> <span>Tier 3 · Third Div / League One</span></label>
+            <label class="tier-check"><input type="checkbox" value="4" checked> <span>Tier 4 · Fourth Div / League Two</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="scope-fieldset scope-years-fieldset">
+          <legend class="scope-legend">Season Range (1981–82 to 2024–25 fixed endpoint)</legend>
+          <div class="year-select-row">
+            <label for="scope-start-year" class="year-label">From
+              <select id="scope-start-year" class="select-control"></select>
+            </label>
+            <label for="scope-end-year" class="year-label">To
+              <select id="scope-end-year" class="select-control"></select>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="scope-fieldset scope-curtail-fieldset">
+          <legend class="scope-legend">COVID-19 Curtailed Tables</legend>
+          <label class="tier-check">
+            <input type="checkbox" id="scope-include-curtailed">
+            <span>Include curtailed 2019–20 League One &amp; League Two (PPG-ordered; Bury expelled)</span>
+          </label>
+        </fieldset>
+      </div>
+
+      <div class="active-scope-banner" id="active-scope-banner" aria-live="polite">
+        <!-- Populated safely with exact slot counts, exclusions, and deduction caveats -->
+      </div>
+    </section>
 
     <nav class="section-nav" aria-label="Article sections">
       <ul class="section-nav-list">
         <li><a href="#ledger">Executive Ledger</a></li>
-        <li><a href="#sec-predictors">01. Predictor Hierarchy</a></li>
-        <li><a href="#sec-champion">02. Champion vs. Runner-Up</a></li>
-        <li><a href="#sec-survival">03. The 40-Point Myth</a></li>
-        <li><a href="#sec-draws">04. The Draw Trap</a></li>
-        <li><a href="#sec-golden-boot">05. The Golden Boot Question</a></li>
-        <li><a href="#sec-archive">06. Full 33-Season Archive</a></li>
+        <li><a href="#sec-predictors">01. Predictors</a></li>
+        <li><a href="#sec-champion">02. Champions</a></li>
+        <li><a href="#sec-survival">03. Survival &amp; Promotion</a></li>
+        <li><a href="#sec-draws">04. Draws</a></li>
+        <li><a href="#sec-golden-boot">05. Scorer Coverage</a></li>
+        <li><a href="#sec-archive">06. Full Archive</a></li>
+        <li><a href="#sec-methodology">07. Sources &amp; Methods</a></li>
       </ul>
     </nav>
 
-    <main>
+    <main id="main-content">
+      <section id="empty-scope-panel" class="empty-scope-panel" hidden>
+        <h2>No Tier-Seasons Match This Filter</h2>
+        <p id="empty-scope-message">Select at least one league tier (1–4) or broaden your year range to inspect historical league tables.</p>
+        <button type="button" class="btn-toggle" id="btn-reset-scope">Reset to All 4 Tiers (1981–82 to 2024–25)</button>
+      </section>
+
       <!-- EXECUTIVE LEDGER -->
       <section id="ledger" class="ledger-section" aria-labelledby="ledger-heading">
         <div class="ledger-header">
-          <h2 id="ledger-heading" class="ledger-title">Headline Findings — Computed Live from JSON</h2>
+          <h2 id="ledger-heading" class="ledger-title">Headline Findings — Computed Live from Local Dataset</h2>
           <span class="ledger-subtitle num" id="ledger-sample-note"></span>
         </div>
         <div class="ledger-grid" id="ledger-grid">
-          <!-- Populated dynamically by app.js from JSON -->
+          <!-- Populated dynamically via safe DOM helpers -->
         </div>
       </section>
 
@@ -63,16 +128,12 @@
         <div class="section-header-grid">
           <div>
             <p class="section-kicker">01 / The Hierarchy of Predictors</p>
-            <h2 id="sec1-title" class="section-title">Goals For Beats Goals Against—And Draws Rank Dead Last</h2>
-            <div class="section-prose" id="sec1-prose">
-              <!-- Populated dynamically from JSON -->
-            </div>
+            <h2 id="sec1-title" class="section-title">Computing predictor hierarchy…</h2>
+            <div class="section-prose" id="sec1-prose"></div>
           </div>
           <aside class="finding-callout" aria-label="Predictor correlation summary">
-            <h3 class="finding-callout-title">Correlation Rank (Per-Game Normalised)</h3>
-            <dl class="finding-kv-list" id="sec1-callout-list">
-              <!-- Populated dynamically from JSON -->
-            </dl>
+            <h3 class="finding-callout-title">Within-Slot Median Correlation (r with Finish Score)</h3>
+            <dl class="finding-kv-list" id="sec1-callout-list"></dl>
           </aside>
         </div>
 
@@ -95,12 +156,12 @@
             <div class="chart-controls" style="margin-block-end: 0.75rem;" role="group" aria-label="Select target variable">
               <span class="control-group-label">Target (Y-Axis):</span>
               <button type="button" class="btn-toggle" data-sec1-target="ppg" aria-pressed="true">Points / Game (PPG)</button>
-              <button type="button" class="btn-toggle" data-sec1-target="pos" aria-pressed="false">Finishing Position</button>
+              <button type="button" class="btn-toggle" data-sec1-target="finishScore" aria-pressed="false">Finish Score (1=1st..0=Last)</button>
             </div>
             <div class="chart-legend">
               <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-champ);"></span>Champion (1st)</span>
-              <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-runner);"></span>Runner-Up (2nd)</span>
-              <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-top4);"></span>3rd–4th</span>
+              <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-runner);"></span>Runner-Up / Promoted</span>
+              <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-top4);"></span>Top Quarter / Play-off</span>
               <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-neutral);"></span>Mid-Table</span>
               <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-rel);"></span>Relegated</span>
             </div>
@@ -111,24 +172,39 @@
           <div class="chart-panel">
             <div class="chart-panel-header">
               <div>
-                <h3 class="chart-title">Predictive Power Ranking</h3>
-                <p class="chart-subtitle">Explained variance (R²) and Pearson r across all team-seasons</p>
+                <h3 class="chart-title">Within-Slot Correlation Range (Median &amp; IQR vs. Pooled)</h3>
+                <p class="chart-subtitle">Bars span Q1–Q3 across individual tier-seasons; solid dot = within-slot median |r|; diamond = pooled |r|</p>
               </div>
             </div>
             <div id="chart-sec1-bars"></div>
             <div tabindex="0" role="region" aria-labelledby="sec1-table-caption" class="table-wrapper" style="margin-block-top: 1rem;">
               <table class="data-table" id="sec1-corr-table">
-                <caption id="sec1-table-caption">Predictor Matrix (All 33 Seasons vs. 38-Game Era)</caption>
+                <caption id="sec1-table-caption">Within-Slot Correlation Summary vs. Pooled Diagnostic</caption>
                 <thead>
                   <tr>
                     <th scope="col" class="text-col">Metric (Per Game)</th>
-                    <th scope="col">r (PPG)</th>
-                    <th scope="col">R² (PPG)</th>
-                    <th scope="col">r (Pos)</th>
-                    <th scope="col">ρ (Pos)</th>
+                    <th scope="col">Slot Med r</th>
+                    <th scope="col">IQR (Q1–Q3)</th>
+                    <th scope="col">Med r(PPG)</th>
+                    <th scope="col">Pooled r</th>
                   </tr>
                 </thead>
                 <tbody id="sec1-corr-tbody"></tbody>
+              </table>
+            </div>
+            <div tabindex="0" role="region" aria-labelledby="sec1-tier-caption" class="table-wrapper" style="margin-block-top: 1rem;">
+              <table class="data-table" id="sec1-tier-table">
+                <caption id="sec1-tier-caption">Attack vs. Defence by Pyramid Tier (Median Within-Slot |r| with Finish Score)</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-col">Pyramid Tier</th>
+                    <th scope="col">Slots</th>
+                    <th scope="col">|r| GF/G</th>
+                    <th scope="col">|r| GA/G</th>
+                    <th scope="col">GA &gt; GF Slots</th>
+                  </tr>
+                </thead>
+                <tbody id="sec1-tier-tbody"></tbody>
               </table>
             </div>
           </div>
@@ -139,44 +215,38 @@
       <section id="sec-champion" class="analysis-section" aria-labelledby="sec2-title">
         <div class="section-header-grid">
           <div>
-            <p class="section-kicker">02 / The Champion Profile &amp; Era Inflation</p>
-            <h2 id="sec2-title" class="section-title">Champions and Runners-Up Have the Same Defence—The Title Is Won by Firepower</h2>
-            <div class="section-prose" id="sec2-prose">
-              <!-- Populated dynamically from JSON -->
-            </div>
+            <p class="section-kicker">02 / The Champion Profile &amp; Historical Eras</p>
+            <h2 id="sec2-title" class="section-title">Computing champion profile…</h2>
+            <div class="section-prose" id="sec2-prose"></div>
           </div>
           <aside class="finding-callout" aria-label="Champion vs Runner-Up averages">
-            <h3 class="finding-callout-title">38-Game Normalised Profile (Mean / Median)</h3>
-            <dl class="finding-kv-list" id="sec2-callout-list">
-              <!-- Populated dynamically from JSON -->
-            </dl>
+            <h3 class="finding-callout-title">Normalised Title Profile (Per Game · Mean / Median)</h3>
+            <dl class="finding-kv-list" id="sec2-callout-list"></dl>
           </aside>
         </div>
 
         <div class="chart-panel">
           <div class="chart-panel-header">
             <div>
-              <h3 class="chart-title">33 Years of Title Races: Champion vs. Runner-Up Trajectory</h3>
+              <h3 class="chart-title">Title Race Trajectory: Champion vs. Runner-Up (Normalised Per Game)</h3>
               <p class="chart-subtitle" id="sec2-timeline-subtitle"></p>
             </div>
             <div class="chart-controls" role="group" aria-label="Select timeline metric">
-              <span class="control-group-label">Metric (38-Game Scale):</span>
-              <button type="button" class="btn-toggle" data-sec2-metric="pts38" aria-pressed="true">Points / 38g</button>
-              <button type="button" class="btn-toggle" data-sec2-metric="wins38" aria-pressed="false">Wins / 38g</button>
-              <button type="button" class="btn-toggle" data-sec2-metric="gf38" aria-pressed="false">Goals For / 38g</button>
-              <button type="button" class="btn-toggle" data-sec2-metric="ga38" aria-pressed="false">Goals Against / 38g</button>
-              <button type="button" class="btn-toggle" data-sec2-metric="gd38" aria-pressed="false">Goal Diff / 38g</button>
+              <span class="control-group-label">Per-Game Metric:</span>
+              <button type="button" class="btn-toggle" data-sec2-metric="ppg" aria-pressed="true">Points / Game</button>
+              <button type="button" class="btn-toggle" data-sec2-metric="winRate" aria-pressed="false">Win Rate (W/G)</button>
+              <button type="button" class="btn-toggle" data-sec2-metric="gfPerGame" aria-pressed="false">Goals For / Game</button>
+              <button type="button" class="btn-toggle" data-sec2-metric="gaPerGame" aria-pressed="false">Goals Against / Game</button>
+              <button type="button" class="btn-toggle" data-sec2-metric="gdPerGame" aria-pressed="false">Goal Diff / Game</button>
             </div>
           </div>
           <div class="chart-legend">
-            <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-champ);"></span>Champion (1st)</span>
-            <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-runner);"></span>Runner-Up (2nd)</span>
-            <span class="legend-item"><span class="legend-swatch" style="background: var(--accent-champ); block-size: 2px; inline-size: 16px;"></span>11-Season Era Mean (Champion)</span>
+            <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-champ);"></span>Champion (1st Place)</span>
+            <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-runner);"></span>Runner-Up (2nd Place)</span>
+            <span class="legend-item"><span class="legend-swatch" style="background: var(--accent-champ); block-size: 2px; inline-size: 16px;"></span>Season Mean Across Selected Tiers</span>
           </div>
           <div id="chart-sec2-timeline"></div>
-          <div class="era-cards" id="sec2-era-cards">
-            <!-- Populated dynamically from JSON -->
-          </div>
+          <div class="era-cards" id="sec2-era-cards"></div>
         </div>
 
         <div class="split-grid">
@@ -184,77 +254,144 @@
             <div class="chart-panel-header">
               <div>
                 <h3 class="chart-title">Distribution Comparison: 1st vs. 2nd Place</h3>
-                <p class="chart-subtitle">Quantile box (Q1, Median, Q3) and individual season strip (38-game scale)</p>
+                <p class="chart-subtitle">Quantile box (Q1, Median, Q3) and min–max whiskers per game across active scope</p>
               </div>
             </div>
             <div id="chart-sec2-distributions"></div>
+            <div id="sec2-fewer-wins-box" class="fewer-wins-box"></div>
           </div>
 
           <div class="chart-panel">
             <div class="chart-panel-header">
               <div>
-                <h3 class="chart-title">Distribution Summary Table</h3>
-                <p class="chart-subtitle">All figures computed on a 38-game normalised basis across 33 seasons</p>
+                <h3 class="chart-title">Distribution &amp; Tier Summary Tables</h3>
+                <p class="chart-subtitle">Per-game metrics eliminate 38/40/42/44/46-game schedule distortion</p>
               </div>
             </div>
             <div tabindex="0" role="region" aria-labelledby="sec2-table-caption" class="table-wrapper">
               <table class="data-table" id="sec2-dist-table">
-                <caption id="sec2-table-caption">Champion vs. Runner-Up Quantiles (1992–93 to 2024–25)</caption>
+                <caption id="sec2-table-caption">Champion vs. Runner-Up Quantiles (Per Game)</caption>
                 <thead>
                   <tr>
-                    <th scope="col" class="text-col">Metric (per 38g)</th>
+                    <th scope="col" class="text-col">Metric (/Game)</th>
                     <th scope="col" class="text-col">Finish</th>
                     <th scope="col">Mean</th>
                     <th scope="col">Median</th>
-                    <th scope="col">IQR (Q1–Q3)</th>
+                    <th scope="col">IQR</th>
                     <th scope="col">Min–Max</th>
                   </tr>
                 </thead>
                 <tbody id="sec2-dist-tbody"></tbody>
               </table>
             </div>
+            <div tabindex="0" role="region" aria-labelledby="sec2-tier-caption" class="table-wrapper" style="margin-block-top: 1rem;">
+              <table class="data-table" id="sec2-tier-table">
+                <caption id="sec2-tier-caption">Title Standard by Pyramid Tier (Mean Champion vs. Runner-Up PPG)</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-col">Tier</th>
+                    <th scope="col">Slots</th>
+                    <th scope="col">Champ PPG</th>
+                    <th scope="col">2nd PPG</th>
+                    <th scope="col">Champ GF/G</th>
+                    <th scope="col">Champ GA/G</th>
+                  </tr>
+                </thead>
+                <tbody id="sec2-tier-tbody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 3: THE 40-POINT MYTH -->
+      <!-- SECTION 3: SURVIVAL, RELEGATION & PROMOTION CUTOFFS -->
       <section id="sec-survival" class="analysis-section" aria-labelledby="sec3-title">
         <div class="section-header-grid">
           <div>
-            <p class="section-kicker">03 / Relegation Mathematics</p>
-            <h2 id="sec3-title" class="section-title">The 40-Point Myth: 35 Points Is the Typical Survival Mark, Not a Guarantee</h2>
-            <div class="section-prose" id="sec3-prose">
-              <!-- Populated dynamically from JSON -->
-            </div>
+            <p class="section-kicker">03 / Survival &amp; Promotion Mathematics</p>
+            <h2 id="sec3-title" class="section-title">Computing relegation &amp; promotion cutoffs…</h2>
+            <div class="section-prose" id="sec3-prose"></div>
           </div>
-          <aside class="finding-callout" aria-label="Relegation threshold metrics">
-            <h3 class="finding-callout-title">38-Game Era Survival Reality (1995–96 to 2024–25)</h3>
-            <dl class="finding-kv-list" id="sec3-callout-list">
-              <!-- Populated dynamically from JSON -->
-            </dl>
+          <aside class="finding-callout" aria-label="Relegation and promotion thresholds">
+            <h3 class="finding-callout-title">Survival Boundary Summary</h3>
+            <dl class="finding-kv-list" id="sec3-callout-list"></dl>
           </aside>
         </div>
 
         <div class="chart-panel">
           <div class="chart-panel-header">
             <div>
-              <h3 class="chart-title">The Survival Boundary vs. The 40-Point Cliché</h3>
+              <h3 class="chart-title">The Survival Boundary vs. Rule-of-Thumb Benchmarks</h3>
               <p class="chart-subtitle" id="sec3-chart-subtitle"></p>
             </div>
-            <div class="chart-controls" role="group" aria-label="Select survival chart era mode">
-              <span class="control-group-label">Scope:</span>
-              <button type="button" class="btn-toggle" data-sec3-mode="era38" aria-pressed="true">38-Game Era Raw Points (30 Seasons)</button>
-              <button type="button" class="btn-toggle" data-sec3-mode="all38" aria-pressed="false">All 33 Seasons (Normalised to 38g)</button>
+            <div class="chart-controls" role="group" aria-label="Select survival chart view">
+              <span class="control-group-label">Scale:</span>
+              <button type="button" class="btn-toggle" data-sec3-mode="ppg" aria-pressed="true">Normalised PPG (All Schedules)</button>
+              <button type="button" class="btn-toggle" data-sec3-mode="pts46" aria-pressed="false">46-Game Scale (EFL Benchmark)</button>
+              <button type="button" class="btn-toggle" data-sec3-mode="pts38" aria-pressed="false">38-Game Scale (PL Benchmark)</button>
             </div>
           </div>
           <div class="chart-legend">
-            <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-top4);"></span>Lowest Surviving Team (17th / 19th / 18th)</span>
-            <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-rel);"></span>Highest Relegated Team (18th / 20th / 19th)</span>
-            <span class="legend-item"><span class="legend-swatch" style="background: var(--accent-warn); block-size: 2px; inline-size: 16px;"></span>The 40-Point Myth Line</span>
-            <span class="legend-item"><span class="legend-swatch" style="background: var(--accent-rel); block-size: 2px; inline-size: 16px;"></span>Median Relegated Total</span>
+            <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-top4);"></span>Lowest Safe Position</span>
+            <span class="legend-item"><span class="legend-swatch circle" style="background: var(--accent-rel);"></span>Highest Relegated Position</span>
+            <span class="legend-item"><span class="legend-swatch" style="background: var(--accent-warn); block-size: 2px; inline-size: 16px;"></span>40 pts / 38g (1.053 PPG)</span>
+            <span class="legend-item"><span class="legend-swatch" style="background: var(--accent-runner); block-size: 2px; inline-size: 16px;"></span>50 pts / 46g (1.087 PPG)</span>
           </div>
           <div id="chart-sec3-survival"></div>
           <p class="chart-note" id="sec3-chart-note"></p>
+        </div>
+
+        <div class="split-grid">
+          <div class="chart-panel">
+            <div class="chart-panel-header">
+              <div>
+                <h3 class="chart-title">Relegation Cutoffs by Pyramid Tier</h3>
+                <p class="chart-subtitle">Excludes 0-relegation re-election / reprieve seasons cleanly</p>
+              </div>
+            </div>
+            <div tabindex="0" role="region" aria-labelledby="sec3-tier-caption" class="table-wrapper">
+              <table class="data-table" id="sec3-tier-table">
+                <caption id="sec3-tier-caption">Survival &amp; Highest-Relegated Benchmarks by Tier</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-col">Tier</th>
+                    <th scope="col">Slots</th>
+                    <th scope="col">Med Safe PPG</th>
+                    <th scope="col">Min Safe PPG</th>
+                    <th scope="col">Max Rel PPG</th>
+                    <th scope="col" class="text-col">Unluckiest Dropped Club</th>
+                  </tr>
+                </thead>
+                <tbody id="sec3-tier-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="chart-panel">
+            <div class="chart-panel-header">
+              <div>
+                <h3 class="chart-title">Promotion Cutoffs &amp; Play-Off Seeds (Tiers 2–4)</h3>
+                <p class="chart-subtitle">Lowest automatic promotion finish &amp; seeded finishing position of play-off winners</p>
+              </div>
+            </div>
+            <div tabindex="0" role="region" aria-labelledby="sec3-promo-caption" class="table-wrapper">
+              <table class="data-table" id="sec3-promo-table">
+                <caption id="sec3-promo-caption">Automatic Promotion Floor &amp; Play-Off Winner Distribution</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-col">Tier</th>
+                    <th scope="col">Auto Floor PPG</th>
+                    <th scope="col">Min Auto PPG</th>
+                    <th scope="col">PO Winners</th>
+                    <th scope="col">3rd Seed Wins</th>
+                    <th scope="col">Lowest Seed Wins</th>
+                  </tr>
+                </thead>
+                <tbody id="sec3-promo-tbody"></tbody>
+              </table>
+            </div>
+            <p class="chart-note" id="sec3-deduction-note"></p>
+          </div>
         </div>
       </section>
 
@@ -263,16 +400,12 @@
         <div class="section-header-grid">
           <div>
             <p class="section-kicker">04 / The Geometry of Stalemates</p>
-            <h2 id="sec4-title" class="section-title">Leading the League in Draws Sentences a Club to 12th Place</h2>
-            <div class="section-prose" id="sec4-prose">
-              <!-- Populated dynamically from JSON -->
-            </div>
+            <h2 id="sec4-title" class="section-title">Computing draw-leader outcomes…</h2>
+            <div class="section-prose" id="sec4-prose"></div>
           </div>
           <aside class="finding-callout" aria-label="High-draw teams summary">
             <h3 class="finding-callout-title">Season Draw Leaders Profile</h3>
-            <dl class="finding-kv-list" id="sec4-callout-list">
-              <!-- Populated dynamically from JSON -->
-            </dl>
+            <dl class="finding-kv-list" id="sec4-callout-list"></dl>
           </aside>
         </div>
 
@@ -280,8 +413,8 @@
           <div class="chart-panel">
             <div class="chart-panel-header">
               <div>
-                <h3 class="chart-title">Where Season Draw-Leaders Finish</h3>
-                <p class="chart-subtitle">Finishing position of every team that led or co-led its season in draws</p>
+                <h3 class="chart-title">Where Season Draw-Leaders Finish (Normalised Percentile)</h3>
+                <p class="chart-subtitle">Every club that led or co-led its tier-season in draws across 20–24 team divisions</p>
               </div>
             </div>
             <div id="chart-sec4-draws-pos"></div>
@@ -291,19 +424,19 @@
           <div class="chart-panel">
             <div class="chart-panel-header">
               <div>
-                <h3 class="chart-title">All-Time Highest Draw Seasons</h3>
-                <p class="chart-subtitle">Every team-season with a draw rate ≥ 36.8% (14+ draws in 38g or 16+ in 42g)</p>
+                <h3 class="chart-title">All-Time Highest Draw Campaigns (≥ 36.8% Draw Rate)</h3>
+                <p class="chart-subtitle">14+ draws in 38g, 16+ in 42g, or 17+ in 46g — top 20 in active scope</p>
               </div>
             </div>
             <div tabindex="0" role="region" aria-labelledby="sec4-table-caption" class="table-wrapper">
               <table class="data-table" id="sec4-draws-table">
-                <caption id="sec4-table-caption">Highest Draw Rate Campaigns (1992–93 to 2024–25)</caption>
+                <caption id="sec4-table-caption">Highest Draw Rate Campaigns</caption>
                 <thead>
                   <tr>
-                    <th scope="col" class="text-col">Season</th>
+                    <th scope="col" class="text-col">Season (Division)</th>
                     <th scope="col" class="text-col">Club</th>
                     <th scope="col">Pos</th>
-                    <th scope="col">Draws</th>
+                    <th scope="col">D</th>
                     <th scope="col">Draw %</th>
                     <th scope="col">W–D–L</th>
                     <th scope="col">Pts</th>
@@ -320,26 +453,30 @@
       <section id="sec-golden-boot" class="analysis-section" aria-labelledby="sec5-title">
         <div class="section-header-grid">
           <div>
-            <p class="section-kicker">05 / The Golden Boot Question &amp; Goal Concentration</p>
-            <h2 id="sec5-title" class="section-title">Two-Thirds of Champions Do Not Employ the Golden Boot Winner</h2>
-            <div class="section-prose" id="sec5-prose">
-              <!-- Populated dynamically from JSON -->
-            </div>
+            <p class="section-kicker">05 / The Golden Boot Question &amp; Scorer Coverage Boundary</p>
+            <h2 id="sec5-title" class="section-title">Evaluating verified scorer coverage…</h2>
+            <div class="section-prose" id="sec5-prose"></div>
           </div>
           <aside class="finding-callout" aria-label="Golden Boot and goal share metrics">
             <h3 class="finding-callout-title">Goal Concentration &amp; Golden Boot Split</h3>
-            <dl class="finding-kv-list" id="sec5-callout-list">
-              <!-- Populated dynamically from JSON -->
-            </dl>
+            <dl class="finding-kv-list" id="sec5-callout-list"></dl>
           </aside>
         </div>
 
-        <div class="split-grid wide-left">
+        <div id="sec5-scope-banner" class="scorer-scope-banner" hidden></div>
+
+        <div id="sec5-unavailable-panel" class="chart-panel unavailable-panel" hidden>
+          <h3>Historical &amp; Lower-Tier Scorer Data Unavailable in Current Filter</h3>
+          <p id="sec5-unavailable-copy"></p>
+          <button type="button" class="btn-toggle" id="btn-jump-pl-scorers">Load Verified Premier League Scope (1992–93 to 2024–25)</button>
+        </div>
+
+        <div id="sec5-verified-panel" class="split-grid wide-left">
           <div class="chart-panel">
             <div class="chart-panel-header">
               <div>
                 <h3 class="chart-title">Club Top-Scorer Share of Team Goals vs. Points Per Game</h3>
-                <p class="chart-subtitle">All 132 Top-Four team-seasons (1st, 2nd, 3rd, 4th) from 1992–93 to 2024–25</p>
+                <p class="chart-subtitle" id="sec5-share-subtitle">Top-Four team-seasons within verified Tier 1 Premier League (1992–93 to 2024–25)</p>
               </div>
             </div>
             <div class="chart-legend">
@@ -356,13 +493,13 @@
             <div class="chart-panel-header">
               <div>
                 <h3 class="chart-title">Where Golden Boot Winners Finish</h3>
-                <p class="chart-subtitle">33 Seasons (41 winner-seasons including ties)</p>
+                <p class="chart-subtitle" id="sec5-gb-subtitle"></p>
               </div>
             </div>
             <div id="chart-sec5-gb-finishes"></div>
             <div tabindex="0" role="region" aria-labelledby="sec5-gb-caption" class="table-wrapper" style="margin-block-top: 1rem; max-block-size: 360px;">
               <table class="data-table" id="sec5-gb-table">
-                <caption id="sec5-gb-caption">Every Season's Golden Boot vs. Champion</caption>
+                <caption id="sec5-gb-caption">Verified Premier League Golden Boot vs. Champion</caption>
                 <thead>
                   <tr>
                     <th scope="col" class="text-col">Season</th>
@@ -379,37 +516,39 @@
         </div>
       </section>
 
-      <!-- SECTION 6: INTERACTIVE 33-SEASON ARCHIVE -->
+      <!-- SECTION 6: INTERACTIVE 176-SLOT ARCHIVE -->
       <section id="sec-archive" class="analysis-section" aria-labelledby="sec6-title">
         <div class="section-header-grid">
           <div>
-            <p class="section-kicker">06 / Complete Verified Dataset Explorer</p>
-            <h2 id="sec6-title" class="section-title">33-Season Final Table &amp; Top-Scorer Archive</h2>
+            <p class="section-kicker">06 / Complete Reconciled League Table Explorer</p>
+            <h2 id="sec6-title" class="section-title">176-Slot Historical Archive (Tiers 1–4, 1981–82 to 2024–25)</h2>
             <div class="section-prose">
               <p>
-                Inspect any of the <strong id="archive-season-count"></strong> completed Premier League seasons below. Click any column header to sort the final table while preserving row identity, or switch between official raw totals and per-game normalised rates.
+                Inspect any of the <strong id="archive-season-count"></strong> tier-seasons in your active scope below. Divisions display their historically authentic name for that season rather than stamping Championship, League One, or League Two onto pre-rebrand tables.
               </p>
             </div>
           </div>
-          <aside class="finding-callout" aria-label="Selected season overview">
-            <h3 class="finding-callout-title" id="archive-summary-title">Selected Season Summary</h3>
-            <dl class="finding-kv-list" id="archive-summary-list">
-              <!-- Populated dynamically when season changes -->
-            </dl>
+          <aside class="finding-callout" aria-label="Selected tier-season overview">
+            <h3 class="finding-callout-title" id="archive-summary-title">Selected Division Summary</h3>
+            <dl class="finding-kv-list" id="archive-summary-list"></dl>
           </aside>
         </div>
 
         <div class="chart-panel">
           <div class="chart-panel-header">
             <div class="chart-controls">
-              <label for="season-select" class="control-group-label">Season:</label>
-              <select id="season-select" class="select-control"></select>
+              <label for="archive-tier-select" class="control-group-label">Tier:
+                <select id="archive-tier-select" class="select-control"></select>
+              </label>
+              <label for="season-select" class="control-group-label">Season:
+                <select id="season-select" class="select-control"></select>
+              </label>
             </div>
             <div class="chart-controls" role="group" aria-label="Table display mode">
               <span class="control-group-label">Display:</span>
               <button type="button" class="btn-toggle" data-archive-mode="raw" aria-pressed="true">Official Season Totals</button>
               <button type="button" class="btn-toggle" data-archive-mode="perGame" aria-pressed="false">Per-Game Rates</button>
-              <button type="button" class="btn-toggle" data-archive-mode="norm38" aria-pressed="false">38-Game Equivalent</button>
+              <button type="button" class="btn-toggle" data-archive-mode="norm38" aria-pressed="false">38-Game Scale</button>
             </div>
           </div>
 
@@ -457,7 +596,7 @@
             </div>
 
             <div tabindex="0" role="region" aria-labelledby="archive-scorers-caption" class="table-wrapper">
-              <table class="data-table" id="archive-scorers-table" style="min-inline-size: 360px;">
+              <table class="data-table" id="archive-scorers-table" style="min-inline-size: 320px;">
                 <caption id="archive-scorers-caption">Season Top Scorers</caption>
                 <thead>
                   <tr>
@@ -475,17 +614,33 @@
           <p class="chart-note" id="archive-deduction-note"></p>
         </div>
       </section>
+
+      <!-- SECTION 7: METHODOLOGY, RULES & SOURCES -->
+      <section id="sec-methodology" class="analysis-section" aria-labelledby="sec7-title">
+        <div class="section-header-grid">
+          <div>
+            <p class="section-kicker">07 / Sources, Historical Rules &amp; Attribution</p>
+            <h2 id="sec7-title" class="section-title">How 176 Tables Were Built and Reconciled</h2>
+            <div class="section-prose" id="sec7-prose"></div>
+          </div>
+          <aside class="finding-callout" aria-label="Dataset audit ledger">
+            <h3 class="finding-callout-title">Reconciliation Audit Summary</h3>
+            <dl class="finding-kv-list" id="sec7-callout-list"></dl>
+          </aside>
+        </div>
+      </section>
     </main>
 
     <footer class="site-footer">
       <div>
-        <strong>The Championship Formula</strong> — Static analytical study of Premier League seasons 1992–93 through 2024–25.
+        <strong>The Championship Formula</strong> — Descriptive empirical study of English Tiers 1–4 across 1981–82 through 2024–25 (excluded: ongoing/uncompleted future seasons; no betting or forecasting claims).
       </div>
       <div id="footer-verification-note"></div>
     </footer>
   </div>
 
-  <script src="./data/premier-league-1992-2025-bundle.js"></script>
+  <script src="./data/england-tiers-1-4-1981-2025-bundle.js"></script>
+  <script defer src="./analysis.js"></script>
   <script defer src="./app.js"></script>
 </body>
 </html>

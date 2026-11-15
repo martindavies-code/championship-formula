@@ -1,0 +1,6709 @@
+{
+  "schemaVersion": "2.0.0",
+  "generatedForEndpoint": "2024-25",
+  "canonicalDatasetFile": "data/england-tiers-1-4-1981-2025.json",
+  "canonicalJsonSha256": "aafc2d59ed24a6fcadf40cfc4651ee8af5971ba2301b836ba12e35661aae395e",
+  "totals": {
+    "slotsExpected": 176,
+    "slotsPresent": 176,
+    "completedSlots": 174,
+    "curtailedSlots": 2,
+    "teamSeasons": 4047,
+    "matches": 89234,
+    "goals": 233356,
+    "plRegressionParity": {
+      "seasons": 33,
+      "rows": 666,
+      "matches": 12786,
+      "goals": 34433
+    }
+  },
+  "matchDiscrepancies": [
+    {
+      "season": "1981-82",
+      "tier": 3,
+      "team": "Exeter City",
+      "field": "ga",
+      "elvidge": 84,
+      "rsssf": 85,
+      "chosen": 84
+    },
+    {
+      "season": "1981-82",
+      "tier": 3,
+      "team": "Bristol City",
+      "field": "gf",
+      "elvidge": 40,
+      "rsssf": 41,
+      "chosen": 40
+    },
+    {
+      "season": "1991-92",
+      "tier": 2,
+      "team": "Wolverhampton Wanderers",
+      "field": "ga",
+      "elvidge": 54,
+      "rsssf": 53,
+      "chosen": 54
+    },
+    {
+      "season": "1991-92",
+      "tier": 2,
+      "team": "Barnsley",
+      "field": "gf",
+      "elvidge": 46,
+      "rsssf": 45,
+      "chosen": 46
+    },
+    {
+      "season": "1993-94",
+      "tier": 3,
+      "team": "Bristol Rovers",
+      "field": "won",
+      "elvidge": 20,
+      "rsssf": 20,
+      "footballData": 19,
+      "chosen": 20
+    },
+    {
+      "season": "1993-94",
+      "tier": 3,
+      "team": "Bristol Rovers",
+      "field": "lost",
+      "elvidge": 16,
+      "rsssf": 16,
+      "footballData": 17,
+      "chosen": 16
+    },
+    {
+      "season": "1993-94",
+      "tier": 3,
+      "team": "Bristol Rovers",
+      "field": "gf",
+      "elvidge": 60,
+      "rsssf": 60,
+      "footballData": 57,
+      "chosen": 60
+    },
+    {
+      "season": "1993-94",
+      "tier": 3,
+      "team": "Bristol Rovers",
+      "field": "ga",
+      "elvidge": 59,
+      "rsssf": 59,
+      "footballData": 62,
+      "chosen": 59
+    },
+    {
+      "season": "1993-94",
+      "tier": 3,
+      "team": "Barnet",
+      "field": "won",
+      "elvidge": 5,
+      "rsssf": 5,
+      "footballData": 6,
+      "chosen": 5
+    },
+    {
+      "season": "1993-94",
+      "tier": 3,
+      "team": "Barnet",
+      "field": "lost",
+      "elvidge": 28,
+      "rsssf": 28,
+      "footballData": 27,
+      "chosen": 28
+    },
+    {
+      "season": "1993-94",
+      "tier": 3,
+      "team": "Barnet",
+      "field": "gf",
+      "elvidge": 41,
+      "rsssf": 41,
+      "footballData": 44,
+      "chosen": 41
+    },
+    {
+      "season": "1993-94",
+      "tier": 3,
+      "team": "Barnet",
+      "field": "ga",
+      "elvidge": 86,
+      "rsssf": 86,
+      "footballData": 83,
+      "chosen": 86
+    },
+    {
+      "season": "1994-95",
+      "tier": 3,
+      "team": "Wrexham",
+      "field": "gf",
+      "elvidge": 65,
+      "rsssf": 65,
+      "footballData": 64,
+      "chosen": 65
+    },
+    {
+      "season": "1994-95",
+      "tier": 3,
+      "team": "Hull City",
+      "field": "ga",
+      "elvidge": 57,
+      "rsssf": 57,
+      "footballData": 56,
+      "chosen": 57
+    },
+    {
+      "season": "1994-95",
+      "tier": 4,
+      "team": "Lincoln City",
+      "field": "ga",
+      "elvidge": 55,
+      "rsssf": 55,
+      "footballData": 56,
+      "chosen": 55
+    },
+    {
+      "season": "1994-95",
+      "tier": 4,
+      "team": "Carlisle United",
+      "field": "gf",
+      "elvidge": 67,
+      "rsssf": 67,
+      "footballData": 68,
+      "chosen": 67
+    },
+    {
+      "season": "1995-96",
+      "tier": 2,
+      "team": "Huddersfield Town",
+      "field": "gf",
+      "elvidge": 61,
+      "rsssf": 61,
+      "footballData": 60,
+      "chosen": 61
+    },
+    {
+      "season": "1995-96",
+      "tier": 2,
+      "team": "Crystal Palace",
+      "field": "ga",
+      "elvidge": 48,
+      "rsssf": 48,
+      "footballData": 47,
+      "chosen": 48
+    },
+    {
+      "season": "1995-96",
+      "tier": 3,
+      "team": "York City",
+      "field": "ga",
+      "elvidge": 73,
+      "rsssf": 73,
+      "footballData": 72,
+      "chosen": 73
+    },
+    {
+      "season": "1995-96",
+      "tier": 3,
+      "team": "Notts County",
+      "field": "ga",
+      "elvidge": 39,
+      "rsssf": 39,
+      "footballData": 40,
+      "chosen": 39
+    },
+    {
+      "season": "1995-96",
+      "tier": 4,
+      "team": "Doncaster Rovers",
+      "field": "gf",
+      "elvidge": 49,
+      "rsssf": 49,
+      "footballData": 48,
+      "chosen": 49
+    },
+    {
+      "season": "1995-96",
+      "tier": 4,
+      "team": "Doncaster Rovers",
+      "field": "ga",
+      "elvidge": 60,
+      "rsssf": 60,
+      "footballData": 59,
+      "chosen": 60
+    },
+    {
+      "season": "1995-96",
+      "tier": 4,
+      "team": "Scarborough",
+      "field": "ga",
+      "elvidge": 69,
+      "rsssf": 69,
+      "footballData": 68,
+      "chosen": 69
+    },
+    {
+      "season": "1995-96",
+      "tier": 4,
+      "team": "Lincoln City",
+      "field": "gf",
+      "elvidge": 57,
+      "rsssf": 57,
+      "footballData": 56,
+      "chosen": 57
+    },
+    {
+      "season": "1995-96",
+      "tier": 4,
+      "team": "Scunthorpe United",
+      "field": "ga",
+      "elvidge": 61,
+      "rsssf": 61,
+      "footballData": 60,
+      "chosen": 61
+    },
+    {
+      "season": "1995-96",
+      "tier": 4,
+      "team": "Northampton Town",
+      "field": "gf",
+      "elvidge": 51,
+      "rsssf": 51,
+      "footballData": 50,
+      "chosen": 51
+    },
+    {
+      "season": "1995-96",
+      "tier": 4,
+      "team": "Northampton Town",
+      "field": "ga",
+      "elvidge": 44,
+      "rsssf": 44,
+      "footballData": 43,
+      "chosen": 44
+    },
+    {
+      "season": "1995-96",
+      "tier": 4,
+      "team": "Fulham",
+      "field": "gf",
+      "elvidge": 57,
+      "rsssf": 57,
+      "footballData": 56,
+      "chosen": 57
+    },
+    {
+      "season": "1996-97",
+      "tier": 2,
+      "team": "Manchester City",
+      "field": "ga",
+      "elvidge": 60,
+      "rsssf": 59,
+      "footballData": 59,
+      "chosen": 60
+    },
+    {
+      "season": "1996-97",
+      "tier": 2,
+      "team": "Southend United",
+      "field": "ga",
+      "elvidge": 86,
+      "rsssf": 85,
+      "footballData": 85,
+      "chosen": 86
+    },
+    {
+      "season": "1996-97",
+      "tier": 2,
+      "team": "Tranmere Rovers",
+      "field": "gf",
+      "elvidge": 63,
+      "rsssf": 62,
+      "footballData": 62,
+      "chosen": 63
+    },
+    {
+      "season": "1996-97",
+      "tier": 2,
+      "team": "Grimsby Town",
+      "field": "gf",
+      "elvidge": 60,
+      "rsssf": 59,
+      "footballData": 59,
+      "chosen": 60
+    },
+    {
+      "season": "1996-97",
+      "tier": 3,
+      "team": "Wrexham",
+      "field": "gf",
+      "elvidge": 54,
+      "rsssf": 55,
+      "footballData": 55,
+      "chosen": 54
+    },
+    {
+      "season": "1996-97",
+      "tier": 3,
+      "team": "Wycombe Wanderers",
+      "field": "ga",
+      "elvidge": 56,
+      "rsssf": 57,
+      "footballData": 57,
+      "chosen": 56
+    },
+    {
+      "season": "1996-97",
+      "tier": 4,
+      "team": "Scarborough",
+      "field": "gf",
+      "elvidge": 65,
+      "rsssf": 66,
+      "footballData": 66,
+      "chosen": 65
+    },
+    {
+      "season": "1996-97",
+      "tier": 4,
+      "team": "Scarborough",
+      "field": "ga",
+      "elvidge": 68,
+      "rsssf": 69,
+      "footballData": 69,
+      "chosen": 68
+    },
+    {
+      "season": "1996-97",
+      "tier": 4,
+      "team": "Cardiff City",
+      "field": "gf",
+      "elvidge": 56,
+      "rsssf": 57,
+      "footballData": 57,
+      "chosen": 56
+    },
+    {
+      "season": "1996-97",
+      "tier": 4,
+      "team": "Cardiff City",
+      "field": "ga",
+      "elvidge": 54,
+      "rsssf": 55,
+      "footballData": 55,
+      "chosen": 54
+    },
+    {
+      "season": "1999-00",
+      "tier": 4,
+      "team": "Rochdale",
+      "field": "won",
+      "elvidge": 18,
+      "rsssf": 18,
+      "footballData": 17,
+      "chosen": 18
+    },
+    {
+      "season": "1999-00",
+      "tier": 4,
+      "team": "Rochdale",
+      "field": "drawn",
+      "elvidge": 14,
+      "rsssf": 14,
+      "footballData": 15,
+      "chosen": 14
+    },
+    {
+      "season": "1999-00",
+      "tier": 4,
+      "team": "Rochdale",
+      "field": "gf",
+      "elvidge": 57,
+      "rsssf": 57,
+      "footballData": 55,
+      "chosen": 57
+    },
+    {
+      "season": "1999-00",
+      "tier": 4,
+      "team": "Hartlepool United",
+      "field": "drawn",
+      "elvidge": 9,
+      "rsssf": 9,
+      "footballData": 10,
+      "chosen": 9
+    },
+    {
+      "season": "1999-00",
+      "tier": 4,
+      "team": "Hartlepool United",
+      "field": "lost",
+      "elvidge": 16,
+      "rsssf": 16,
+      "footballData": 15,
+      "chosen": 16
+    },
+    {
+      "season": "1999-00",
+      "tier": 4,
+      "team": "Hartlepool United",
+      "field": "ga",
+      "elvidge": 49,
+      "rsssf": 49,
+      "footballData": 47,
+      "chosen": 49
+    },
+    {
+      "season": "2012-13",
+      "tier": 3,
+      "team": "Portsmouth",
+      "field": "gf",
+      "elvidge": 51,
+      "rsssf": 51,
+      "footballData": 50,
+      "chosen": 51
+    },
+    {
+      "season": "2012-13",
+      "tier": 3,
+      "team": "Shrewsbury Town",
+      "field": "ga",
+      "elvidge": 60,
+      "rsssf": 60,
+      "footballData": 59,
+      "chosen": 60
+    }
+  ],
+  "deductionAudit": [
+    {
+      "season": "1981-82",
+      "tier": 3,
+      "team": "Bristol Rovers",
+      "signedAdjustment": -2,
+      "rsssfImpliedAdjustment": -2,
+      "entries": [
+        {
+          "date": "1982-02-10",
+          "team": "Bristol Rovers",
+          "signedAdjustment": -2,
+          "note": "Fielded an unregistered player (Steve Bailey) in a match against Exeter City on 1982-02-09"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "1981-82",
+      "tier": 4,
+      "team": "Mansfield Town",
+      "signedAdjustment": -2,
+      "rsssfImpliedAdjustment": -2,
+      "entries": [
+        {
+          "date": "1982-03-14",
+          "team": "Mansfield Town",
+          "signedAdjustment": -2,
+          "note": "Fielded an unregistered player (Colin Calderwood) in a match against Crewe Alexandra on 1982-03-13"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "1982-83",
+      "tier": 4,
+      "team": "Blackpool",
+      "signedAdjustment": -2,
+      "rsssfImpliedAdjustment": -2,
+      "entries": [
+        {
+          "date": "1983-01-17",
+          "team": "Blackpool",
+          "signedAdjustment": -2,
+          "note": "Fielded an ineligible player (John Butler) in two League games and one League Cup game without his registration having been confirmed"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "1987-88",
+      "tier": 4,
+      "team": "Halifax Town",
+      "signedAdjustment": -1,
+      "rsssfImpliedAdjustment": -1,
+      "entries": [
+        {
+          "date": "1987-08-16",
+          "team": "Halifax Town",
+          "signedAdjustment": -1,
+          "note": "Fielded an unregistered player against Darlington on 1987-08-15"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "1987-88",
+      "tier": 4,
+      "team": "Tranmere Rovers",
+      "signedAdjustment": -2,
+      "rsssfImpliedAdjustment": -2,
+      "entries": [
+        {
+          "date": "1987-09-25",
+          "team": "Tranmere Rovers",
+          "signedAdjustment": -2,
+          "note": "Postponed match against Bolton (on 1987-09-24) without permission"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "1990-91",
+      "tier": 1,
+      "team": "Manchester United",
+      "signedAdjustment": -1,
+      "rsssfImpliedAdjustment": -1,
+      "entries": [
+        {
+          "date": "1990-11-12",
+          "team": "Manchester United",
+          "signedAdjustment": -1,
+          "note": "Bringing the game into disrepute during fixture against Arsenal on 1990-10-20"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "1990-91",
+      "tier": 1,
+      "team": "Arsenal",
+      "signedAdjustment": -2,
+      "rsssfImpliedAdjustment": -2,
+      "entries": [
+        {
+          "date": "1990-11-12",
+          "team": "Arsenal",
+          "signedAdjustment": -2,
+          "note": "Bringing the game into disrepute during fixture against Manchester United on 1990-10-20 (2 pts because of similar incident in previous season against Norwich [1989-11-04])"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "1994-95",
+      "tier": 1,
+      "team": "Tottenham Hotspur",
+      "signedAdjustment": 0,
+      "rsssfImpliedAdjustment": 0,
+      "entries": [
+        {
+          "date": "1994-08-01",
+          "team": "Tottenham Hotspur",
+          "signedAdjustment": 0,
+          "note": "Were given a 12-point penalty for making irregular payments to players. This was first reduced to a 6-point penalty and then completely overturned in December 1994 following appeals"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "1996-97",
+      "tier": 1,
+      "team": "Middlesbrough",
+      "signedAdjustment": -3,
+      "rsssfImpliedAdjustment": -3,
+      "entries": [
+        {
+          "date": "1997-01-14",
+          "team": "Middlesbrough",
+          "signedAdjustment": -3,
+          "note": "Postponed match against Blackburn Rovers (scheduled for 1996-12-21) without permission due to large number of players injured or ill"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "1996-97",
+      "tier": 4,
+      "team": "Brighton & Hove Albion",
+      "signedAdjustment": -2,
+      "rsssfImpliedAdjustment": -2,
+      "entries": [
+        {
+          "date": "1996-12-09",
+          "team": "Brighton & Hove Albion",
+          "signedAdjustment": -2,
+          "note": "Pitch invasion in match against Lincoln City (on 1996-10-01). Had a suspended 3-point deduction following pitch invastion in match against York City on 1996-04-27"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "1997-98",
+      "tier": 4,
+      "team": "Leyton Orient",
+      "signedAdjustment": -3,
+      "rsssfImpliedAdjustment": -3,
+      "entries": [
+        {
+          "date": "1997-08-01",
+          "team": "Leyton Orient",
+          "signedAdjustment": -3,
+          "note": "Fielded suspended players (Mark Warren; Simon Clark; Stuart Hicks) [unsure of exact date of point deduction]"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2000-01",
+      "tier": 4,
+      "team": "Chesterfield",
+      "signedAdjustment": -9,
+      "rsssfImpliedAdjustment": -9,
+      "entries": [
+        {
+          "date": "2001-05-03",
+          "team": "Chesterfield",
+          "signedAdjustment": -9,
+          "note": "Financial irregularities"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2002-03",
+      "tier": 4,
+      "team": "Boston United",
+      "signedAdjustment": -4,
+      "rsssfImpliedAdjustment": -4,
+      "entries": [
+        {
+          "date": "2002-08-01",
+          "team": "Boston United",
+          "signedAdjustment": -4,
+          "note": "Financial irregularities"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2004-05",
+      "tier": 3,
+      "team": "Wrexham",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2004-12-03",
+          "team": "Wrexham",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2004-05",
+      "tier": 4,
+      "team": "Cambridge United",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2005-04-29",
+          "team": "Cambridge United",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2005-06",
+      "tier": 4,
+      "team": "Bury",
+      "signedAdjustment": -1,
+      "rsssfImpliedAdjustment": 0,
+      "entries": [
+        {
+          "date": "2006-05-25",
+          "team": "Bury",
+          "signedAdjustment": -1,
+          "note": "Fielded an ineligible player (Colin Marrison; in a match against Lincoln City on 2006-04-15 after his loan deal had expired)"
+        }
+      ],
+      "overrideNote": "Verified via Wikipedia/EFL (RSSSF omitted -1 for fielding unregistered loanee Colin Marrison)"
+    },
+    {
+      "season": "2006-07",
+      "tier": 2,
+      "team": "Leeds United",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2007-05-04",
+          "team": "Leeds United",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2006-07",
+      "tier": 3,
+      "team": "Rotherham United",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2006-08-01",
+          "team": "Rotherham United",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2006-07",
+      "tier": 4,
+      "team": "Boston United",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": 0,
+      "entries": [
+        {
+          "date": "2007-05-05",
+          "team": "Boston United",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": "Verified via Wikipedia/EFL (RSSSF omitted -10 administration deduction; relegated to Conference North)"
+    },
+    {
+      "season": "2007-08",
+      "tier": 3,
+      "team": "AFC Bournemouth",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2008-02-08",
+          "team": "AFC Bournemouth",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2007-08",
+      "tier": 3,
+      "team": "Leeds United",
+      "signedAdjustment": -15,
+      "rsssfImpliedAdjustment": -15,
+      "entries": [
+        {
+          "date": "2007-08-03",
+          "team": "Leeds United",
+          "signedAdjustment": -15,
+          "note": "Breach of financial rules"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2007-08",
+      "tier": 3,
+      "team": "Luton Town",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2007-11-22",
+          "team": "Luton Town",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2007-08",
+      "tier": 4,
+      "team": "Rotherham United",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2008-03-18",
+          "team": "Rotherham United",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2008-09",
+      "tier": 2,
+      "team": "Crystal Palace",
+      "signedAdjustment": -1,
+      "rsssfImpliedAdjustment": 0,
+      "entries": [
+        {
+          "date": "2009-06-01",
+          "team": "Crystal Palace",
+          "signedAdjustment": -1,
+          "note": "Fielded an ineligible player (Rui Fonte; in a match against Sheffield United on 2009-05-03 whose youth loan paperwork had expired)"
+        }
+      ],
+      "overrideNote": "Verified via Wikipedia/EFL (RSSSF omitted -1 for fielding ineligible Rui Fonte)"
+    },
+    {
+      "season": "2008-09",
+      "tier": 3,
+      "team": "Stockport County",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2009-04-30",
+          "team": "Stockport County",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2008-09",
+      "tier": 4,
+      "team": "AFC Bournemouth",
+      "signedAdjustment": -17,
+      "rsssfImpliedAdjustment": -17,
+      "entries": [
+        {
+          "date": "2008-08-08",
+          "team": "AFC Bournemouth",
+          "signedAdjustment": -17,
+          "note": "Breach of insolvency rules (leaving administration without a Company Voluntary Agreement [CVA])"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2008-09",
+      "tier": 4,
+      "team": "Darlington",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2009-02-25",
+          "team": "Darlington",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2008-09",
+      "tier": 4,
+      "team": "Luton Town",
+      "signedAdjustment": -30,
+      "rsssfImpliedAdjustment": -30,
+      "entries": [
+        {
+          "date": "2008-08-01",
+          "team": "Luton Town",
+          "signedAdjustment": -20,
+          "note": "Breach of insolvency rules (leaving administration without a Company Voluntary Agreement [CVA])"
+        },
+        {
+          "date": "2008-08-01",
+          "team": "Luton Town",
+          "signedAdjustment": -10,
+          "note": "Misconduct for paying agents via a third party"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2008-09",
+      "tier": 4,
+      "team": "Rotherham United",
+      "signedAdjustment": -17,
+      "rsssfImpliedAdjustment": -17,
+      "entries": [
+        {
+          "date": "2008-08-07",
+          "team": "Rotherham United",
+          "signedAdjustment": -17,
+          "note": "Breach of insolvency rules (leaving administration without a Company Voluntary Agreement [CVA])"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2009-10",
+      "tier": 1,
+      "team": "Portsmouth",
+      "signedAdjustment": -9,
+      "rsssfImpliedAdjustment": -9,
+      "entries": [
+        {
+          "date": "2010-03-17",
+          "team": "Portsmouth",
+          "signedAdjustment": -9,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2009-10",
+      "tier": 2,
+      "team": "Crystal Palace",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2010-01-28",
+          "team": "Crystal Palace",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2009-10",
+      "tier": 3,
+      "team": "Southampton",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2009-08-01",
+          "team": "Southampton",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2009-10",
+      "tier": 3,
+      "team": "Hartlepool United",
+      "signedAdjustment": -3,
+      "rsssfImpliedAdjustment": 0,
+      "entries": [
+        {
+          "date": "2010-05-06",
+          "team": "Hartlepool United",
+          "signedAdjustment": -3,
+          "note": "Fielded an ineligible player (Gary Liddle) in match against Brighton & Hove Albion on 2010-04-05 (should have been serving first of two-match suspension)"
+        }
+      ],
+      "overrideNote": "Verified via Wikipedia/EFL (RSSSF eng2010 omitted -3 for fielding ineligible Gary Liddle and misranked 16th/22nd-23rd)"
+    },
+    {
+      "season": "2010-11",
+      "tier": 3,
+      "team": "Plymouth Argyle",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2011-02-21",
+          "team": "Plymouth Argyle",
+          "signedAdjustment": -10,
+          "note": "Notice of intention to appoint an administrator (insolvency event)"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2010-11",
+      "tier": 4,
+      "team": "Torquay United",
+      "signedAdjustment": -1,
+      "rsssfImpliedAdjustment": -1,
+      "entries": [
+        {
+          "date": "2011-04-06",
+          "team": "Torquay United",
+          "signedAdjustment": -1,
+          "note": "Fielded an ineligible player (Jake Robinson) in match against Hereford United on 2011-02-01 (missed 1200 deadline for player registration day before match)"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2010-11",
+      "tier": 4,
+      "team": "Hereford United",
+      "signedAdjustment": -3,
+      "rsssfImpliedAdjustment": -3,
+      "entries": [
+        {
+          "date": "2011-04-06",
+          "team": "Hereford United",
+          "signedAdjustment": -3,
+          "note": "Fielded an ineligible player (Rob Purdie) in match against Torquay united on 2011-02-01 (missed 1200 deadline for player registration day before match)"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2011-12",
+      "tier": 2,
+      "team": "Portsmouth",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2012-02-17",
+          "team": "Portsmouth",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2011-12",
+      "tier": 4,
+      "team": "Port Vale",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2012-03-09",
+          "team": "Port Vale",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2012-13",
+      "tier": 3,
+      "team": "Portsmouth",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": 0,
+      "entries": [
+        {
+          "date": "2013-04-20",
+          "team": "Portsmouth",
+          "signedAdjustment": -10,
+          "note": "Breach of insolvency rules when coming out of administration (Company Voluntary Arrangement [CVA] not fully compliant with the Football League's Insolvency Policy)"
+        }
+      ],
+      "overrideNote": "Verified via Wikipedia/EFL (RSSSF eng2013 omitted -10 administration exit penalty)"
+    },
+    {
+      "season": "2012-13",
+      "tier": 3,
+      "team": "Coventry City",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2013-03-28",
+          "team": "Coventry City",
+          "signedAdjustment": -10,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2013-14",
+      "tier": 3,
+      "team": "Coventry City",
+      "signedAdjustment": -10,
+      "rsssfImpliedAdjustment": -10,
+      "entries": [
+        {
+          "date": "2013-08-02",
+          "team": "Coventry City",
+          "signedAdjustment": -10,
+          "note": "Went into liquidation (exited administration without a Company Voluntary Arrangement [CVA])"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2013-14",
+      "tier": 4,
+      "team": "AFC Wimbledon",
+      "signedAdjustment": -3,
+      "rsssfImpliedAdjustment": -3,
+      "entries": [
+        {
+          "date": "2014-04-28",
+          "team": "AFC Wimbledon",
+          "signedAdjustment": -3,
+          "note": "Fielded an ineligible player (Jake Nicholson) in match against Cheltenham on 2014-03-22 (the player's multiplicity contract expired on 2014-03-19 and had not been renewed due to the illness of a key member of the club's administrative staff)"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2014-15",
+      "tier": 2,
+      "team": "Rotherham United",
+      "signedAdjustment": -3,
+      "rsssfImpliedAdjustment": -3,
+      "entries": [
+        {
+          "date": "2015-04-24",
+          "team": "Rotherham United",
+          "signedAdjustment": -3,
+          "note": "Fielded an ineligible player (Farrend Rawson) in match against Brighton on 2015-04-06 (a day after the players youth loan had expired)"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2015-16",
+      "tier": 3,
+      "team": "Bury",
+      "signedAdjustment": -3,
+      "rsssfImpliedAdjustment": 0,
+      "entries": [
+        {
+          "date": "2016-07-01",
+          "team": "Bury",
+          "signedAdjustment": -3,
+          "note": "Fielded an ineligible player (Callum Styles) in match against Southend United on 2016-05-08 due to late administrative registration paperwork."
+        }
+      ],
+      "overrideNote": "Verified via Wikipedia/EFL (RSSSF eng2016 omitted retrospective -3 penalty applied July 2016 for Callum Styles)"
+    },
+    {
+      "season": "2018-19",
+      "tier": 2,
+      "team": "Birmingham City",
+      "signedAdjustment": -9,
+      "rsssfImpliedAdjustment": -9,
+      "entries": [
+        {
+          "date": "2019-03-22",
+          "team": "Birmingham City",
+          "signedAdjustment": -9,
+          "note": "Breach of financial rules"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2019-20",
+      "tier": 2,
+      "team": "Wigan Athletic",
+      "signedAdjustment": -12,
+      "rsssfImpliedAdjustment": -12,
+      "entries": [
+        {
+          "date": "2020-07-22",
+          "team": "Wigan Athletic",
+          "signedAdjustment": -12,
+          "note": "Entered administration (points deduction applied at the end of the season)"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2019-20",
+      "tier": 3,
+      "team": "Bolton Wanderers",
+      "signedAdjustment": -12,
+      "rsssfImpliedAdjustment": -12,
+      "entries": [
+        {
+          "date": "2019-08-01",
+          "team": "Bolton Wanderers",
+          "signedAdjustment": -12,
+          "note": "Entered administration"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2019-20",
+      "tier": 4,
+      "team": "Macclesfield Town",
+      "signedAdjustment": -17,
+      "rsssfImpliedAdjustment": -17,
+      "entries": [
+        {
+          "date": "2019-12-19",
+          "team": "Macclesfield Town",
+          "signedAdjustment": -6,
+          "note": "Failure to pay player wages and failure to fulfil fixture (against Crewe Alexandra)"
+        },
+        {
+          "date": "2020-03-17",
+          "team": "Macclesfield Town",
+          "signedAdjustment": 2,
+          "note": "6-point deduction from 2019-12-19 reduced to 4 points on appeal"
+        },
+        {
+          "date": "2020-05-07",
+          "team": "Macclesfield Town",
+          "signedAdjustment": -7,
+          "note": "Failure to pay player wages and failure to fulfil fixture (against Plymouth Argyle)"
+        },
+        {
+          "date": "2020-06-19",
+          "team": "Macclesfield Town",
+          "signedAdjustment": -2,
+          "note": "Failure to pay player wages"
+        },
+        {
+          "date": "2020-08-11",
+          "team": "Macclesfield Town",
+          "signedAdjustment": -4,
+          "note": "Failure to pay player wages and failure to act with utmost good faith in respect of matters with the EFL and for breaching an order requriement direction or instruction of the league"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2020-21",
+      "tier": 2,
+      "team": "Sheffield Wednesday",
+      "signedAdjustment": -6,
+      "rsssfImpliedAdjustment": -6,
+      "entries": [
+        {
+          "date": "2020-08-01",
+          "team": "Sheffield Wednesday",
+          "signedAdjustment": -12,
+          "note": "Breach of Profitability and Sustainability Rules"
+        },
+        {
+          "date": "2020-11-04",
+          "team": "Sheffield Wednesday",
+          "signedAdjustment": 6,
+          "note": "12-point deduction from start of season reduced to 6 points following a decision from an Independent League Arbitration panel on appeal"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2021-22",
+      "tier": 2,
+      "team": "Derby County",
+      "signedAdjustment": -21,
+      "rsssfImpliedAdjustment": -21,
+      "entries": [
+        {
+          "date": "2021-09-22",
+          "team": "Derby County",
+          "signedAdjustment": -12,
+          "note": "Entered administration"
+        },
+        {
+          "date": "2021-11-16",
+          "team": "Derby County",
+          "signedAdjustment": -9,
+          "note": "Breach of EFL accounting rules"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2021-22",
+      "tier": 2,
+      "team": "Reading",
+      "signedAdjustment": -6,
+      "rsssfImpliedAdjustment": -6,
+      "entries": [
+        {
+          "date": "2021-11-17",
+          "team": "Reading",
+          "signedAdjustment": -6,
+          "note": "Breach of financial rules"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2022-23",
+      "tier": 2,
+      "team": "Reading",
+      "signedAdjustment": -6,
+      "rsssfImpliedAdjustment": -6,
+      "entries": [
+        {
+          "date": "2023-04-04",
+          "team": "Reading",
+          "signedAdjustment": -6,
+          "note": "Failure to follow league-opposed financial business plan"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2022-23",
+      "tier": 2,
+      "team": "Wigan Athletic",
+      "signedAdjustment": -6,
+      "rsssfImpliedAdjustment": -3,
+      "entries": [
+        {
+          "date": "2023-03-20",
+          "team": "Wigan Athletic",
+          "signedAdjustment": -3,
+          "note": "Activation of suspended penalty from January 2023 for late wage payments in June July and October 2022"
+        },
+        {
+          "date": "2023-05-19",
+          "team": "Wigan Athletic",
+          "signedAdjustment": -3,
+          "note": "Late payment of player wages in March 2023"
+        }
+      ],
+      "overrideNote": "Verified via Wikipedia/EFL (RSSSF eng2023 listed only -3 of two -3 penalties totaling -6)"
+    },
+    {
+      "season": "2023-24",
+      "tier": 1,
+      "team": "Everton",
+      "signedAdjustment": -8,
+      "rsssfImpliedAdjustment": -8,
+      "entries": [
+        {
+          "date": "2023-11-17",
+          "team": "Everton",
+          "signedAdjustment": -10,
+          "note": "Breach of profit and sustainability rules"
+        },
+        {
+          "date": "2024-02-26",
+          "team": "Everton",
+          "signedAdjustment": 4,
+          "note": "10-point deduction from 2023-11-17 reduced to 6 points on appeal"
+        },
+        {
+          "date": "2024-04-08",
+          "team": "Everton",
+          "signedAdjustment": -2,
+          "note": "Breach of profit and sustainability rules"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2023-24",
+      "tier": 1,
+      "team": "Nottingham Forest",
+      "signedAdjustment": -4,
+      "rsssfImpliedAdjustment": -4,
+      "entries": [
+        {
+          "date": "2024-03-18",
+          "team": "Nottingham Forest",
+          "signedAdjustment": -4,
+          "note": "Breach of profit and sustainability rules"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2023-24",
+      "tier": 3,
+      "team": "Reading",
+      "signedAdjustment": -6,
+      "rsssfImpliedAdjustment": -6,
+      "entries": [
+        {
+          "date": "2023-08-16",
+          "team": "Reading",
+          "signedAdjustment": -1,
+          "note": "Late payment of player wages during 2022/2023 season"
+        },
+        {
+          "date": "2023-09-13",
+          "team": "Reading",
+          "signedAdjustment": -3,
+          "note": "Late payment of player and staff wages"
+        },
+        {
+          "date": "2024-02-27",
+          "team": "Reading",
+          "signedAdjustment": -2,
+          "note": "Late HMRC payment"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2023-24",
+      "tier": 3,
+      "team": "Wigan Athletic",
+      "signedAdjustment": -8,
+      "rsssfImpliedAdjustment": -8,
+      "entries": [
+        {
+          "date": "2023-08-01",
+          "team": "Wigan Athletic",
+          "signedAdjustment": -4,
+          "note": "Late payment of player and staff wages in May 2023"
+        },
+        {
+          "date": "2023-08-01",
+          "team": "Wigan Athletic",
+          "signedAdjustment": -4,
+          "note": "Breach of financial rules (missed deadline to deposit 125% of monthly wage bill)"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2023-24",
+      "tier": 4,
+      "team": "Morecambe",
+      "signedAdjustment": -3,
+      "rsssfImpliedAdjustment": 0,
+      "entries": [
+        {
+          "date": "2024-04-09",
+          "team": "Morecambe",
+          "signedAdjustment": -3,
+          "note": "Late payment of player wages"
+        }
+      ],
+      "overrideNote": "Verified via Wikipedia/EFL (RSSSF eng2024 omitted -3 wage payment penalty)"
+    },
+    {
+      "season": "2024-25",
+      "tier": 2,
+      "team": "Sheffield United",
+      "signedAdjustment": -2,
+      "rsssfImpliedAdjustment": -2,
+      "entries": [
+        {
+          "date": "2024-08-01",
+          "team": "Sheffield United",
+          "signedAdjustment": -2,
+          "note": "Default on payments to other clubs during 2022/2023 season"
+        }
+      ],
+      "overrideNote": null
+    }
+  ],
+  "clubs": [
+    {
+      "clubId": "accrington-stanley",
+      "canonicalName": "Accrington Stanley",
+      "aliases": [
+        "Accrington",
+        "Accrington Stanley"
+      ]
+    },
+    {
+      "clubId": "afc-bournemouth",
+      "canonicalName": "AFC Bournemouth",
+      "aliases": [
+        "A. F. C. Bournemouth",
+        "AFC BOURNEMOUTH",
+        "AFC Bournemouth",
+        "BOURNEMOUTH",
+        "Bournemouth"
+      ]
+    },
+    {
+      "clubId": "afc-wimbledon",
+      "canonicalName": "AFC Wimbledon",
+      "aliases": [
+        "AFC Wimbledon"
+      ]
+    },
+    {
+      "clubId": "aldershot",
+      "canonicalName": "Aldershot",
+      "aliases": [
+        "ALDERSHOT",
+        "Aldershot"
+      ]
+    },
+    {
+      "clubId": "aldershot-town",
+      "canonicalName": "Aldershot Town",
+      "aliases": [
+        "Aldershot",
+        "Aldershot Town"
+      ]
+    },
+    {
+      "clubId": "arsenal",
+      "canonicalName": "Arsenal",
+      "aliases": [
+        "ARSENAL",
+        "Arsenal"
+      ]
+    },
+    {
+      "clubId": "aston-villa",
+      "canonicalName": "Aston Villa",
+      "aliases": [
+        "ASTON VILLA",
+        "Aston Villa"
+      ]
+    },
+    {
+      "clubId": "barnet",
+      "canonicalName": "Barnet",
+      "aliases": [
+        "BARNET",
+        "Barnet"
+      ]
+    },
+    {
+      "clubId": "barnsley",
+      "canonicalName": "Barnsley",
+      "aliases": [
+        "BARNSLEY",
+        "Barnsley"
+      ]
+    },
+    {
+      "clubId": "barrow",
+      "canonicalName": "Barrow",
+      "aliases": [
+        "Barrow"
+      ]
+    },
+    {
+      "clubId": "birmingham-city",
+      "canonicalName": "Birmingham City",
+      "aliases": [
+        "BIRMINGHAM CITY",
+        "Birmingham",
+        "Birmingham City"
+      ]
+    },
+    {
+      "clubId": "blackburn-rovers",
+      "canonicalName": "Blackburn Rovers",
+      "aliases": [
+        "BLACKBURN ROVERS",
+        "Blackburn",
+        "Blackburn Rovers"
+      ]
+    },
+    {
+      "clubId": "blackpool",
+      "canonicalName": "Blackpool",
+      "aliases": [
+        "BLACKPOOL",
+        "Blackpool"
+      ]
+    },
+    {
+      "clubId": "bolton-wanderers",
+      "canonicalName": "Bolton Wanderers",
+      "aliases": [
+        "BOLTON WANDERERS",
+        "Bolton",
+        "Bolton Wanderers"
+      ]
+    },
+    {
+      "clubId": "boston-united",
+      "canonicalName": "Boston United",
+      "aliases": [
+        "Boston",
+        "Boston United"
+      ]
+    },
+    {
+      "clubId": "bradford-city",
+      "canonicalName": "Bradford City",
+      "aliases": [
+        "BRADFORD CITY",
+        "Bradford",
+        "Bradford City"
+      ]
+    },
+    {
+      "clubId": "brentford",
+      "canonicalName": "Brentford",
+      "aliases": [
+        "BRENTFORD",
+        "Brentford"
+      ]
+    },
+    {
+      "clubId": "brighton-and-hove-albion",
+      "canonicalName": "Brighton & Hove Albion",
+      "aliases": [
+        "BRIGHTON & HOVE ALBION",
+        "BRIGHTON AND HOVE ALBION",
+        "Brighton",
+        "Brighton & Hove Albion"
+      ]
+    },
+    {
+      "clubId": "bristol-city",
+      "canonicalName": "Bristol City",
+      "aliases": [
+        "BRISTOL CITY",
+        "Bristol City"
+      ]
+    },
+    {
+      "clubId": "bristol-rovers",
+      "canonicalName": "Bristol Rovers",
+      "aliases": [
+        "BRISTOL ROVERS",
+        "Bristol Rovers",
+        "Bristol Rvs"
+      ]
+    },
+    {
+      "clubId": "bromley",
+      "canonicalName": "Bromley",
+      "aliases": [
+        "Bromley"
+      ]
+    },
+    {
+      "clubId": "burnley",
+      "canonicalName": "Burnley",
+      "aliases": [
+        "BURNLEY",
+        "Burnley"
+      ]
+    },
+    {
+      "clubId": "burton-albion",
+      "canonicalName": "Burton Albion",
+      "aliases": [
+        "Burton",
+        "Burton Albion"
+      ]
+    },
+    {
+      "clubId": "bury",
+      "canonicalName": "Bury",
+      "aliases": [
+        "BURY",
+        "Bury"
+      ]
+    },
+    {
+      "clubId": "cambridge-united",
+      "canonicalName": "Cambridge United",
+      "aliases": [
+        "CAMBRIDGE UNITED",
+        "Cambridge",
+        "Cambridge United"
+      ]
+    },
+    {
+      "clubId": "cardiff-city",
+      "canonicalName": "Cardiff City",
+      "aliases": [
+        "CARDIFF CITY",
+        "Cardiff",
+        "Cardiff City"
+      ]
+    },
+    {
+      "clubId": "carlisle-united",
+      "canonicalName": "Carlisle United",
+      "aliases": [
+        "CARLISLE UNITED",
+        "Carlisle",
+        "Carlisle United"
+      ]
+    },
+    {
+      "clubId": "charlton-athletic",
+      "canonicalName": "Charlton Athletic",
+      "aliases": [
+        "CHARLTON ATHLETIC",
+        "Charlton",
+        "Charlton Athletic",
+        "Charlton Atletic"
+      ]
+    },
+    {
+      "clubId": "chelsea",
+      "canonicalName": "Chelsea",
+      "aliases": [
+        "CHELSEA",
+        "Chelsea"
+      ]
+    },
+    {
+      "clubId": "cheltenham-town",
+      "canonicalName": "Cheltenham Town",
+      "aliases": [
+        "CHELTENHAM TOWN",
+        "Cheltenham",
+        "Cheltenham Town"
+      ]
+    },
+    {
+      "clubId": "chester",
+      "canonicalName": "Chester",
+      "aliases": [
+        "CHESTER CITY",
+        "Chester",
+        "Chester City"
+      ]
+    },
+    {
+      "clubId": "chesterfield",
+      "canonicalName": "Chesterfield",
+      "aliases": [
+        "CHESTERFIELD",
+        "Chesterfield"
+      ]
+    },
+    {
+      "clubId": "colchester-united",
+      "canonicalName": "Colchester United",
+      "aliases": [
+        "COLCHESTER UNITED",
+        "Colchester",
+        "Colchester United"
+      ]
+    },
+    {
+      "clubId": "coventry-city",
+      "canonicalName": "Coventry City",
+      "aliases": [
+        "COVENTRY CITY",
+        "Coventry",
+        "Coventry City"
+      ]
+    },
+    {
+      "clubId": "crawley-town",
+      "canonicalName": "Crawley Town",
+      "aliases": [
+        "Crawley Town"
+      ]
+    },
+    {
+      "clubId": "crewe-alexandra",
+      "canonicalName": "Crewe Alexandra",
+      "aliases": [
+        "CREWE ALEXANDRA",
+        "Crewe",
+        "Crewe Alexandra"
+      ]
+    },
+    {
+      "clubId": "crystal-palace",
+      "canonicalName": "Crystal Palace",
+      "aliases": [
+        "CRYSTAL PALACE",
+        "Crystal Palace",
+        "Crystal Palalce"
+      ]
+    },
+    {
+      "clubId": "dagenham-and-redbridge",
+      "canonicalName": "Dagenham & Redbridge",
+      "aliases": [
+        "Dag and Red",
+        "Dagenham & Redbridge",
+        "Dagenham and Redbridge"
+      ]
+    },
+    {
+      "clubId": "darlington",
+      "canonicalName": "Darlington",
+      "aliases": [
+        "DARLINGTON",
+        "Darlington"
+      ]
+    },
+    {
+      "clubId": "derby-county",
+      "canonicalName": "Derby County",
+      "aliases": [
+        "DERBY COUNTY",
+        "Derby",
+        "Derby County"
+      ]
+    },
+    {
+      "clubId": "doncaster-rovers",
+      "canonicalName": "Doncaster Rovers",
+      "aliases": [
+        "DONCASTER ROVERS",
+        "Doncaster",
+        "Doncaster Rovers"
+      ]
+    },
+    {
+      "clubId": "everton",
+      "canonicalName": "Everton",
+      "aliases": [
+        "EVERTON",
+        "Everton"
+      ]
+    },
+    {
+      "clubId": "exeter-city",
+      "canonicalName": "Exeter City",
+      "aliases": [
+        "EXERTER CITY",
+        "EXETER CITY",
+        "Exeter",
+        "Exeter City"
+      ]
+    },
+    {
+      "clubId": "fleetwood-town",
+      "canonicalName": "Fleetwood Town",
+      "aliases": [
+        "Fleetwood Town"
+      ]
+    },
+    {
+      "clubId": "forest-green-rovers",
+      "canonicalName": "Forest Green Rovers",
+      "aliases": [
+        "Forest Green",
+        "Forest Green Rovers"
+      ]
+    },
+    {
+      "clubId": "fulham",
+      "canonicalName": "Fulham",
+      "aliases": [
+        "FULHAM",
+        "Fulham"
+      ]
+    },
+    {
+      "clubId": "gillingham",
+      "canonicalName": "Gillingham",
+      "aliases": [
+        "GILLINGHAM",
+        "Gillingham"
+      ]
+    },
+    {
+      "clubId": "grimsby-town",
+      "canonicalName": "Grimsby Town",
+      "aliases": [
+        "GRIMSBY TOWN",
+        "Grimsby",
+        "Grimsby Town"
+      ]
+    },
+    {
+      "clubId": "halifax-town",
+      "canonicalName": "Halifax Town",
+      "aliases": [
+        "HALIFAX TOWN",
+        "Halifax",
+        "Halifax Town"
+      ]
+    },
+    {
+      "clubId": "harrogate-town",
+      "canonicalName": "Harrogate Town",
+      "aliases": [
+        "Harrogate",
+        "Harrogate Town"
+      ]
+    },
+    {
+      "clubId": "hartlepool-united",
+      "canonicalName": "Hartlepool United",
+      "aliases": [
+        "HARTLEPOOL UNITED",
+        "Hartlepool",
+        "Hartlepool United"
+      ]
+    },
+    {
+      "clubId": "hereford-united",
+      "canonicalName": "Hereford United",
+      "aliases": [
+        "HEREFORD UNITED",
+        "Hereford",
+        "Hereford United"
+      ]
+    },
+    {
+      "clubId": "huddersfield-town",
+      "canonicalName": "Huddersfield Town",
+      "aliases": [
+        "HUDDERSFIELD TOWN",
+        "Huddersfield",
+        "Huddersfield Town"
+      ]
+    },
+    {
+      "clubId": "hull-city",
+      "canonicalName": "Hull City",
+      "aliases": [
+        "HULL CITY",
+        "Hull",
+        "Hull City"
+      ]
+    },
+    {
+      "clubId": "ipswich-town",
+      "canonicalName": "Ipswich Town",
+      "aliases": [
+        "IPSWICH TOWN",
+        "Ipswich",
+        "Ipswich Town"
+      ]
+    },
+    {
+      "clubId": "kidderminster-harriers",
+      "canonicalName": "Kidderminster Harriers",
+      "aliases": [
+        "KIDDERMINSTER HARRIERS",
+        "Kidderminster",
+        "Kidderminster Harriers"
+      ]
+    },
+    {
+      "clubId": "leeds-united",
+      "canonicalName": "Leeds United",
+      "aliases": [
+        "LEEDS UNITED",
+        "Leeds",
+        "Leeds United"
+      ]
+    },
+    {
+      "clubId": "leicester-city",
+      "canonicalName": "Leicester City",
+      "aliases": [
+        "LEICESTER CITY",
+        "Leicester",
+        "Leicester City"
+      ]
+    },
+    {
+      "clubId": "leyton-orient",
+      "canonicalName": "Leyton Orient",
+      "aliases": [
+        "LEYTON ORIENT",
+        "Leyton Orient"
+      ]
+    },
+    {
+      "clubId": "lincoln-city",
+      "canonicalName": "Lincoln City",
+      "aliases": [
+        "LINCOLN CITY",
+        "Lincoln",
+        "Lincoln City"
+      ]
+    },
+    {
+      "clubId": "liverpool",
+      "canonicalName": "Liverpool",
+      "aliases": [
+        "LIVERPOOL",
+        "Liverpool"
+      ]
+    },
+    {
+      "clubId": "luton-town",
+      "canonicalName": "Luton Town",
+      "aliases": [
+        "LUTON TOWN",
+        "Luton",
+        "Luton Town"
+      ]
+    },
+    {
+      "clubId": "macclesfield-town",
+      "canonicalName": "Macclesfield Town",
+      "aliases": [
+        "MACCLESFIELD TOWN",
+        "Macclesfield",
+        "Macclesfield Town"
+      ]
+    },
+    {
+      "clubId": "maidstone-united",
+      "canonicalName": "Maidstone United",
+      "aliases": [
+        "Maidstone United"
+      ]
+    },
+    {
+      "clubId": "manchester-city",
+      "canonicalName": "Manchester City",
+      "aliases": [
+        "MANCHESTER CITY",
+        "Man City",
+        "Manchester City"
+      ]
+    },
+    {
+      "clubId": "manchester-united",
+      "canonicalName": "Manchester United",
+      "aliases": [
+        "MANCHESTER UNITED",
+        "Man United",
+        "Manchester United"
+      ]
+    },
+    {
+      "clubId": "mansfield-town",
+      "canonicalName": "Mansfield Town",
+      "aliases": [
+        "MANSFIELD TOWN",
+        "Mansfield",
+        "Mansfield Town"
+      ]
+    },
+    {
+      "clubId": "middlesbrough",
+      "canonicalName": "Middlesbrough",
+      "aliases": [
+        "MIDDLESBROUGH",
+        "Middlesbrough"
+      ]
+    },
+    {
+      "clubId": "millwall",
+      "canonicalName": "Millwall",
+      "aliases": [
+        "MILLWALL",
+        "Millwall"
+      ]
+    },
+    {
+      "clubId": "milton-keynes-dons",
+      "canonicalName": "Milton Keynes Dons",
+      "aliases": [
+        "MILTON KEYNES DONS",
+        "Milton Keynes Dons"
+      ]
+    },
+    {
+      "clubId": "morecambe",
+      "canonicalName": "Morecambe",
+      "aliases": [
+        "Morecambe"
+      ]
+    },
+    {
+      "clubId": "newcastle-united",
+      "canonicalName": "Newcastle United",
+      "aliases": [
+        "NEWCASTLE UNITED",
+        "Newcastle",
+        "Newcastle United"
+      ]
+    },
+    {
+      "clubId": "newport-county",
+      "canonicalName": "Newport County",
+      "aliases": [
+        "NEWPORT COUNTY",
+        "Newport County"
+      ]
+    },
+    {
+      "clubId": "northampton-town",
+      "canonicalName": "Northampton Town",
+      "aliases": [
+        "NORTHAMPTON",
+        "NORTHAMPTON TOWN",
+        "Northampton",
+        "Northampton Town"
+      ]
+    },
+    {
+      "clubId": "norwich-city",
+      "canonicalName": "Norwich City",
+      "aliases": [
+        "NORWICH CITY",
+        "Norwich",
+        "Norwich City"
+      ]
+    },
+    {
+      "clubId": "nottingham-forest",
+      "canonicalName": "Nottingham Forest",
+      "aliases": [
+        "NOTTINGHAM FOREST",
+        "Nott'm Forest",
+        "Nottingham Forest"
+      ]
+    },
+    {
+      "clubId": "notts-county",
+      "canonicalName": "Notts County",
+      "aliases": [
+        "NOTTS COUNTY",
+        "Notts County"
+      ]
+    },
+    {
+      "clubId": "oldham-athletic",
+      "canonicalName": "Oldham Athletic",
+      "aliases": [
+        "OLDHAM ATHLETIC",
+        "Oldham",
+        "Oldham Athletic"
+      ]
+    },
+    {
+      "clubId": "oxford-united",
+      "canonicalName": "Oxford United",
+      "aliases": [
+        "OXFORD UNITED",
+        "Oxford",
+        "Oxford United"
+      ]
+    },
+    {
+      "clubId": "peterborough-united",
+      "canonicalName": "Peterborough United",
+      "aliases": [
+        "PETERBOROUGH",
+        "PETERBOROUGH UNITED",
+        "Peterboro",
+        "Peterborough United"
+      ]
+    },
+    {
+      "clubId": "plymouth-argyle",
+      "canonicalName": "Plymouth Argyle",
+      "aliases": [
+        "PLYMOUTH ARGYLE",
+        "Plymouth",
+        "Plymouth Argyle"
+      ]
+    },
+    {
+      "clubId": "port-vale",
+      "canonicalName": "Port Vale",
+      "aliases": [
+        "PORT VALE",
+        "Port Vale"
+      ]
+    },
+    {
+      "clubId": "portsmouth",
+      "canonicalName": "Portsmouth",
+      "aliases": [
+        "PORTSMOUTH",
+        "Portsmouth"
+      ]
+    },
+    {
+      "clubId": "preston-north-end",
+      "canonicalName": "Preston North End",
+      "aliases": [
+        "PRESTON NORTH END",
+        "Preston",
+        "Preston North End"
+      ]
+    },
+    {
+      "clubId": "queens-park-rangers",
+      "canonicalName": "Queens Park Rangers",
+      "aliases": [
+        "QPR",
+        "QUEENS PARK RANGERS",
+        "Queen's Park Rangers",
+        "Queens Park Rangers"
+      ]
+    },
+    {
+      "clubId": "reading",
+      "canonicalName": "Reading",
+      "aliases": [
+        "READING",
+        "Reading"
+      ]
+    },
+    {
+      "clubId": "rochdale",
+      "canonicalName": "Rochdale",
+      "aliases": [
+        "Rochdale"
+      ]
+    },
+    {
+      "clubId": "rotherham-united",
+      "canonicalName": "Rotherham United",
+      "aliases": [
+        "ROTHERHAM UNITED",
+        "Rotherham",
+        "Rotherham United"
+      ]
+    },
+    {
+      "clubId": "rushden-and-diamonds",
+      "canonicalName": "Rushden & Diamonds",
+      "aliases": [
+        "RUSHDEN & DIAMONDS",
+        "Rushden & D",
+        "Rushden & Diamonds"
+      ]
+    },
+    {
+      "clubId": "salford-city",
+      "canonicalName": "Salford City",
+      "aliases": [
+        "Salford",
+        "Salford City"
+      ]
+    },
+    {
+      "clubId": "scarborough",
+      "canonicalName": "Scarborough",
+      "aliases": [
+        "SCARBOROUGH",
+        "Scarborough"
+      ]
+    },
+    {
+      "clubId": "scunthorpe-united",
+      "canonicalName": "Scunthorpe United",
+      "aliases": [
+        "SCUNTHORPE TOWN",
+        "SCUNTHORPE UNITED",
+        "Scunthorpe",
+        "Scunthorpe United"
+      ]
+    },
+    {
+      "clubId": "sheffield-united",
+      "canonicalName": "Sheffield United",
+      "aliases": [
+        "SHEFFIELD UNITED",
+        "Sheffield United"
+      ]
+    },
+    {
+      "clubId": "sheffield-wednesday",
+      "canonicalName": "Sheffield Wednesday",
+      "aliases": [
+        "SHEFFIELD WEDNESDAY",
+        "SHEFFIELD WEDSNESDAY",
+        "Sheffield Wednesday",
+        "Sheffield Weds"
+      ]
+    },
+    {
+      "clubId": "shrewsbury-town",
+      "canonicalName": "Shrewsbury Town",
+      "aliases": [
+        "SHREWSBURY TOWN",
+        "Shrewsbury",
+        "Shrewsbury Town"
+      ]
+    },
+    {
+      "clubId": "southampton",
+      "canonicalName": "Southampton",
+      "aliases": [
+        "SOUTHAMPTON",
+        "Southampton"
+      ]
+    },
+    {
+      "clubId": "southend-united",
+      "canonicalName": "Southend United",
+      "aliases": [
+        "SOUTHEND UNITED",
+        "Southend",
+        "Southend United"
+      ]
+    },
+    {
+      "clubId": "stevenage",
+      "canonicalName": "Stevenage",
+      "aliases": [
+        "Stevenage"
+      ]
+    },
+    {
+      "clubId": "stockport-county",
+      "canonicalName": "Stockport County",
+      "aliases": [
+        "STOCKPORT COUNTY",
+        "Stockport",
+        "Stockport County"
+      ]
+    },
+    {
+      "clubId": "stoke-city",
+      "canonicalName": "Stoke City",
+      "aliases": [
+        "STOKE CITY",
+        "Stoke",
+        "Stoke City"
+      ]
+    },
+    {
+      "clubId": "sunderland",
+      "canonicalName": "Sunderland",
+      "aliases": [
+        "SUNDERLAND",
+        "Sunderland"
+      ]
+    },
+    {
+      "clubId": "sutton-united",
+      "canonicalName": "Sutton United",
+      "aliases": [
+        "Sutton",
+        "Sutton United"
+      ]
+    },
+    {
+      "clubId": "swansea-city",
+      "canonicalName": "Swansea City",
+      "aliases": [
+        "SWANSEA CITY",
+        "Swansea",
+        "Swansea City"
+      ]
+    },
+    {
+      "clubId": "swindon-town",
+      "canonicalName": "Swindon Town",
+      "aliases": [
+        "SWINDON TOWN",
+        "Swindon",
+        "Swindon Town"
+      ]
+    },
+    {
+      "clubId": "torquay-united",
+      "canonicalName": "Torquay United",
+      "aliases": [
+        "TORQUAY UNITED",
+        "Torquay",
+        "Torquay United"
+      ]
+    },
+    {
+      "clubId": "tottenham-hotspur",
+      "canonicalName": "Tottenham Hotspur",
+      "aliases": [
+        "Tottenham",
+        "Tottenham Hotspur",
+        "Tottenham Hotspurs"
+      ]
+    },
+    {
+      "clubId": "tranmere-rovers",
+      "canonicalName": "Tranmere Rovers",
+      "aliases": [
+        "TRANMERE ROVERS",
+        "Tranmere",
+        "Tranmere Rovers"
+      ]
+    },
+    {
+      "clubId": "walsall",
+      "canonicalName": "Walsall",
+      "aliases": [
+        "WALSALL",
+        "Walsall"
+      ]
+    },
+    {
+      "clubId": "watford",
+      "canonicalName": "Watford",
+      "aliases": [
+        "WATFORD",
+        "Watford"
+      ]
+    },
+    {
+      "clubId": "west-bromwich-albion",
+      "canonicalName": "West Bromwich Albion",
+      "aliases": [
+        "WEST BROMWICH ALBION",
+        "West Brom",
+        "West Bromwich Albion"
+      ]
+    },
+    {
+      "clubId": "west-ham-united",
+      "canonicalName": "West Ham United",
+      "aliases": [
+        "WEST HAM UNITED",
+        "West Ham",
+        "West Ham United"
+      ]
+    },
+    {
+      "clubId": "wigan-athletic",
+      "canonicalName": "Wigan Athletic",
+      "aliases": [
+        "WIGAN ATHLETIC",
+        "Wigan",
+        "Wigan Athleitc",
+        "Wigan Athletic"
+      ]
+    },
+    {
+      "clubId": "wimbledon",
+      "canonicalName": "Wimbledon",
+      "aliases": [
+        "WIMBLEDON",
+        "Wimbledon"
+      ]
+    },
+    {
+      "clubId": "wolverhampton-wanderers",
+      "canonicalName": "Wolverhampton Wanderers",
+      "aliases": [
+        "WOLVERHAMPTON",
+        "WOLVERHAMPTON WANDERERS",
+        "Wolverhampton Wanderers",
+        "Wolves"
+      ]
+    },
+    {
+      "clubId": "wrexham",
+      "canonicalName": "Wrexham",
+      "aliases": [
+        "WREXHAM",
+        "Wrexham"
+      ]
+    },
+    {
+      "clubId": "wycombe-wanderers",
+      "canonicalName": "Wycombe Wanderers",
+      "aliases": [
+        "WYCOMBE WANDERERS",
+        "Wycombe",
+        "Wycombe Wanderers"
+      ]
+    },
+    {
+      "clubId": "yeovil-town",
+      "canonicalName": "Yeovil Town",
+      "aliases": [
+        "YEOVIL TOWN",
+        "Yeovil",
+        "Yeovil Town"
+      ]
+    },
+    {
+      "clubId": "york-city",
+      "canonicalName": "York City",
+      "aliases": [
+        "YORK CITY",
+        "York",
+        "York City"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "slotId": "1981-82-T1",
+      "season": "1981-82",
+      "tier": 1,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1173,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Leeds United (20)",
+        "Wolverhampton Wanderers (21)",
+        "Middlesbrough (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1981-82-T2",
+      "season": "1981-82",
+      "tier": 2,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1171,
+      "promotedTeams": [
+        "Luton Town (1)",
+        "Watford (2)",
+        "Norwich City (3)"
+      ],
+      "relegatedTeams": [
+        "Cardiff City (20)",
+        "Wrexham (21)",
+        "Leyton Orient (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1981-82-T3",
+      "season": "1981-82",
+      "tier": 3,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1421,
+      "promotedTeams": [
+        "Burnley (1)",
+        "Carlisle United (2)",
+        "Fulham (3)"
+      ],
+      "relegatedTeams": [
+        "Wimbledon (21)",
+        "Swindon Town (22)",
+        "Bristol City (23)",
+        "Chester (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "1981-82 League Division 3: First season of 3 points for a win; champions Burnley (21W, 17D, 8L = 80 pts, +21 GD) finished ahead of runners-up Carlisle United (23W, 11D, 12L = 80 pts, +15 GD) despite fewer wins.",
+        "Bristol Rovers: -2 pts (-2 pts: Fielded an unregistered player (Steve Bailey) in a match against Exeter City on 1982-02-09)"
+      ]
+    },
+    {
+      "slotId": "1981-82-T4",
+      "season": "1981-82",
+      "tier": 4,
+      "historicalDivisionName": "Football League Fourth Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1512,
+      "promotedTeams": [
+        "Sheffield United (1)",
+        "Bradford City (2)",
+        "Wigan Athletic (3)",
+        "AFC Bournemouth (4)"
+      ],
+      "relegatedTeams": [],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "Mansfield Town: -2 pts (-2 pts: Fielded an unregistered player (Colin Calderwood) in a match against Crewe Alexandra on 1982-03-13)"
+      ]
+    },
+    {
+      "slotId": "1982-83-T1",
+      "season": "1982-83",
+      "tier": 1,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1264,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Manchester City (20)",
+        "Swansea City (21)",
+        "Brighton & Hove Albion (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1982-83-T2",
+      "season": "1982-83",
+      "tier": 2,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1244,
+      "promotedTeams": [
+        "Queens Park Rangers (1)",
+        "Wolverhampton Wanderers (2)",
+        "Leicester City (3)"
+      ],
+      "relegatedTeams": [
+        "Rotherham United (20)",
+        "Burnley (21)",
+        "Bolton Wanderers (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1982-83-T3",
+      "season": "1982-83",
+      "tier": 3,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1617,
+      "promotedTeams": [
+        "Portsmouth (1)",
+        "Cardiff City (2)",
+        "Huddersfield Town (3)"
+      ],
+      "relegatedTeams": [
+        "Reading (21)",
+        "Wrexham (22)",
+        "Doncaster Rovers (23)",
+        "Chesterfield (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1982-83-T4",
+      "season": "1982-83",
+      "tier": 4,
+      "historicalDivisionName": "Football League Fourth Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1502,
+      "promotedTeams": [
+        "Wimbledon (1)",
+        "Hull City (2)",
+        "Port Vale (3)",
+        "Scunthorpe United (4)"
+      ],
+      "relegatedTeams": [],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "Blackpool: -2 pts (-2 pts: Fielded an ineligible player (John Butler) in two League games and one League Cup game without his registration having been confirmed)"
+      ]
+    },
+    {
+      "slotId": "1983-84-T1",
+      "season": "1983-84",
+      "tier": 1,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1250,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Birmingham City (20)",
+        "Notts County (21)",
+        "Wolverhampton Wanderers (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1983-84-T2",
+      "season": "1983-84",
+      "tier": 2,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1233,
+      "promotedTeams": [
+        "Chelsea (1)",
+        "Sheffield Wednesday (2)",
+        "Newcastle United (3)"
+      ],
+      "relegatedTeams": [
+        "Derby County (20)",
+        "Swansea City (21)",
+        "Cambridge United (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1983-84-T3",
+      "season": "1983-84",
+      "tier": 3,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1586,
+      "promotedTeams": [
+        "Oxford United (1)",
+        "Wimbledon (2)",
+        "Sheffield United (3)"
+      ],
+      "relegatedTeams": [
+        "Scunthorpe United (21)",
+        "Southend United (22)",
+        "Port Vale (23)",
+        "Exeter City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1983-84-T4",
+      "season": "1983-84",
+      "tier": 4,
+      "historicalDivisionName": "Football League Fourth Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1505,
+      "promotedTeams": [
+        "York City (1)",
+        "Doncaster Rovers (2)",
+        "Reading (3)",
+        "Bristol City (4)"
+      ],
+      "relegatedTeams": [],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1984-85-T1",
+      "season": "1984-85",
+      "tier": 1,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1288,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Norwich City (20)",
+        "Sunderland (21)",
+        "Stoke City (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1984-85-T2",
+      "season": "1984-85",
+      "tier": 2,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1255,
+      "promotedTeams": [
+        "Oxford United (1)",
+        "Birmingham City (2)",
+        "Manchester City (3)"
+      ],
+      "relegatedTeams": [
+        "Notts County (20)",
+        "Cardiff City (21)",
+        "Wolverhampton Wanderers (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1984-85-T3",
+      "season": "1984-85",
+      "tier": 3,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1503,
+      "promotedTeams": [
+        "Bradford City (1)",
+        "Millwall (2)",
+        "Hull City (3)"
+      ],
+      "relegatedTeams": [
+        "Burnley (21)",
+        "Leyton Orient (22)",
+        "Preston North End (23)",
+        "Cambridge United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1984-85-T4",
+      "season": "1984-85",
+      "tier": 4,
+      "historicalDivisionName": "Football League Fourth Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1478,
+      "promotedTeams": [
+        "Chesterfield (1)",
+        "Blackpool (2)",
+        "Darlington (3)",
+        "Bury (4)"
+      ],
+      "relegatedTeams": [],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1985-86-T1",
+      "season": "1985-86",
+      "tier": 1,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1288,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Ipswich Town (20)",
+        "Birmingham City (21)",
+        "West Bromwich Albion (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1985-86-T2",
+      "season": "1985-86",
+      "tier": 2,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1264,
+      "promotedTeams": [
+        "Norwich City (1)",
+        "Charlton Athletic (2)",
+        "Wimbledon (3)"
+      ],
+      "relegatedTeams": [
+        "Carlisle United (20)",
+        "Middlesbrough (21)",
+        "Fulham (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1985-86-T3",
+      "season": "1985-86",
+      "tier": 3,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1550,
+      "promotedTeams": [
+        "Reading (1)",
+        "Plymouth Argyle (2)",
+        "Derby County (3)"
+      ],
+      "relegatedTeams": [
+        "Lincoln City (21)",
+        "Cardiff City (22)",
+        "Wolverhampton Wanderers (23)",
+        "Swansea City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1985-86-T4",
+      "season": "1985-86",
+      "tier": 4,
+      "historicalDivisionName": "Football League Fourth Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1576,
+      "promotedTeams": [
+        "Swindon Town (1)",
+        "Chester City (2)",
+        "Mansfield Town (3)",
+        "Port Vale (4)"
+      ],
+      "relegatedTeams": [],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1986-87-T1",
+      "season": "1986-87",
+      "tier": 1,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1215,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Leicester City (20)",
+        "Manchester City (21)",
+        "Aston Villa (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1986-87-T2",
+      "season": "1986-87",
+      "tier": 2,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1131,
+      "promotedTeams": [
+        "Derby County (1)",
+        "Portsmouth (2)"
+      ],
+      "relegatedTeams": [
+        "Sunderland (20)",
+        "Grimsby Town (21)",
+        "Brighton & Hove Albion (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "Transitional 1986-87 promotion/relegation play-offs included First Division 19th-placed Charlton Athletic, who defeated Second Division 4th-placed Leeds United to retain their top-flight place."
+      ]
+    },
+    {
+      "slotId": "1986-87-T3",
+      "season": "1986-87",
+      "tier": 3,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1471,
+      "promotedTeams": [
+        "AFC Bournemouth (1)",
+        "Middlesbrough (2)",
+        "Swindon Town (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Bolton Wanderers (21)",
+        "Carlisle United (22)",
+        "Darlington (23)",
+        "Newport County (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1986-87-T4",
+      "season": "1986-87",
+      "tier": 4,
+      "historicalDivisionName": "Football League Fourth Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1456,
+      "promotedTeams": [
+        "Northampton Town (1)",
+        "Preston North End (2)",
+        "Southend United (3)",
+        "Aldershot (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Lincoln City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1987-88-T1",
+      "season": "1987-88",
+      "tier": 1,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 21,
+      "matchCount": 420,
+      "totalGoals": 1049,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Chelsea (18)",
+        "Portsmouth (19)",
+        "Watford (20)",
+        "Oxford United (21)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "League Division 1 temporarily contracted from 22 to 21 clubs in 1987-88 (42 games -> 40 games) and then to 20 clubs for 1988-89; 18th-placed Chelsea entered the Second Division play-offs and were relegated."
+      ]
+    },
+    {
+      "slotId": "1987-88-T2",
+      "season": "1987-88",
+      "tier": 2,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 23,
+      "matchCount": 506,
+      "totalGoals": 1389,
+      "promotedTeams": [
+        "Millwall (1)",
+        "Aston Villa (2)",
+        "Middlesbrough (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Sheffield United (21)",
+        "Reading (22)",
+        "Huddersfield Town (23)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "League Division 2 temporarily stood at 23 clubs (44 games) during Football League restructuring; 3rd-placed Middlesbrough beat First Division 18th-placed Chelsea in the play-offs to earn promotion."
+      ]
+    },
+    {
+      "slotId": "1987-88-T3",
+      "season": "1987-88",
+      "tier": 3,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1485,
+      "promotedTeams": [
+        "Sunderland (1)",
+        "Brighton & Hove Albion (2)",
+        "Walsall (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Rotherham United (21)",
+        "Grimsby Town (22)",
+        "York City (23)",
+        "Doncaster Rovers (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1987-88-T4",
+      "season": "1987-88",
+      "tier": 4,
+      "historicalDivisionName": "Football League Fourth Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1404,
+      "promotedTeams": [
+        "Wolverhampton Wanderers (1)",
+        "Cardiff City (2)",
+        "Bolton Wanderers (3)",
+        "Swansea City (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Newport County (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "Tranmere Rovers: -2 pts (-2 pts: Postponed match against Bolton (on 1987-09-24) without permission)",
+        "Halifax Town: -1 pts (-1 pts: Fielded an unregistered player against Darlington on 1987-08-15)"
+      ]
+    },
+    {
+      "slotId": "1988-89-T1",
+      "season": "1988-89",
+      "tier": 1,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 962,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Middlesbrough (18)",
+        "West Ham United (19)",
+        "Newcastle United (20)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1988-89-T2",
+      "season": "1988-89",
+      "tier": 2,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1465,
+      "promotedTeams": [
+        "Chelsea (1)",
+        "Manchester City (2)",
+        "Crystal Palace (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Shrewsbury Town (22)",
+        "Birmingham City (23)",
+        "Walsall (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1988-89-T3",
+      "season": "1988-89",
+      "tier": 3,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1495,
+      "promotedTeams": [
+        "Wolverhampton Wanderers (1)",
+        "Sheffield United (2)",
+        "Port Vale (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Southend United (21)",
+        "Chesterfield (22)",
+        "Gillingham (23)",
+        "Aldershot (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1988-89-T4",
+      "season": "1988-89",
+      "tier": 4,
+      "historicalDivisionName": "Football League Fourth Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1498,
+      "promotedTeams": [
+        "Rotherham United (1)",
+        "Tranmere Rovers (2)",
+        "Crewe Alexandra (3)",
+        "Leyton Orient (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Darlington (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1989-90-T1",
+      "season": "1989-90",
+      "tier": 1,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 986,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Sheffield Wednesday (18)",
+        "Charlton Athletic (19)",
+        "Millwall (20)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1989-90-T2",
+      "season": "1989-90",
+      "tier": 2,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1526,
+      "promotedTeams": [
+        "Leeds United (1)",
+        "Sheffield United (2)",
+        "Sunderland (6, PO)"
+      ],
+      "relegatedTeams": [
+        "AFC Bournemouth (22)",
+        "Bradford City (23)",
+        "Stoke City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1989-90-T3",
+      "season": "1989-90",
+      "tier": 3,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1414,
+      "promotedTeams": [
+        "Bristol Rovers (1)",
+        "Bristol City (2)",
+        "Notts County (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Cardiff City (21)",
+        "Northampton Town (22)",
+        "Blackpool (23)",
+        "Walsall (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1989-90-T4",
+      "season": "1989-90",
+      "tier": 4,
+      "historicalDivisionName": "Football League Fourth Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1426,
+      "promotedTeams": [
+        "Exeter City (1)",
+        "Grimsby Town (2)",
+        "Southend United (3)",
+        "Cambridge United (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Colchester United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1990-91-T1",
+      "season": "1990-91",
+      "tier": 1,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1049,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Sunderland (19)",
+        "Derby County (20)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "Football League First Division bottom two (19th-20th) relegated as the top flight expanded back to 22 clubs for 1991-92.",
+        "Arsenal: -2 pts (-2 pts: Bringing the game into disrepute during fixture against Manchester United on 1990-10-20 (2 pts because of similar incident in previous season against Norwich [1989-11-04]))",
+        "Manchester United: -1 pts (-1 pts: Bringing the game into disrepute during fixture against Arsenal on 1990-10-20)"
+      ]
+    },
+    {
+      "slotId": "1990-91-T2",
+      "season": "1990-91",
+      "tier": 2,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1481,
+      "promotedTeams": [
+        "Oldham Athletic (1)",
+        "West Ham United (2)",
+        "Sheffield Wednesday (3)",
+        "Notts County (4, PO)"
+      ],
+      "relegatedTeams": [
+        "West Bromwich Albion (23)",
+        "Hull City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "Top three clubs promoted automatically plus 4th-placed play-off winner Notts County (four promotions total) as the top tier expanded from 20 to 22 clubs."
+      ]
+    },
+    {
+      "slotId": "1990-91-T3",
+      "season": "1990-91",
+      "tier": 3,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1381,
+      "promotedTeams": [
+        "Cambridge United (1)",
+        "Southend United (2)",
+        "Grimsby Town (3)",
+        "Tranmere Rovers (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Crewe Alexandra (22)",
+        "Rotherham United (23)",
+        "Mansfield Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "Top three clubs promoted automatically plus 5th-placed play-off winner Tranmere Rovers (four promotions) while 22nd-24th relegated (only 3 down) during restructuring."
+      ]
+    },
+    {
+      "slotId": "1990-91-T4",
+      "season": "1990-91",
+      "tier": 4,
+      "historicalDivisionName": "Football League Fourth Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1415,
+      "promotedTeams": [
+        "Darlington (1)",
+        "Stockport County (2)",
+        "Hartlepool United (3)",
+        "Peterborough United (4)",
+        "Torquay United (7, PO)"
+      ],
+      "relegatedTeams": [
+        "Aldershot (23)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "Four automatic promotion places plus 7th-placed play-off winner Torquay United (five promotions); no club relegated as tier expanded/restructured."
+      ]
+    },
+    {
+      "slotId": "1991-92-T1",
+      "season": "1991-92",
+      "tier": 1,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1174,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Luton Town (20)",
+        "Notts County (21)",
+        "West Ham United (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1991-92-T2",
+      "season": "1991-92",
+      "tier": 2,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1418,
+      "promotedTeams": [
+        "Ipswich Town (1)",
+        "Middlesbrough (2)",
+        "Blackburn Rovers (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Plymouth Argyle (22)",
+        "Brighton & Hove Albion (23)",
+        "Port Vale (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1991-92-T3",
+      "season": "1991-92",
+      "tier": 3,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1435,
+      "promotedTeams": [
+        "Brentford (1)",
+        "Birmingham City (2)",
+        "Peterborough United (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Bury (21)",
+        "Shrewsbury Town (22)",
+        "Torquay United (23)",
+        "Darlington (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1991-92-T4",
+      "season": "1991-92",
+      "tier": 4,
+      "historicalDivisionName": "Football League Fourth Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1247,
+      "promotedTeams": [
+        "Burnley (1)",
+        "Rotherham United (2)",
+        "Mansfield Town (3)",
+        "Blackpool (4, PO)"
+      ],
+      "relegatedTeams": [],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "Aldershot withdrew after 36 matches (folded 25 March 1992) and all their Football League results were expunged, leaving 22 completed teams (42 matches each) and no bottom-club relegation."
+      ]
+    },
+    {
+      "slotId": "1992-93-T1",
+      "season": "1992-93",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1222,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Crystal Palace (20)",
+        "Middlesbrough (21)",
+        "Nottingham Forest (22)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "Inaugural FA Premier League season (22 clubs, 42 games); Football League Division One became Tier 2."
+      ]
+    },
+    {
+      "slotId": "1992-93-T2",
+      "season": "1992-93",
+      "tier": 2,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1449,
+      "promotedTeams": [
+        "Newcastle United (1)",
+        "West Ham United (2)",
+        "Swindon Town (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Brentford (22)",
+        "Cambridge United (23)",
+        "Bristol Rovers (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1992-93-T3",
+      "season": "1992-93",
+      "tier": 3,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1479,
+      "promotedTeams": [
+        "Stoke City (1)",
+        "Bolton Wanderers (2)",
+        "West Bromwich Albion (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Preston North End (21)",
+        "Mansfield Town (22)",
+        "Wigan Athletic (23)",
+        "Chester City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1992-93-T4",
+      "season": "1992-93",
+      "tier": 4,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1311,
+      "promotedTeams": [
+        "Cardiff City (1)",
+        "Wrexham (2)",
+        "Barnet (3)",
+        "York City (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Halifax Town (22)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "double_source_reconciled",
+      "exceptions": [
+        "Maidstone United resigned from the Football League in August 1992 before playing a fixture, leaving Football League Third Division (Tier 4) with 22 teams (42 matches each). Tie-break in Football League Tiers 2-4 from 1992-93 to 1998-99 ranked GF ahead of GD."
+      ]
+    },
+    {
+      "slotId": "1993-94-T1",
+      "season": "1993-94",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1195,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Sheffield United (20)",
+        "Oldham Athletic (21)",
+        "Swindon Town (22)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1993-94-T2",
+      "season": "1993-94",
+      "tier": 2,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1450,
+      "promotedTeams": [
+        "Crystal Palace (1)",
+        "Nottingham Forest (2)",
+        "Leicester City (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Birmingham City (22)",
+        "Oxford United (23)",
+        "Peterborough United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1993-94-T3",
+      "season": "1993-94",
+      "tier": 3,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1508,
+      "promotedTeams": [
+        "Reading (1)",
+        "Port Vale (2)",
+        "Burnley (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Fulham (21)",
+        "Exeter City (22)",
+        "Hartlepool United (23)",
+        "Barnet (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1993-94-T4",
+      "season": "1993-94",
+      "tier": 4,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1265,
+      "promotedTeams": [
+        "Shrewsbury Town (1)",
+        "Chester City (2)",
+        "Crewe Alexandra (3)",
+        "Wycombe Wanderers (4, PO)"
+      ],
+      "relegatedTeams": [],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Northampton Town (22nd) were reprieved from relegation because Conference champions Kidderminster Harriers failed League ground-grading standards."
+      ]
+    },
+    {
+      "slotId": "1994-95-T1",
+      "season": "1994-95",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1195,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Crystal Palace (19)",
+        "Norwich City (20)",
+        "Leicester City (21)",
+        "Ipswich Town (22)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Premier League contracted from 22 to 20 clubs after 1994-95: four teams (19th-22nd) were relegated.",
+        "Tottenham Hotspur: Were given a 12-point penalty for making irregular payments to players. This was first reduced to a 6-point penalty and then completely overturned in December 1994 following appeals"
+      ]
+    },
+    {
+      "slotId": "1994-95-T2",
+      "season": "1994-95",
+      "tier": 2,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1389,
+      "promotedTeams": [
+        "Middlesbrough (1)",
+        "Bolton Wanderers (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Swindon Town (21)",
+        "Burnley (22)",
+        "Bristol City (23)",
+        "Notts County (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Only two teams promoted (champions Middlesbrough automatically plus 3rd-placed play-off winners Bolton Wanderers) because of the Premier League contraction from 22 to 20 clubs."
+      ]
+    },
+    {
+      "slotId": "1994-95-T3",
+      "season": "1994-95",
+      "tier": 3,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1441,
+      "promotedTeams": [
+        "Birmingham City (1)",
+        "Huddersfield Town (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Cambridge United (20)",
+        "Plymouth Argyle (21)",
+        "Cardiff City (22)",
+        "Chester City (23)",
+        "Leyton Orient (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Only two teams promoted (Birmingham City and play-off winners Huddersfield Town) while five teams (20th-24th) were relegated during Pyramid contraction."
+      ]
+    },
+    {
+      "slotId": "1994-95-T4",
+      "season": "1994-95",
+      "tier": 4,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 22,
+      "matchCount": 462,
+      "totalGoals": 1229,
+      "promotedTeams": [
+        "Carlisle United (1)",
+        "Walsall (2)",
+        "Chesterfield (3, PO)"
+      ],
+      "relegatedTeams": [],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Exeter City (22nd) were reprieved from relegation because Conference champions Macclesfield Town failed League ground-grading standards. Division expanded back to 24 teams for 1995-96."
+      ]
+    },
+    {
+      "slotId": "1995-96-T1",
+      "season": "1995-96",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 988,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Manchester City (18)",
+        "Queens Park Rangers (19)",
+        "Bolton Wanderers (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1995-96-T2",
+      "season": "1995-96",
+      "tier": 2,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1417,
+      "promotedTeams": [
+        "Sunderland (1)",
+        "Derby County (2)",
+        "Leicester City (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Millwall (22)",
+        "Watford (23)",
+        "Luton Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1995-96-T3",
+      "season": "1995-96",
+      "tier": 3,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1414,
+      "promotedTeams": [
+        "Swindon Town (1)",
+        "Oxford United (2)",
+        "Bradford City (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Carlisle United (21)",
+        "Swansea City (22)",
+        "Brighton & Hove Albion (23)",
+        "Hull City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1995-96-T4",
+      "season": "1995-96",
+      "tier": 4,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1346,
+      "promotedTeams": [
+        "Preston North End (1)",
+        "Gillingham (2)",
+        "Bury (3)",
+        "Plymouth Argyle (4, PO)"
+      ],
+      "relegatedTeams": [],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Torquay United (24th) were reprieved from relegation because Conference champions Stevenage Borough failed League ground-grading standards."
+      ]
+    },
+    {
+      "slotId": "1996-97-T1",
+      "season": "1996-97",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 970,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Sunderland (18)",
+        "Middlesbrough (19)",
+        "Nottingham Forest (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Middlesbrough: -3 pts (-3 pts: Postponed match against Blackburn Rovers (scheduled for 1996-12-21) without permission due to large number of players injured or ill)"
+      ]
+    },
+    {
+      "slotId": "1996-97-T2",
+      "season": "1996-97",
+      "tier": 2,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1476,
+      "promotedTeams": [
+        "Bolton Wanderers (1)",
+        "Barnsley (2)",
+        "Crystal Palace (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Grimsby Town (22)",
+        "Oldham Athletic (23)",
+        "Southend United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1996-97-T3",
+      "season": "1996-97",
+      "tier": 3,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1269,
+      "promotedTeams": [
+        "Bury (1)",
+        "Stockport County (2)",
+        "Crewe Alexandra (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Peterborough United (21)",
+        "Shrewsbury Town (22)",
+        "Rotherham United (23)",
+        "Notts County (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1996-97-T4",
+      "season": "1996-97",
+      "tier": 4,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1383,
+      "promotedTeams": [
+        "Wigan Athletic (1)",
+        "Fulham (2)",
+        "Carlisle United (3)",
+        "Northampton Town (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Hereford United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Brighton & Hove Albion: -2 pts (-2 pts: Pitch invasion in match against Lincoln City (on 1996-10-01). Had a suspended 3-point deduction following pitch invastion in match against York City on 1996-04-27)"
+      ]
+    },
+    {
+      "slotId": "1997-98-T1",
+      "season": "1997-98",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1019,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Bolton Wanderers (18)",
+        "Barnsley (19)",
+        "Crystal Palace (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1997-98-T2",
+      "season": "1997-98",
+      "tier": 2,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1410,
+      "promotedTeams": [
+        "Nottingham Forest (1)",
+        "Middlesbrough (2)",
+        "Charlton Athletic (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Manchester City (22)",
+        "Stoke City (23)",
+        "Reading (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1997-98-T3",
+      "season": "1997-98",
+      "tier": 3,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1337,
+      "promotedTeams": [
+        "Watford (1)",
+        "Bristol City (2)",
+        "Grimsby Town (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Brentford (21)",
+        "Plymouth Argyle (22)",
+        "Carlisle United (23)",
+        "Southend United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1997-98-T4",
+      "season": "1997-98",
+      "tier": 4,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1431,
+      "promotedTeams": [
+        "Notts County (1)",
+        "Macclesfield Town (2)",
+        "Lincoln City (3)",
+        "Colchester United (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Doncaster Rovers (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Leyton Orient: -3 pts (-3 pts: Fielded suspended players (Mark Warren; Simon Clark; Stuart Hicks) [unsure of exact date of point deduction])"
+      ]
+    },
+    {
+      "slotId": "1998-99-T1",
+      "season": "1998-99",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 959,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Charlton Athletic (18)",
+        "Blackburn Rovers (19)",
+        "Nottingham Forest (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1998-99-T2",
+      "season": "1998-99",
+      "tier": 2,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1455,
+      "promotedTeams": [
+        "Sunderland (1)",
+        "Bradford City (2)",
+        "Watford (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Bury (22)",
+        "Oxford United (23)",
+        "Bristol City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1998-99-T3",
+      "season": "1998-99",
+      "tier": 3,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1358,
+      "promotedTeams": [
+        "Fulham (1)",
+        "Walsall (2)",
+        "Manchester City (3, PO)"
+      ],
+      "relegatedTeams": [
+        "York City (21)",
+        "Northampton Town (22)",
+        "Lincoln City (23)",
+        "Macclesfield Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1998-99-T4",
+      "season": "1998-99",
+      "tier": 4,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1395,
+      "promotedTeams": [
+        "Brentford (1)",
+        "Cambridge United (2)",
+        "Cardiff City (3)",
+        "Scunthorpe United (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Scarborough (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1999-00-T1",
+      "season": "1999-00",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1060,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Wimbledon (18)",
+        "Sheffield Wednesday (19)",
+        "Watford (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1999-00-T2",
+      "season": "1999-00",
+      "tier": 2,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1391,
+      "promotedTeams": [
+        "Charlton Athletic (1)",
+        "Manchester City (2)",
+        "Ipswich Town (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Walsall (22)",
+        "Port Vale (23)",
+        "Swindon Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1999-00-T3",
+      "season": "1999-00",
+      "tier": 3,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1404,
+      "promotedTeams": [
+        "Preston North End (1)",
+        "Burnley (2)",
+        "Gillingham (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Cardiff City (21)",
+        "Blackpool (22)",
+        "Scunthorpe United (23)",
+        "Chesterfield (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "1999-00-T4",
+      "season": "1999-00",
+      "tier": 4,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1303,
+      "promotedTeams": [
+        "Swansea City (1)",
+        "Rotherham United (2)",
+        "Northampton Town (3)",
+        "Peterborough United (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Chester City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2000-01-T1",
+      "season": "2000-01",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 992,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Manchester City (18)",
+        "Coventry City (19)",
+        "Bradford City (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2000-01-T2",
+      "season": "2000-01",
+      "tier": 2,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1373,
+      "promotedTeams": [
+        "Fulham (1)",
+        "Blackburn Rovers (2)",
+        "Bolton Wanderers (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Huddersfield Town (22)",
+        "Queens Park Rangers (23)",
+        "Tranmere Rovers (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2000-01-T3",
+      "season": "2000-01",
+      "tier": 3,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1466,
+      "promotedTeams": [
+        "Millwall (1)",
+        "Rotherham United (2)",
+        "Walsall (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Bristol Rovers (21)",
+        "Luton Town (22)",
+        "Swansea City (23)",
+        "Oxford United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2000-01-T4",
+      "season": "2000-01",
+      "tier": 4,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1397,
+      "promotedTeams": [
+        "Brighton & Hove Albion (1)",
+        "Cardiff City (2)",
+        "Chesterfield (3)",
+        "Blackpool (7, PO)"
+      ],
+      "relegatedTeams": [
+        "Barnet (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Chesterfield: -9 pts (-9 pts: Financial irregularities)"
+      ]
+    },
+    {
+      "slotId": "2001-02-T1",
+      "season": "2001-02",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1001,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Ipswich Town (18)",
+        "Derby County (19)",
+        "Leicester City (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2001-02-T2",
+      "season": "2001-02",
+      "tier": 2,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1485,
+      "promotedTeams": [
+        "Manchester City (1)",
+        "West Bromwich Albion (2)",
+        "Birmingham City (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Crewe Alexandra (22)",
+        "Barnsley (23)",
+        "Stockport County (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2001-02-T3",
+      "season": "2001-02",
+      "tier": 3,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1472,
+      "promotedTeams": [
+        "Brighton & Hove Albion (1)",
+        "Reading (2)",
+        "Stoke City (5, PO)"
+      ],
+      "relegatedTeams": [
+        "AFC Bournemouth (21)",
+        "Bury (22)",
+        "Wrexham (23)",
+        "Cambridge United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2001-02-T4",
+      "season": "2001-02",
+      "tier": 4,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1397,
+      "promotedTeams": [
+        "Plymouth Argyle (1)",
+        "Luton Town (2)",
+        "Mansfield Town (3)",
+        "Cheltenham Town (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Halifax Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2002-03-T1",
+      "season": "2002-03",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1000,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "West Ham United (18)",
+        "West Bromwich Albion (19)",
+        "Sunderland (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2002-03-T2",
+      "season": "2002-03",
+      "tier": 2,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1512,
+      "promotedTeams": [
+        "Portsmouth (1)",
+        "Leicester City (2)",
+        "Wolverhampton Wanderers (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Sheffield Wednesday (22)",
+        "Brighton & Hove Albion (23)",
+        "Grimsby Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2002-03-T3",
+      "season": "2002-03",
+      "tier": 3,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1421,
+      "promotedTeams": [
+        "Wigan Athletic (1)",
+        "Crewe Alexandra (2)",
+        "Cardiff City (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Cheltenham Town (21)",
+        "Huddersfield Town (22)",
+        "Mansfield Town (23)",
+        "Northampton Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2002-03-T4",
+      "season": "2002-03",
+      "tier": 4,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1419,
+      "promotedTeams": [
+        "Rushden & Diamonds (1)",
+        "Hartlepool United (2)",
+        "Wrexham (3)",
+        "AFC Bournemouth (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Exeter City (23)",
+        "Shrewsbury Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Boston United: -4 pts (-4 pts: Financial irregularities)"
+      ]
+    },
+    {
+      "slotId": "2003-04-T1",
+      "season": "2003-04",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1012,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Leicester City (18)",
+        "Leeds United (19)",
+        "Wolverhampton Wanderers (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2003-04-T2",
+      "season": "2003-04",
+      "tier": 2,
+      "historicalDivisionName": "Football League First Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1435,
+      "promotedTeams": [
+        "Norwich City (1)",
+        "West Bromwich Albion (2)",
+        "Crystal Palace (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Walsall (22)",
+        "Bradford City (23)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2003-04-T3",
+      "season": "2003-04",
+      "tier": 3,
+      "historicalDivisionName": "Football League Second Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1460,
+      "promotedTeams": [
+        "Plymouth Argyle (1)",
+        "Queens Park Rangers (2)",
+        "Brighton & Hove Albion (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Grimsby Town (21)",
+        "Rushden & Diamonds (22)",
+        "Notts County (23)",
+        "Wycombe Wanderers (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2003-04-T4",
+      "season": "2003-04",
+      "tier": 4,
+      "historicalDivisionName": "Football League Third Division",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1398,
+      "promotedTeams": [
+        "Doncaster Rovers (1)",
+        "Hull City (2)",
+        "Torquay United (3)",
+        "Huddersfield Town (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Carlisle United (23)",
+        "York City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2004-05-T1",
+      "season": "2004-05",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 975,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Crystal Palace (18)",
+        "Norwich City (19)",
+        "Southampton (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2004-05-T2",
+      "season": "2004-05",
+      "tier": 2,
+      "historicalDivisionName": "Football League Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1342,
+      "promotedTeams": [
+        "Sunderland (1)",
+        "Wigan Athletic (2)",
+        "West Ham United (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Gillingham (22)",
+        "Nottingham Forest (23)",
+        "Rotherham United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2004-05-T3",
+      "season": "2004-05",
+      "tier": 3,
+      "historicalDivisionName": "Football League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1551,
+      "promotedTeams": [
+        "Luton Town (1)",
+        "Hull City (2)",
+        "Sheffield Wednesday (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Torquay United (21)",
+        "Wrexham (22)",
+        "Peterborough United (23)",
+        "Stockport County (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Wrexham: -10 pts (-10 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2004-05-T4",
+      "season": "2004-05",
+      "tier": 4,
+      "historicalDivisionName": "Football League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1347,
+      "promotedTeams": [
+        "Yeovil Town (1)",
+        "Scunthorpe United (2)",
+        "Swansea City (3)",
+        "Southend United (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Kidderminster Harriers (23)",
+        "Cambridge United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Cambridge United: -10 pts (-10 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2005-06-T1",
+      "season": "2005-06",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 944,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Birmingham City (18)",
+        "West Bromwich Albion (19)",
+        "Sunderland (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2005-06-T2",
+      "season": "2005-06",
+      "tier": 2,
+      "historicalDivisionName": "Football League Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1341,
+      "promotedTeams": [
+        "Reading (1)",
+        "Sheffield United (2)",
+        "Watford (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Crewe Alexandra (22)",
+        "Millwall (23)",
+        "Brighton & Hove Albion (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2005-06-T3",
+      "season": "2005-06",
+      "tier": 3,
+      "historicalDivisionName": "Football League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1384,
+      "promotedTeams": [
+        "Southend United (1)",
+        "Colchester United (2)",
+        "Barnsley (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Hartlepool United (21)",
+        "Milton Keynes Dons (22)",
+        "Swindon Town (23)",
+        "Walsall (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2005-06-T4",
+      "season": "2005-06",
+      "tier": 4,
+      "historicalDivisionName": "Football League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1392,
+      "promotedTeams": [
+        "Carlisle United (1)",
+        "Northampton Town (2)",
+        "Leyton Orient (3)",
+        "Cheltenham Town (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Oxford United (23)",
+        "Rushden & Diamonds (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Bury: -1 pts (-1 pts: Fielded an ineligible player (Colin Marrison; in a match against Lincoln City on 2006-04-15 after his loan deal had expired))"
+      ]
+    },
+    {
+      "slotId": "2006-07-T1",
+      "season": "2006-07",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 931,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Sheffield United (18)",
+        "Charlton Athletic (19)",
+        "Watford (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2006-07-T2",
+      "season": "2006-07",
+      "tier": 2,
+      "historicalDivisionName": "Football League Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1439,
+      "promotedTeams": [
+        "Sunderland (1)",
+        "Birmingham City (2)",
+        "Derby County (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Southend United (22)",
+        "Luton Town (23)",
+        "Leeds United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Leeds United: -10 pts (-10 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2006-07-T3",
+      "season": "2006-07",
+      "tier": 3,
+      "historicalDivisionName": "Football League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1386,
+      "promotedTeams": [
+        "Scunthorpe United (1)",
+        "Bristol City (2)",
+        "Blackpool (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Chesterfield (21)",
+        "Bradford City (22)",
+        "Rotherham United (23)",
+        "Brentford (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Rotherham United: -10 pts (-10 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2006-07-T4",
+      "season": "2006-07",
+      "tier": 4,
+      "historicalDivisionName": "Football League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1372,
+      "promotedTeams": [
+        "Walsall (1)",
+        "Hartlepool United (2)",
+        "Swindon Town (3)",
+        "Bristol Rovers (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Boston United (23)",
+        "Torquay United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Boston United (23rd after a final-day 10-point administration penalty) were relegated two divisions directly to the Conference North alongside 24th-placed Torquay United.",
+        "Boston United: -10 pts (-10 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2007-08-T1",
+      "season": "2007-08",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1002,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Reading (18)",
+        "Birmingham City (19)",
+        "Derby County (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2007-08-T2",
+      "season": "2007-08",
+      "tier": 2,
+      "historicalDivisionName": "Football League Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1394,
+      "promotedTeams": [
+        "West Bromwich Albion (1)",
+        "Stoke City (2)",
+        "Hull City (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Leicester City (22)",
+        "Scunthorpe United (23)",
+        "Colchester United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2007-08-T3",
+      "season": "2007-08",
+      "tier": 3,
+      "historicalDivisionName": "Football League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1335,
+      "promotedTeams": [
+        "Swansea City (1)",
+        "Nottingham Forest (2)",
+        "Doncaster Rovers (3, PO)"
+      ],
+      "relegatedTeams": [
+        "AFC Bournemouth (21)",
+        "Gillingham (22)",
+        "Port Vale (23)",
+        "Luton Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Leeds United: -15 pts (-15 pts: Breach of financial rules)",
+        "AFC Bournemouth: -10 pts (-10 pts: Entered administration)",
+        "Luton Town: -10 pts (-10 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2007-08-T4",
+      "season": "2007-08",
+      "tier": 4,
+      "historicalDivisionName": "Football League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1427,
+      "promotedTeams": [
+        "Milton Keynes Dons (1)",
+        "Peterborough United (2)",
+        "Hereford United (3)",
+        "Stockport County (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Mansfield Town (23)",
+        "Wrexham (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Rotherham United: -10 pts (-10 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2008-09-T1",
+      "season": "2008-09",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 942,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Newcastle United (18)",
+        "Middlesbrough (19)",
+        "West Bromwich Albion (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2008-09-T2",
+      "season": "2008-09",
+      "tier": 2,
+      "historicalDivisionName": "Football League Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1350,
+      "promotedTeams": [
+        "Wolverhampton Wanderers (1)",
+        "Birmingham City (2)",
+        "Burnley (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Norwich City (22)",
+        "Southampton (23)",
+        "Charlton Athletic (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Crystal Palace: -1 pts (-1 pts: Fielded an ineligible player (Rui Fonte; in a match against Sheffield United on 2009-05-03 whose youth loan paperwork had expired))"
+      ]
+    },
+    {
+      "slotId": "2008-09-T3",
+      "season": "2008-09",
+      "tier": 3,
+      "historicalDivisionName": "Football League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1516,
+      "promotedTeams": [
+        "Leicester City (1)",
+        "Peterborough United (2)",
+        "Scunthorpe United (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Northampton Town (21)",
+        "Crewe Alexandra (22)",
+        "Cheltenham Town (23)",
+        "Hereford United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Stockport County: -10 pts (-10 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2008-09-T4",
+      "season": "2008-09",
+      "tier": 4,
+      "historicalDivisionName": "Football League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1374,
+      "promotedTeams": [
+        "Brentford (1)",
+        "Exeter City (2)",
+        "Wycombe Wanderers (3)",
+        "Gillingham (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Chester City (23)",
+        "Luton Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Darlington: -10 pts (-10 pts: Entered administration)",
+        "Rotherham United: -17 pts (-17 pts: Breach of insolvency rules (leaving administration without a Company Voluntary Agreement [CVA]))",
+        "AFC Bournemouth: -17 pts (-17 pts: Breach of insolvency rules (leaving administration without a Company Voluntary Agreement [CVA]))",
+        "Luton Town: -30 pts (-20 pts: Breach of insolvency rules (leaving administration without a Company Voluntary Agreement [CVA]) | -10 pts: Misconduct for paying agents via a third party)"
+      ]
+    },
+    {
+      "slotId": "2009-10-T1",
+      "season": "2009-10",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1053,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Burnley (18)",
+        "Hull City (19)",
+        "Portsmouth (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Portsmouth: -9 pts (-9 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2009-10-T2",
+      "season": "2009-10",
+      "tier": 2,
+      "historicalDivisionName": "Football League Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1425,
+      "promotedTeams": [
+        "Newcastle United (1)",
+        "West Bromwich Albion (2)",
+        "Blackpool (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Sheffield Wednesday (22)",
+        "Plymouth Argyle (23)",
+        "Peterborough United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Crystal Palace: -10 pts (-10 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2009-10-T3",
+      "season": "2009-10",
+      "tier": 3,
+      "historicalDivisionName": "Football League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1459,
+      "promotedTeams": [
+        "Norwich City (1)",
+        "Leeds United (2)",
+        "Millwall (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Gillingham (21)",
+        "Wycombe Wanderers (22)",
+        "Southend United (23)",
+        "Stockport County (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Southampton: -10 pts (-10 pts: Entered administration)",
+        "Hartlepool United: -3 pts (-3 pts: Fielded an ineligible player (Gary Liddle) in match against Brighton & Hove Albion on 2010-04-05 (should have been serving first of two-match suspension))"
+      ]
+    },
+    {
+      "slotId": "2009-10-T4",
+      "season": "2009-10",
+      "tier": 4,
+      "historicalDivisionName": "Football League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1446,
+      "promotedTeams": [
+        "Notts County (1)",
+        "AFC Bournemouth (2)",
+        "Rochdale (3)",
+        "Dagenham & Redbridge (7, PO)"
+      ],
+      "relegatedTeams": [
+        "Grimsby Town (23)",
+        "Darlington (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2010-11-T1",
+      "season": "2010-11",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1063,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Birmingham City (18)",
+        "Blackpool (19)",
+        "West Ham United (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2010-11-T2",
+      "season": "2010-11",
+      "tier": 2,
+      "historicalDivisionName": "Football League Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1510,
+      "promotedTeams": [
+        "Queens Park Rangers (1)",
+        "Norwich City (2)",
+        "Swansea City (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Preston North End (22)",
+        "Sheffield United (23)",
+        "Scunthorpe United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2010-11-T3",
+      "season": "2010-11",
+      "tier": 3,
+      "historicalDivisionName": "Football League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1509,
+      "promotedTeams": [
+        "Brighton & Hove Albion (1)",
+        "Southampton (2)",
+        "Peterborough United (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Dagenham & Redbridge (21)",
+        "Bristol Rovers (22)",
+        "Plymouth Argyle (23)",
+        "Swindon Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Plymouth Argyle: -10 pts (-10 pts: Notice of intention to appoint an administrator (insolvency event))"
+      ]
+    },
+    {
+      "slotId": "2010-11-T4",
+      "season": "2010-11",
+      "tier": 4,
+      "historicalDivisionName": "Football League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1506,
+      "promotedTeams": [
+        "Chesterfield (1)",
+        "Bury (2)",
+        "Wycombe Wanderers (3)",
+        "Stevenage (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Lincoln City (23)",
+        "Stockport County (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Torquay United: -1 pts (-1 pts: Fielded an ineligible player (Jake Robinson) in match against Hereford United on 2011-02-01 (missed 1200 deadline for player registration day before match))",
+        "Hereford United: -3 pts (-3 pts: Fielded an ineligible player (Rob Purdie) in match against Torquay united on 2011-02-01 (missed 1200 deadline for player registration day before match))"
+      ]
+    },
+    {
+      "slotId": "2011-12-T1",
+      "season": "2011-12",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1066,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Bolton Wanderers (18)",
+        "Blackburn Rovers (19)",
+        "Wolverhampton Wanderers (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2011-12-T2",
+      "season": "2011-12",
+      "tier": 2,
+      "historicalDivisionName": "Football League Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1419,
+      "promotedTeams": [
+        "Reading (1)",
+        "Southampton (2)",
+        "West Ham United (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Portsmouth (22)",
+        "Coventry City (23)",
+        "Doncaster Rovers (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Portsmouth: -10 pts (-10 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2011-12-T3",
+      "season": "2011-12",
+      "tier": 3,
+      "historicalDivisionName": "Football League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1489,
+      "promotedTeams": [
+        "Charlton Athletic (1)",
+        "Sheffield Wednesday (2)",
+        "Huddersfield Town (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Wycombe Wanderers (21)",
+        "Chesterfield (22)",
+        "Exeter City (23)",
+        "Rochdale (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2011-12-T4",
+      "season": "2011-12",
+      "tier": 4,
+      "historicalDivisionName": "Football League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1458,
+      "promotedTeams": [
+        "Swindon Town (1)",
+        "Shrewsbury Town (2)",
+        "Crawley Town (3)",
+        "Crewe Alexandra (7, PO)"
+      ],
+      "relegatedTeams": [
+        "Hereford United (23)",
+        "Macclesfield Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Port Vale: -10 pts (-10 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2012-13-T1",
+      "season": "2012-13",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1063,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Wigan Athletic (18)",
+        "Reading (19)",
+        "Queens Park Rangers (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2012-13-T2",
+      "season": "2012-13",
+      "tier": 2,
+      "historicalDivisionName": "Football League Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1494,
+      "promotedTeams": [
+        "Cardiff City (1)",
+        "Hull City (2)",
+        "Crystal Palace (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Peterborough United (22)",
+        "Wolverhampton Wanderers (23)",
+        "Bristol City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2012-13-T3",
+      "season": "2012-13",
+      "tier": 3,
+      "historicalDivisionName": "Football League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1367,
+      "promotedTeams": [
+        "Doncaster Rovers (1)",
+        "AFC Bournemouth (2)",
+        "Yeovil Town (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Scunthorpe United (21)",
+        "Bury (22)",
+        "Hartlepool United (23)",
+        "Portsmouth (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Coventry City: -10 pts (-10 pts: Entered administration)",
+        "Portsmouth: -10 pts (-10 pts: Breach of insolvency rules when coming out of administration (Company Voluntary Arrangement [CVA] not fully compliant with the Football League's Insolvency Policy))"
+      ]
+    },
+    {
+      "slotId": "2012-13-T4",
+      "season": "2012-13",
+      "tier": 4,
+      "historicalDivisionName": "Football League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1415,
+      "promotedTeams": [
+        "Gillingham (1)",
+        "Rotherham United (2)",
+        "Port Vale (3)",
+        "Bradford City (7, PO)"
+      ],
+      "relegatedTeams": [
+        "Barnet (23)",
+        "Aldershot Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2013-14-T1",
+      "season": "2013-14",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1052,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Norwich City (18)",
+        "Fulham (19)",
+        "Cardiff City (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2013-14-T2",
+      "season": "2013-14",
+      "tier": 2,
+      "historicalDivisionName": "Football League Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1434,
+      "promotedTeams": [
+        "Leicester City (1)",
+        "Burnley (2)",
+        "Queens Park Rangers (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Doncaster Rovers (22)",
+        "Barnsley (23)",
+        "Yeovil Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2013-14-T3",
+      "season": "2013-14",
+      "tier": 3,
+      "historicalDivisionName": "Football League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1473,
+      "promotedTeams": [
+        "Wolverhampton Wanderers (1)",
+        "Brentford (2)",
+        "Rotherham United (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Tranmere Rovers (21)",
+        "Carlisle United (22)",
+        "Shrewsbury Town (23)",
+        "Stevenage (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Coventry City: -10 pts (-10 pts: Went into liquidation (exited administration without a Company Voluntary Arrangement [CVA]))"
+      ]
+    },
+    {
+      "slotId": "2013-14-T4",
+      "season": "2013-14",
+      "tier": 4,
+      "historicalDivisionName": "Football League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1291,
+      "promotedTeams": [
+        "Chesterfield (1)",
+        "Scunthorpe United (2)",
+        "Rochdale (3)",
+        "Fleetwood Town (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Bristol Rovers (23)",
+        "Torquay United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "AFC Wimbledon: -3 pts (-3 pts: Fielded an ineligible player (Jake Nicholson) in match against Cheltenham on 2014-03-22 (the player's multiplicity contract expired on 2014-03-19 and had not been renewed due to the illness of a key member of the club's administrative staff))"
+      ]
+    },
+    {
+      "slotId": "2014-15-T1",
+      "season": "2014-15",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 975,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Hull City (18)",
+        "Burnley (19)",
+        "Queens Park Rangers (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2014-15-T2",
+      "season": "2014-15",
+      "tier": 2,
+      "historicalDivisionName": "Football League Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1474,
+      "promotedTeams": [
+        "AFC Bournemouth (1)",
+        "Watford (2)",
+        "Norwich City (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Millwall (22)",
+        "Wigan Athletic (23)",
+        "Blackpool (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Rotherham United: -3 pts (-3 pts: Fielded an ineligible player (Farrend Rawson) in match against Brighton on 2015-04-06 (a day after the players youth loan had expired))"
+      ]
+    },
+    {
+      "slotId": "2014-15-T3",
+      "season": "2014-15",
+      "tier": 3,
+      "historicalDivisionName": "Football League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1464,
+      "promotedTeams": [
+        "Bristol City (1)",
+        "Milton Keynes Dons (2)",
+        "Preston North End (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Notts County (21)",
+        "Crawley Town (22)",
+        "Leyton Orient (23)",
+        "Yeovil Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2014-15-T4",
+      "season": "2014-15",
+      "tier": 4,
+      "historicalDivisionName": "Football League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1317,
+      "promotedTeams": [
+        "Burton Albion (1)",
+        "Shrewsbury Town (2)",
+        "Bury (3)",
+        "Southend United (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Cheltenham Town (23)",
+        "Tranmere Rovers (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2015-16-T1",
+      "season": "2015-16",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1026,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Newcastle United (18)",
+        "Norwich City (19)",
+        "Aston Villa (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2015-16-T2",
+      "season": "2015-16",
+      "tier": 2,
+      "historicalDivisionName": "Football League Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1337,
+      "promotedTeams": [
+        "Burnley (1)",
+        "Middlesbrough (2)",
+        "Hull City (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Charlton Athletic (22)",
+        "Milton Keynes Dons (23)",
+        "Bolton Wanderers (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2015-16-T3",
+      "season": "2015-16",
+      "tier": 3,
+      "historicalDivisionName": "Football League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1457,
+      "promotedTeams": [
+        "Wigan Athletic (1)",
+        "Burton Albion (2)",
+        "Barnsley (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Doncaster Rovers (21)",
+        "Blackpool (22)",
+        "Colchester United (23)",
+        "Crewe Alexandra (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Bury: -3 pts (-3 pts: Fielded an ineligible player (Callum Styles) in match against Southend United on 2016-05-08 due to late administrative registration paperwork.)"
+      ]
+    },
+    {
+      "slotId": "2015-16-T4",
+      "season": "2015-16",
+      "tier": 4,
+      "historicalDivisionName": "Football League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1472,
+      "promotedTeams": [
+        "Northampton Town (1)",
+        "Oxford United (2)",
+        "Bristol Rovers (3)",
+        "AFC Wimbledon (7, PO)"
+      ],
+      "relegatedTeams": [
+        "Dagenham & Redbridge (23)",
+        "York City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2016-17-T1",
+      "season": "2016-17",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1064,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Hull City (18)",
+        "Middlesbrough (19)",
+        "Sunderland (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2016-17-T2",
+      "season": "2016-17",
+      "tier": 2,
+      "historicalDivisionName": "EFL Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1441,
+      "promotedTeams": [
+        "Newcastle United (1)",
+        "Brighton & Hove Albion (2)",
+        "Huddersfield Town (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Blackburn Rovers (22)",
+        "Wigan Athletic (23)",
+        "Rotherham United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2016-17-T3",
+      "season": "2016-17",
+      "tier": 3,
+      "historicalDivisionName": "EFL League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1417,
+      "promotedTeams": [
+        "Sheffield United (1)",
+        "Bolton Wanderers (2)",
+        "Millwall (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Port Vale (21)",
+        "Swindon Town (22)",
+        "Coventry City (23)",
+        "Chesterfield (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2016-17-T4",
+      "season": "2016-17",
+      "tier": 4,
+      "historicalDivisionName": "EFL League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1465,
+      "promotedTeams": [
+        "Portsmouth (1)",
+        "Plymouth Argyle (2)",
+        "Doncaster Rovers (3)",
+        "Blackpool (7, PO)"
+      ],
+      "relegatedTeams": [
+        "Hartlepool United (23)",
+        "Leyton Orient (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2017-18-T1",
+      "season": "2017-18",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1018,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Swansea City (18)",
+        "Stoke City (19)",
+        "West Bromwich Albion (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2017-18-T2",
+      "season": "2017-18",
+      "tier": 2,
+      "historicalDivisionName": "EFL Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1409,
+      "promotedTeams": [
+        "Wolverhampton Wanderers (1)",
+        "Cardiff City (2)",
+        "Fulham (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Barnsley (22)",
+        "Burton Albion (23)",
+        "Sunderland (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2017-18-T3",
+      "season": "2017-18",
+      "tier": 3,
+      "historicalDivisionName": "EFL League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1401,
+      "promotedTeams": [
+        "Wigan Athletic (1)",
+        "Blackburn Rovers (2)",
+        "Rotherham United (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Oldham Athletic (21)",
+        "Northampton Town (22)",
+        "Milton Keynes Dons (23)",
+        "Bury (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2017-18-T4",
+      "season": "2017-18",
+      "tier": 4,
+      "historicalDivisionName": "EFL League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1458,
+      "promotedTeams": [
+        "Accrington Stanley (1)",
+        "Luton Town (2)",
+        "Wycombe Wanderers (3)",
+        "Coventry City (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Barnet (23)",
+        "Chesterfield (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2018-19-T1",
+      "season": "2018-19",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1072,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Cardiff City (18)",
+        "Fulham (19)",
+        "Huddersfield Town (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2018-19-T2",
+      "season": "2018-19",
+      "tier": 2,
+      "historicalDivisionName": "EFL Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1473,
+      "promotedTeams": [
+        "Norwich City (1)",
+        "Sheffield United (2)",
+        "Aston Villa (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Rotherham United (22)",
+        "Bolton Wanderers (23)",
+        "Ipswich Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Birmingham City: -9 pts (-9 pts: Breach of financial rules)"
+      ]
+    },
+    {
+      "slotId": "2018-19-T3",
+      "season": "2018-19",
+      "tier": 3,
+      "historicalDivisionName": "EFL League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1462,
+      "promotedTeams": [
+        "Luton Town (1)",
+        "Barnsley (2)",
+        "Charlton Athletic (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Plymouth Argyle (21)",
+        "Walsall (22)",
+        "Scunthorpe United (23)",
+        "Bradford City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2018-19-T4",
+      "season": "2018-19",
+      "tier": 4,
+      "historicalDivisionName": "EFL League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1409,
+      "promotedTeams": [
+        "Lincoln City (1)",
+        "Bury (2)",
+        "Milton Keynes Dons (3)",
+        "Tranmere Rovers (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Notts County (23)",
+        "Yeovil Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2019-20-T1",
+      "season": "2019-20",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1034,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "AFC Bournemouth (18)",
+        "Watford (19)",
+        "Norwich City (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2019-20-T2",
+      "season": "2019-20",
+      "tier": 2,
+      "historicalDivisionName": "EFL Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1457,
+      "promotedTeams": [
+        "Leeds United (1)",
+        "West Bromwich Albion (2)",
+        "Fulham (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Charlton Athletic (22)",
+        "Wigan Athletic (23)",
+        "Hull City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Wigan Athletic: -12 pts (-12 pts: Entered administration (points deduction applied at the end of the season))"
+      ]
+    },
+    {
+      "slotId": "2019-20-T3",
+      "season": "2019-20",
+      "tier": 3,
+      "historicalDivisionName": "EFL League One",
+      "status": "curtailed",
+      "rankingBasis": "unweighted_ppg",
+      "participantCount": 23,
+      "matchCount": 400,
+      "totalGoals": 1044,
+      "promotedTeams": [
+        "Coventry City (1)",
+        "Rotherham United (2)",
+        "Wycombe Wanderers (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Tranmere Rovers (21)",
+        "Southend United (22)",
+        "Bolton Wanderers (23)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Curtailed due to COVID-19: Bury were expelled before playing a fixture (leaving 23 active teams), and remaining clubs were ranked on unweighted points per game (34-36 matches played). Play-offs still took place; 3rd-placed Wycombe Wanderers (1.735 PPG vs Oxford United 1.714 PPG) won the final.",
+        "Bolton Wanderers: -12 pts (-12 pts: Entered administration)"
+      ]
+    },
+    {
+      "slotId": "2019-20-T4",
+      "season": "2019-20",
+      "tier": 4,
+      "historicalDivisionName": "EFL League Two",
+      "status": "curtailed",
+      "rankingBasis": "unweighted_ppg",
+      "participantCount": 24,
+      "matchCount": 440,
+      "totalGoals": 1108,
+      "promotedTeams": [
+        "Swindon Town (1)",
+        "Crewe Alexandra (2)",
+        "Plymouth Argyle (3)",
+        "Northampton Town (7, PO)"
+      ],
+      "relegatedTeams": [
+        "Macclesfield Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Curtailed due to COVID-19: final table ranked on unweighted PPG (36-37 matches played). Only bottom club Macclesfield Town (-17 points deducted net of appeals & August 2020 arbitration ruling) were relegated; 23rd-placed Stevenage were reprieved due to Bury's Tier 3 expulsion. Play-offs still took place; 7th-placed Northampton Town won promotion.",
+        "Macclesfield Town: -17 pts (-6 pts: Failure to pay player wages and failure to fulfil fixture (against Crewe Alexandra) | +2 pts: 6-point deduction from 2019-12-19 reduced to 4 points on appeal | -7 pts: Failure to pay player wages and failure to fulfil fixture (against Plymouth Argyle) | -2 pts: Failure to pay player wages | -4 pts: Failure to pay player wages and failure to act with utmost good faith in respect of matters with the EFL and for breaching an order requriement direction or instruction of the league)"
+      ]
+    },
+    {
+      "slotId": "2020-21-T1",
+      "season": "2020-21",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1024,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Fulham (18)",
+        "West Bromwich Albion (19)",
+        "Sheffield United (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2020-21-T2",
+      "season": "2020-21",
+      "tier": 2,
+      "historicalDivisionName": "EFL Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1274,
+      "promotedTeams": [
+        "Norwich City (1)",
+        "Watford (2)",
+        "Brentford (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Wycombe Wanderers (22)",
+        "Rotherham United (23)",
+        "Sheffield Wednesday (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Sheffield Wednesday: -6 pts (-12 pts: Breach of Profitability and Sustainability Rules | +6 pts: 12-point deduction from start of season reduced to 6 points following a decision from an Independent League Arbitration panel on appeal)"
+      ]
+    },
+    {
+      "slotId": "2020-21-T3",
+      "season": "2020-21",
+      "tier": 3,
+      "historicalDivisionName": "EFL League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1447,
+      "promotedTeams": [
+        "Hull City (1)",
+        "Peterborough United (2)",
+        "Blackpool (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Rochdale (21)",
+        "Northampton Town (22)",
+        "Swindon Town (23)",
+        "Bristol Rovers (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2020-21-T4",
+      "season": "2020-21",
+      "tier": 4,
+      "historicalDivisionName": "EFL League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1303,
+      "promotedTeams": [
+        "Cheltenham Town (1)",
+        "Cambridge United (2)",
+        "Bolton Wanderers (3)",
+        "Morecambe (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Southend United (23)",
+        "Grimsby Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2021-22-T1",
+      "season": "2021-22",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1071,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Burnley (18)",
+        "Watford (19)",
+        "Norwich City (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2021-22-T2",
+      "season": "2021-22",
+      "tier": 2,
+      "historicalDivisionName": "EFL Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1385,
+      "promotedTeams": [
+        "Fulham (1)",
+        "AFC Bournemouth (2)",
+        "Nottingham Forest (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Peterborough United (22)",
+        "Derby County (23)",
+        "Barnsley (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Reading: -6 pts (-6 pts: Breach of financial rules)",
+        "Derby County: -21 pts (-12 pts: Entered administration | -9 pts: Breach of EFL accounting rules)"
+      ]
+    },
+    {
+      "slotId": "2021-22-T3",
+      "season": "2021-22",
+      "tier": 3,
+      "historicalDivisionName": "EFL League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1489,
+      "promotedTeams": [
+        "Wigan Athletic (1)",
+        "Rotherham United (2)",
+        "Sunderland (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Gillingham (21)",
+        "Doncaster Rovers (22)",
+        "AFC Wimbledon (23)",
+        "Crewe Alexandra (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2021-22-T4",
+      "season": "2021-22",
+      "tier": 4,
+      "historicalDivisionName": "EFL League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1359,
+      "promotedTeams": [
+        "Forest Green Rovers (1)",
+        "Exeter City (2)",
+        "Bristol Rovers (3)",
+        "Port Vale (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Oldham Athletic (23)",
+        "Scunthorpe United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2022-23-T1",
+      "season": "2022-23",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1084,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Leicester City (18)",
+        "Leeds United (19)",
+        "Southampton (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2022-23-T2",
+      "season": "2022-23",
+      "tier": 2,
+      "historicalDivisionName": "EFL Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1342,
+      "promotedTeams": [
+        "Burnley (1)",
+        "Sheffield United (2)",
+        "Luton Town (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Reading (22)",
+        "Blackpool (23)",
+        "Wigan Athletic (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Reading: -6 pts (-6 pts: Failure to follow league-opposed financial business plan)",
+        "Wigan Athletic: -6 pts (-3 pts: Activation of suspended penalty from January 2023 for late wage payments in June July and October 2022 | -3 pts: Late payment of player wages in March 2023)"
+      ]
+    },
+    {
+      "slotId": "2022-23-T3",
+      "season": "2022-23",
+      "tier": 3,
+      "historicalDivisionName": "EFL League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1414,
+      "promotedTeams": [
+        "Plymouth Argyle (1)",
+        "Ipswich Town (2)",
+        "Sheffield Wednesday (3, PO)"
+      ],
+      "relegatedTeams": [
+        "Milton Keynes Dons (21)",
+        "Morecambe (22)",
+        "Accrington Stanley (23)",
+        "Forest Green Rovers (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2022-23-T4",
+      "season": "2022-23",
+      "tier": 4,
+      "historicalDivisionName": "EFL League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1294,
+      "promotedTeams": [
+        "Leyton Orient (1)",
+        "Stevenage (2)",
+        "Northampton Town (3)",
+        "Carlisle United (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Hartlepool United (23)",
+        "Rochdale (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2023-24-T1",
+      "season": "2023-24",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1246,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Luton Town (18)",
+        "Burnley (19)",
+        "Sheffield United (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Everton: -8 pts (-10 pts: Breach of profit and sustainability rules | +4 pts: 10-point deduction from 2023-11-17 reduced to 6 points on appeal | -2 pts: Breach of profit and sustainability rules)",
+        "Nottingham Forest: -4 pts (-4 pts: Breach of profit and sustainability rules)"
+      ]
+    },
+    {
+      "slotId": "2023-24-T2",
+      "season": "2023-24",
+      "tier": 2,
+      "historicalDivisionName": "EFL Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1480,
+      "promotedTeams": [
+        "Leicester City (1)",
+        "Ipswich Town (2)",
+        "Southampton (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Birmingham City (22)",
+        "Huddersfield Town (23)",
+        "Rotherham United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2023-24-T3",
+      "season": "2023-24",
+      "tier": 3,
+      "historicalDivisionName": "EFL League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1427,
+      "promotedTeams": [
+        "Portsmouth (1)",
+        "Derby County (2)",
+        "Oxford United (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Cheltenham Town (21)",
+        "Fleetwood Town (22)",
+        "Port Vale (23)",
+        "Carlisle United (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Wigan Athletic: -8 pts (-4 pts: Late payment of player and staff wages in May 2023 | -4 pts: Breach of financial rules (missed deadline to deposit 125% of monthly wage bill))",
+        "Reading: -6 pts (-1 pts: Late payment of player wages during 2022/2023 season | -3 pts: Late payment of player and staff wages | -2 pts: Late HMRC payment)"
+      ]
+    },
+    {
+      "slotId": "2023-24-T4",
+      "season": "2023-24",
+      "tier": 4,
+      "historicalDivisionName": "EFL League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1645,
+      "promotedTeams": [
+        "Stockport County (1)",
+        "Wrexham (2)",
+        "Mansfield Town (3)",
+        "Crawley Town (7, PO)"
+      ],
+      "relegatedTeams": [
+        "Sutton United (23)",
+        "Forest Green Rovers (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Morecambe: -3 pts (-3 pts: Late payment of player wages)"
+      ]
+    },
+    {
+      "slotId": "2024-25-T1",
+      "season": "2024-25",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1115,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "Leicester City (18)",
+        "Ipswich Town (19)",
+        "Southampton (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2024-25-T2",
+      "season": "2024-25",
+      "tier": 2,
+      "historicalDivisionName": "EFL Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1353,
+      "promotedTeams": [
+        "Leeds United (1)",
+        "Burnley (2)",
+        "Sunderland (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Luton Town (22)",
+        "Plymouth Argyle (23)",
+        "Cardiff City (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "Sheffield United: -2 pts (-2 pts: Default on payments to other clubs during 2022/2023 season)"
+      ]
+    },
+    {
+      "slotId": "2024-25-T3",
+      "season": "2024-25",
+      "tier": 3,
+      "historicalDivisionName": "EFL League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1427,
+      "promotedTeams": [
+        "Birmingham City (1)",
+        "Wrexham (2)",
+        "Charlton Athletic (4, PO)"
+      ],
+      "relegatedTeams": [
+        "Crawley Town (21)",
+        "Bristol Rovers (22)",
+        "Cambridge United (23)",
+        "Shrewsbury Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2024-25-T4",
+      "season": "2024-25",
+      "tier": 4,
+      "historicalDivisionName": "EFL League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1377,
+      "promotedTeams": [
+        "Doncaster Rovers (1)",
+        "Port Vale (2)",
+        "Bradford City (3)",
+        "AFC Wimbledon (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Carlisle United (23)",
+        "Morecambe (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    }
+  ]
+}
