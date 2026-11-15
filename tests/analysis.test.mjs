@@ -127,3 +127,59 @@ test('Scorer availability contract enforces explicit unavailable state outside P
   assert.equal(mPl.surv38Stats.median, 38);
   assert.equal(mPl.rel38Stats.max, 42);
 });
+
+test('Stage 2 A1-A4: Attack/defence dual metrics, raw-mode official-outcome isolation, draw quartiles, and Stevenage reprieve', () => {
+  const mOff = CA.buildAnalyticalModel(dataset, CA.PRESETS['all-4-tiers']);
+  const mRaw = CA.buildAnalyticalModel(dataset, { ...CA.PRESETS['all-4-tiers'], pointsMode: 'raw' });
+  const mPl = CA.buildAnalyticalModel(dataset, CA.PRESETS['pl-1992-2025']);
+
+  // A1: Pooled R2(PPG) alongside within-slot |r| on both all-4-tiers and pl-1992-2025
+  const plGfW = mPl.correlations.find((c) => c.key === 'gfPerGame').medianAbsRFinish;
+  const plGaW = mPl.correlations.find((c) => c.key === 'gaPerGame').medianAbsRFinish;
+  const plGfR2 = mPl.pooledCorrelations.find((p) => p.key === 'gfPerGame').r2Ppg;
+  const plGaR2 = mPl.pooledCorrelations.find((p) => p.key === 'gaPerGame').r2Ppg;
+  assert.ok(plGaW > plGfW, 'PL 1992-2025 within-slot |r| has GA/G slightly higher than GF/G');
+  assert.ok(plGfR2 > plGaR2, 'PL 1992-2025 pooled R2(PPG) has GF/G higher than GA/G');
+  assert.equal(mOff.byTierCorrelations.length, 4);
+  for (const tc of mOff.byTierCorrelations) {
+    assert.ok(Array.isArray(tc.pooledCorrelations) && tc.pooledCorrelations.length === 5);
+    assert.equal(tc.drawRankInTier, 5);
+  }
+
+  // A2: Draw leader quartile counts and tie non-independence metadata
+  const dl = mOff.drawLeaderStats;
+  assert.equal(dl.count, 233);
+  assert.equal(dl.bottomQuarterCount + dl.middleHalfCount + dl.topQuarterCount, dl.count);
+  assert.equal(dl.bottomQuarterCount, 57);
+  assert.equal(dl.middleHalfCount, 147);
+  assert.equal(dl.topQuarterCount, 29);
+  assert.equal(dl.coLeaderSlotsCount, 46);
+  assert.equal(dl.championCampaigns.length, 1);
+  assert.equal(dl.championCampaigns[0].team, 'Swindon Town');
+  assert.equal(mPl.drawLeaderStats.championCount, 0);
+  assert.equal(mPl.drawLeaderStats.championCampaigns.length, 0);
+
+  // A3: Raw mode keeps official outcomes invariant (Reading 2022-23 T2 stays 44 pts in survivalSeries; rel40 stays 46)
+  assert.equal(mRaw.survivalStats.relegatedAtOrAbove40Over38Rate.length, mOff.survivalStats.relegatedAtOrAbove40Over38Rate.length);
+  const readOff = mOff.survivalSeries.find((s) => s.slotId === '2022-23-T2');
+  const readRaw = mRaw.survivalSeries.find((s) => s.slotId === '2022-23-T2');
+  assert.equal(readOff.relegatedHighPts, 44);
+  assert.equal(readRaw.relegatedHighPts, 44);
+  assert.equal(readRaw.relegatedTeam, readOff.relegatedTeam);
+  assert.equal(mRaw.champStats.ppg.mean, mOff.champStats.ppg.mean);
+  assert.deepEqual(mRaw.drawLeaderStats, mOff.drawLeaderStats);
+
+  // A4: Curtailed 2019-20 T4 excludes reprieved Stevenage (23rd) and uses merit survivor Morecambe (22nd)
+  const mCur = CA.buildAnalyticalModel(dataset, { ...CA.PRESETS['all-4-tiers'], includeCurtailed: true });
+  const l2Surv = mCur.survivalSeries.find((s) => s.slotId === '2019-20-T4');
+  assert.equal(l2Surv.survivingTeam, 'Morecambe');
+  assert.equal(l2Surv.survivingPos, 22);
+  assert.equal(l2Surv.survivingPts, 32);
+  assert.ok(mCur.excludedSurvivalRows.some((x) => x.slotId === '2019-20-T4' && x.team === 'Stevenage' && x.outcomeType === 'reprieved' && x.relegationActiveSlot === true));
+
+  // A4: validateDataset rejects unknown outcomeType
+  const badDs = structuredClone(dataset);
+  badDs.tierSeasons = [structuredClone(badDs.tierSeasons[0])];
+  badDs.tierSeasons[0].table[0].outcomeType = 'made_up';
+  assert.equal(CA.validateDataset(badDs).ok, false);
+});

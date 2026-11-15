@@ -51,7 +51,7 @@
         <div class="scope-points-mode" role="group" aria-label="Points calculation basis">
           <span class="control-group-label">Points Basis:</span>
           <button type="button" class="btn-toggle" data-points-mode="official" aria-pressed="true">Official Table (incl. deductions)</button>
-          <button type="button" class="btn-toggle" data-points-mode="raw" aria-pressed="false">Raw Sporting Points (3W+D)</button>
+          <button type="button" class="btn-toggle" data-points-mode="raw" aria-pressed="false" title="Updates PPG, rawPos and finishScore in predictor correlations/scatter and deduction sensitivity panels; official outcomes stay fixed.">Raw Sporting Points (3W+D)</button>
         </div>
       </div>
 
@@ -132,7 +132,7 @@
             <div class="section-prose" id="sec1-prose"></div>
           </div>
           <aside class="finding-callout" aria-label="Predictor correlation summary">
-            <h3 class="finding-callout-title">Within-Slot Median Correlation (r with Finish Score)</h3>
+            <h3 class="finding-callout-title">Within-Slot vs. Pooled Diagnostics</h3>
             <dl class="finding-kv-list" id="sec1-callout-list"></dl>
           </aside>
         </div>
@@ -172,21 +172,21 @@
           <div class="chart-panel">
             <div class="chart-panel-header">
               <div>
-                <h3 class="chart-title">Within-Slot Correlation Range (Median &amp; IQR vs. Pooled)</h3>
-                <p class="chart-subtitle">Bars span Q1–Q3 across individual tier-seasons; solid dot = within-slot median |r|; diamond = pooled |r|</p>
+                <h3 class="chart-title">Within-Slot Correlation Magnitude (Median |r| &amp; IQR vs. Pooled)</h3>
+                <p class="chart-subtitle">Bars span Q1–Q3 of |r| across individual tier-seasons; solid dot = median of |r| (not |median r|); diamond = pooled |r|</p>
               </div>
             </div>
             <div id="chart-sec1-bars"></div>
             <div tabindex="0" role="region" aria-labelledby="sec1-table-caption" class="table-wrapper" style="margin-block-top: 1rem;">
               <table class="data-table" id="sec1-corr-table">
-                <caption id="sec1-table-caption">Within-Slot Correlation Summary vs. Pooled Diagnostic</caption>
+                <caption id="sec1-table-caption">Within-Slot Correlations (Finish Score &amp; PPG) vs. Pooled R²(PPG)</caption>
                 <thead>
                   <tr>
                     <th scope="col" class="text-col">Metric (Per Game)</th>
-                    <th scope="col">Slot Med r</th>
-                    <th scope="col">IQR (Q1–Q3)</th>
+                    <th scope="col">Med Signed r</th>
+                    <th scope="col">Med |r| (IQR)</th>
                     <th scope="col">Med r(PPG)</th>
-                    <th scope="col">Pooled r</th>
+                    <th scope="col">Pooled R²(PPG)</th>
                   </tr>
                 </thead>
                 <tbody id="sec1-corr-tbody"></tbody>
@@ -194,14 +194,15 @@
             </div>
             <div tabindex="0" role="region" aria-labelledby="sec1-tier-caption" class="table-wrapper" style="margin-block-top: 1rem;">
               <table class="data-table" id="sec1-tier-table">
-                <caption id="sec1-tier-caption">Attack vs. Defence by Pyramid Tier (Median Within-Slot |r| with Finish Score)</caption>
+                <caption id="sec1-tier-caption">Attack vs. Defence by Pyramid Tier (Within-Slot Med |r| &amp; Pooled R² with PPG)</caption>
                 <thead>
                   <tr>
-                    <th scope="col" class="text-col">Pyramid Tier</th>
+                    <th scope="col" class="text-col">Tier</th>
                     <th scope="col">Slots</th>
                     <th scope="col">|r| GF/G</th>
                     <th scope="col">|r| GA/G</th>
-                    <th scope="col">GA &gt; GF Slots</th>
+                    <th scope="col">GA &gt; GF</th>
+                    <th scope="col">R²(PPG) GF/GA</th>
                   </tr>
                 </thead>
                 <tbody id="sec1-tier-tbody"></tbody>
@@ -220,7 +221,7 @@
             <div class="section-prose" id="sec2-prose"></div>
           </div>
           <aside class="finding-callout" aria-label="Champion vs Runner-Up averages">
-            <h3 class="finding-callout-title">Normalised Title Profile (Per Game · Mean / Median)</h3>
+            <h3 class="finding-callout-title">Official Title Profile (Per Game · Mean / Median)</h3>
             <dl class="finding-kv-list" id="sec2-callout-list"></dl>
           </aside>
         </div>
@@ -313,7 +314,7 @@
             <div class="section-prose" id="sec3-prose"></div>
           </div>
           <aside class="finding-callout" aria-label="Relegation and promotion thresholds">
-            <h3 class="finding-callout-title">Survival Boundary Summary</h3>
+            <h3 class="finding-callout-title">Official Survival Boundary Summary</h3>
             <dl class="finding-kv-list" id="sec3-callout-list"></dl>
           </aside>
         </div>
@@ -346,7 +347,7 @@
             <div class="chart-panel-header">
               <div>
                 <h3 class="chart-title">Relegation Cutoffs by Pyramid Tier</h3>
-                <p class="chart-subtitle">Excludes 0-relegation re-election / reprieve seasons cleanly</p>
+                <p class="chart-subtitle">Official points per game across relegation-active divisions (reprieves separated when present)</p>
               </div>
             </div>
             <div tabindex="0" role="region" aria-labelledby="sec3-tier-caption" class="table-wrapper">
@@ -371,7 +372,7 @@
             <div class="chart-panel-header">
               <div>
                 <h3 class="chart-title">Promotion Cutoffs &amp; Play-Off Seeds (Tiers 2–4)</h3>
-                <p class="chart-subtitle">Lowest automatic promotion finish &amp; seeded finishing position of play-off winners</p>
+                <p class="chart-subtitle">Official automatic promotion floor &amp; seeded finish of play-off winners (3W+D deduction sensitivity below)</p>
               </div>
             </div>
             <div tabindex="0" role="region" aria-labelledby="sec3-promo-caption" class="table-wrapper">
@@ -413,8 +414,8 @@
           <div class="chart-panel">
             <div class="chart-panel-header">
               <div>
-                <h3 class="chart-title">Where Season Draw-Leaders Finish (Normalised Percentile)</h3>
-                <p class="chart-subtitle">Every club that led or co-led its tier-season in draws across 20–24 team divisions</p>
+                <h3 class="chart-title">Where Season Draw-Leaders Finish (Official Finish Percentile)</h3>
+                <p class="chart-subtitle">Clubs leading or co-leading a tier-season in draws (ties yield multiple co-leaders per table; official 20–24 club finishes)</p>
               </div>
             </div>
             <div id="chart-sec4-draws-pos"></div>

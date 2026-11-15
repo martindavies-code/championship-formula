@@ -2,7 +2,7 @@
   "schemaVersion": "2.0.0",
   "generatedForEndpoint": "2024-25",
   "canonicalDatasetFile": "data/england-tiers-1-4-1981-2025.json",
-  "canonicalJsonSha256": "834fd3c049edc3669e9c8fba665c6511d99114c0fd8ec36f41a4a4d669330430",
+  "canonicalJsonSha256": "5dcddcc452b28bc670a3e3297409e9b7ca62d011a5cfa34f06fc28cbef135387",
   "totals": {
     "slotsExpected": 176,
     "slotsPresent": 176,
@@ -1505,6 +1505,7 @@
       "key": "2003|2|wimbledon",
       "promoted": false,
       "relegated": true,
+      "outcomeType": "none",
       "administrativeOutcome": null,
       "sourceNote": "Renamed and relocated as Milton Keynes Dons ahead of 2004-05.",
       "source": "https://www.rsssf.org/engpaul/FLA/2003-04.html & https://en.wikipedia.org/wiki/2003%E2%80%9304_Football_League_First_Division"
@@ -1513,6 +1514,7 @@
       "key": "1990|4|aldershot",
       "promoted": false,
       "relegated": false,
+      "outcomeType": "withdrew",
       "administrativeOutcome": "Finished 23rd (not relegated during League restructuring); remained in 1991-92 Fourth Division before withdrawing/folding in March 1992 with all 1991-92 results expunged.",
       "source": "https://www.rsssf.org/engpaul/FLA/1990-91.html & https://www.rsssf.org/engpaul/FLA/1991-92.html"
     },
@@ -1520,6 +1522,7 @@
       "key": "1991|4|maidstone united",
       "promoted": false,
       "relegated": false,
+      "outcomeType": "withdrew",
       "administrativeOutcome": "Finished 18th (not relegated); resigned from the Football League in August 1992 prior to 1992-93 fixtures.",
       "source": "https://www.rsssf.org/engpaul/FLA/1991-92.html"
     },
@@ -1527,6 +1530,7 @@
       "key": "2006|4|boston united",
       "promoted": false,
       "relegated": true,
+      "outcomeType": "administration_relegation",
       "administrativeOutcome": "Relegated two divisions to Conference North due to CVA/administration (-10 final-day penalty).",
       "source": "https://en.wikipedia.org/wiki/2006%E2%80%9307_Football_League_Two"
     },
@@ -1534,6 +1538,7 @@
       "key": "2018|4|bury",
       "promoted": true,
       "relegated": false,
+      "outcomeType": "expelled",
       "administrativeOutcome": "Finished 2nd (promoted on final table); expelled from EFL in August 2019 before playing in 2019-20 League One.",
       "source": "https://www.rsssf.org/tablese/eng2019.html & https://en.wikipedia.org/wiki/2019%E2%80%9320_EFL_League_One"
     }

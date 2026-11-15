@@ -42,10 +42,13 @@ const PL_BASELINE_PATH = path.join(REPO_DIR, 'data/premier-league-1992-2025.json
 // Tiers 1-3 missing next-season membership MUST appear here or the importer fails loudly.
 // Note: Wimbledon (2003-04) was renamed/relocated as Milton Keynes Dons in 2004-05; we keep
 // wimbledon, milton-keynes-dons, and afc-wimbledon as three distinct clubIds without settling naming disputes.
+const VALID_OUTCOME_TYPES = new Set(['none', 'reprieved', 'expelled', 'withdrew', 'administration_relegation']);
+
 const MISSING_NEXT_TIER_OUTCOMES = new Map([
   ['2003|2|wimbledon', {
     promoted: false,
     relegated: true,
+    outcomeType: 'none',
     administrativeOutcome: null,
     sourceNote: 'Renamed and relocated as Milton Keynes Dons ahead of 2004-05.',
     source: 'https://www.rsssf.org/engpaul/FLA/2003-04.html & https://en.wikipedia.org/wiki/2003%E2%80%9304_Football_League_First_Division',
@@ -53,24 +56,28 @@ const MISSING_NEXT_TIER_OUTCOMES = new Map([
   ['1990|4|aldershot', {
     promoted: false,
     relegated: false,
+    outcomeType: 'withdrew',
     administrativeOutcome: 'Finished 23rd (not relegated during League restructuring); remained in 1991-92 Fourth Division before withdrawing/folding in March 1992 with all 1991-92 results expunged.',
     source: 'https://www.rsssf.org/engpaul/FLA/1990-91.html & https://www.rsssf.org/engpaul/FLA/1991-92.html',
   }],
   ['1991|4|maidstone united', {
     promoted: false,
     relegated: false,
+    outcomeType: 'withdrew',
     administrativeOutcome: 'Finished 18th (not relegated); resigned from the Football League in August 1992 prior to 1992-93 fixtures.',
     source: 'https://www.rsssf.org/engpaul/FLA/1991-92.html',
   }],
   ['2006|4|boston united', {
     promoted: false,
     relegated: true,
+    outcomeType: 'administration_relegation',
     administrativeOutcome: 'Relegated two divisions to Conference North due to CVA/administration (-10 final-day penalty).',
     source: 'https://en.wikipedia.org/wiki/2006%E2%80%9307_Football_League_Two',
   }],
   ['2018|4|bury', {
     promoted: true,
     relegated: false,
+    outcomeType: 'expelled',
     administrativeOutcome: 'Finished 2nd (promoted on final table); expelled from EFL in August 2019 before playing in 2019-20 League One.',
     source: 'https://www.rsssf.org/tablese/eng2019.html & https://en.wikipedia.org/wiki/2019%E2%80%9320_EFL_League_One',
   }],
@@ -495,6 +502,7 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
       const isChamp = row.pos === 1;
       let promoted = false;
       let relegated = false;
+      let outcomeType = 'none';
       let administrativeOutcome = null;
       let sourceNote = null;
 
@@ -515,11 +523,13 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
             }
             promoted = Boolean(documented.promoted);
             relegated = Boolean(documented.relegated);
+            if (documented.outcomeType) outcomeType = documented.outcomeType;
             if (documented.administrativeOutcome) administrativeOutcome = documented.administrativeOutcome;
             if (documented.sourceNote) sourceNote = documented.sourceNote;
           } else if (documented) {
             promoted = Boolean(documented.promoted);
             relegated = Boolean(documented.relegated);
+            if (documented.outcomeType) outcomeType = documented.outcomeType;
             if (documented.administrativeOutcome) administrativeOutcome = documented.administrativeOutcome;
             if (documented.sourceNote) sourceNote = documented.sourceNote;
           } else {
@@ -543,12 +553,17 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
         administrativeOutcome = 'Promoted from play-offs after final winners Swindon Town were stripped of promotion';
       }
       if (sy === 2019 && tier === 4 && row.pos === 23) {
+        outcomeType = 'reprieved';
         administrativeOutcome = 'Reprieved from relegation following Bury expulsion in League One';
       }
       if ((sy === 1993 && tier === 4 && row.pos === 22) || (sy === 1994 && tier === 4 && row.pos === 22) || (sy === 1995 && tier === 4 && row.pos === 24)) {
+        outcomeType = 'reprieved';
         administrativeOutcome = 'Reprieved from relegation because Conference champions failed League ground-grading requirements';
       }
-      return { row, isChamp, promoted, relegated, administrativeOutcome, sourceNote };
+      if (!VALID_OUTCOME_TYPES.has(outcomeType)) {
+        throw new Error(`Invalid outcomeType "${outcomeType}" in ${slotKey} (${row.team})`);
+      }
+      return { row, isChamp, promoted, relegated, outcomeType, administrativeOutcome, sourceNote };
     });
 
     // Determine authoritative play-off winner key: parsed RSSSF final if promoted, else lowest-placed promoted club when play-offs were contested (excl. 1986-87 T2 where T1 Charlton stayed up)
@@ -558,7 +573,7 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
       effectivePoWinnerKey = promotedPrelim[promotedPrelim.length - 1].row.normKey;
     }
 
-    const rowsFinal = rowsPrelim.map(({ row, isChamp, promoted, relegated, administrativeOutcome, sourceNote }) => {
+    const rowsFinal = rowsPrelim.map(({ row, isChamp, promoted, relegated, outcomeType, administrativeOutcome, sourceNote }) => {
       let promotionMethod = null;
       if (promoted) {
         promotedCount++;
@@ -588,6 +603,7 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
         promoted,
         promotionMethod,
         relegated,
+        outcomeType,
         administrativeOutcome,
         ...(sourceNote ? { sourceNote } : {}),
         topScorer: row.topScorer,
@@ -720,6 +736,7 @@ for (const slot of tierSeasons) {
     if (row.gd !== row.gf - row.ga) throw new Error(`GD fail in ${slot.slotId} ${row.team}`);
     if (row.rawPoints !== 3 * row.won + row.drawn) throw new Error(`RawPoints fail in ${slot.slotId} ${row.team}`);
     if (row.points !== row.rawPoints + row.signedAdjustment) throw new Error(`OfficialPoints fail in ${slot.slotId} ${row.team}`);
+    if (!VALID_OUTCOME_TYPES.has(row.outcomeType)) throw new Error(`Invalid outcomeType fail in ${slot.slotId} ${row.team}`);
   }
   if (slot.relegationSlots !== slot.table.filter((r) => r.relegated).length) {
     throw new Error(`RelegationSlots mismatch in ${slot.slotId}`);

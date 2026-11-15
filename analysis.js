@@ -58,6 +58,9 @@
     4: 'Tier 4 (Fourth Div / League Two)',
   };
 
+  const VALID_OUTCOME_TYPES = new Set(['none', 'reprieved', 'expelled', 'withdrew', 'administration_relegation']);
+  const EXCLUDED_SURVIVAL_OUTCOMES = new Set(['reprieved', 'expelled', 'withdrew']);
+
   const PREDICTOR_DEFS = [
     {
       key: 'winRate',
@@ -306,6 +309,9 @@
             return { ok: false, error: `Invalid numeric row field ${rk} in ${ts.slotId} (${row.team}).` };
           }
         }
+        if (typeof row.outcomeType !== 'string' || !VALID_OUTCOME_TYPES.has(row.outcomeType)) {
+          return { ok: false, error: `Invalid outcomeType "${String(row.outcomeType)}" in ${ts.slotId} (${row.team}).` };
+        }
       }
     }
     return { ok: true };
@@ -384,6 +390,9 @@
     const validTeams = typeof slot.participantCount === 'number' && slot.participantCount > 1;
     const normPos = validTeams ? (effectivePos - 1) / (slot.participantCount - 1) : null;
     const finishScore = normPos !== null ? 1 - normPos : null;
+    const officialFinishScore = validTeams ? 1 - (row.pos - 1) / (slot.participantCount - 1) : null;
+    const officialPpg = validGames ? row.points / g : null;
+    const rawPpg = validGames ? row.rawPoints / g : null;
 
     return {
       slotId: slot.slotId,
@@ -406,8 +415,8 @@
       effectivePos,
       pointsUsed: ptsUsed,
       ppg: validGames ? ptsUsed / g : null,
-      officialPpg: validGames ? row.points / g : null,
-      rawPpg: validGames ? row.rawPoints / g : null,
+      officialPpg,
+      rawPpg,
       winRate: validGames ? row.won / g : null,
       drawRate: validGames ? row.drawn / g : null,
       lossRate: validGames ? row.lost / g : null,
@@ -416,6 +425,8 @@
       gdPerGame: validGames ? row.gd / g : null,
       pts38: validGames ? (ptsUsed / g) * 38 : null,
       pts46: validGames ? (ptsUsed / g) * 46 : null,
+      officialPts38: validGames ? officialPpg * 38 : null,
+      officialPts46: validGames ? officialPpg * 46 : null,
       wins38: validGames ? (row.won / g) * 38 : null,
       draws38: validGames ? (row.drawn / g) * 38 : null,
       gf38: validGames ? (row.gf / g) * 38 : null,
@@ -423,6 +434,7 @@
       gd38: validGames ? (row.gd / g) * 38 : null,
       normPos,
       finishScore,
+      officialFinishScore,
     };
   }
 
@@ -640,16 +652,24 @@
         const gaAdv = gfPred?.medianAbsRFinish !== null && gaPred?.medianAbsRFinish !== null
           ? gaPred.medianAbsRFinish - gfPred.medianAbsRFinish
           : null;
+        const tAllTeams = tSlots.flatMap((x) => x.enrichedTable);
+        const tPooled = computePooledCorrelations(tAllTeams);
+        const drawIdx = w.predictors.findIndex((p) => p.key === 'drawRate');
+        const drawPredTier = drawIdx >= 0 ? w.predictors[drawIdx] : null;
         return {
           tier: tierNum,
           label: TIER_LABELS[tierNum],
           slotCount: tSlots.length,
-          teamSeasonCount: tSlots.reduce((acc, x) => acc + x.enrichedTable.length, 0),
+          teamSeasonCount: tAllTeams.length,
           predictors: w.predictors,
+          pooledCorrelations: tPooled,
           gaBeatsGfCount: w.gaBeatsGfCount,
           gfBeatsGaCount: w.gfBeatsGaCount,
           comparableGfGaSlots: w.comparableGfGaSlots,
           gaMinusGfMedianAbsR: gaAdv,
+          drawRankInTier: drawIdx >= 0 ? drawIdx + 1 : null,
+          drawIsLastInTier: drawIdx >= 0 && drawIdx === w.predictors.length - 1,
+          drawPositiveSlotsCount: drawPredTier ? drawPredTier.slotValues.filter((sv) => sv.rFinish > 0).length : 0,
         };
       });
     const pooledCorrelations = computePooledCorrelations(allTeams);
@@ -674,7 +694,7 @@
       champs.push(c);
       if (ru) {
         runnersUp.push(ru);
-        const ppgMargin = c.ppg !== null && ru.ppg !== null ? c.ppg - ru.ppg : null;
+        const ppgMargin = c.officialPpg !== null && ru.officialPpg !== null ? c.officialPpg - ru.officialPpg : null;
         titlePairs.push({
           slotId: s.slotId,
           season: s.season,
@@ -684,7 +704,7 @@
           champion: c,
           runnerUp: ru,
           ppgMargin,
-          ptsMargin: c.pointsUsed - ru.pointsUsed,
+          ptsMargin: c.points - ru.points,
           winRateGap: c.winRate !== null && ru.winRate !== null ? c.winRate - ru.winRate : null,
           gaGap: c.gaPerGame !== null && ru.gaPerGame !== null ? c.gaPerGame - ru.gaPerGame : null,
           gfGap: c.gfPerGame !== null && ru.gfPerGame !== null ? c.gfPerGame - ru.gfPerGame : null,
@@ -722,15 +742,15 @@
     function profileMetrics(list) {
       return {
         count: list.length,
-        ppg: statsSummary(list.map((x) => x.ppg)),
+        ppg: statsSummary(list.map((x) => x.officialPpg)),
         winRate: statsSummary(list.map((x) => x.winRate)),
         drawRate: statsSummary(list.map((x) => x.drawRate)),
         gfPerGame: statsSummary(list.map((x) => x.gfPerGame)),
         gaPerGame: statsSummary(list.map((x) => x.gaPerGame)),
         gdPerGame: statsSummary(list.map((x) => x.gdPerGame)),
-        pts38: statsSummary(list.map((x) => x.pts38)),
-        pts46: statsSummary(list.map((x) => x.pts46)),
-        points: statsSummary(list.map((x) => x.pointsUsed)),
+        pts38: statsSummary(list.map((x) => x.officialPts38)),
+        pts46: statsSummary(list.map((x) => x.officialPts46)),
+        points: statsSummary(list.map((x) => x.points)),
         wins38: statsSummary(list.map((x) => x.wins38)),
         gf38: statsSummary(list.map((x) => x.gf38)),
         ga38: statsSummary(list.map((x) => x.ga38)),
@@ -764,9 +784,9 @@
         return {
           ...era,
           count: cSub.length,
-          champPpg: mean(cSub.map((x) => x.ppg)),
-          champPts38: mean(cSub.map((x) => x.pts38)),
-          champPts46: mean(cSub.map((x) => x.pts46)),
+          champPpg: mean(cSub.map((x) => x.officialPpg)),
+          champPts38: mean(cSub.map((x) => x.officialPts38)),
+          champPts46: mean(cSub.map((x) => x.officialPts46)),
           champWinRate: mean(cSub.map((x) => x.winRate)),
           champGfPerGame: mean(cSub.map((x) => x.gfPerGame)),
           champGaPerGame: mean(cSub.map((x) => x.gaPerGame)),
@@ -774,46 +794,69 @@
           champGf38: mean(cSub.map((x) => x.gf38)),
           champGa38: mean(cSub.map((x) => x.ga38)),
           champGd38: mean(cSub.map((x) => x.gd38)),
-          runnerPpg: mean(rSub.map((x) => x.ppg)),
-          runnerPts38: mean(rSub.map((x) => x.pts38)),
+          runnerPpg: mean(rSub.map((x) => x.officialPpg)),
+          runnerPts38: mean(rSub.map((x) => x.officialPts38)),
         };
       })
       .filter((e) => e.count > 0);
 
-    // 3. Survival, Relegation & Promotion Boundaries
-    // IMPORTANT: Never treat 0-relegation slots (e.g. T4 re-election 1981-86, T4 ground-grading reprieves) as relegation survival lines!
+    // 3. Survival, Relegation & Promotion Boundaries (always OFFICIAL table outcomes; typed outcomeType exclusion)
+    // IMPORTANT: Never treat 0-relegation slots or reprieved/expelled/withdrew boundary clubs as merit survival cutoffs.
     const noRelegationSlots = [];
+    const excludedSurvivalRows = [];
     const survivalSeries = [];
 
     for (const s of slots) {
       const relRows = s.enrichedTable.filter((r) => r.relegated);
+      const safeRows = s.enrichedTable.filter((r) => !r.relegated);
+      const adminExcludedInSlot = safeRows.filter((r) => !r.promoted && EXCLUDED_SURVIVAL_OUTCOMES.has(r.outcomeType));
+      for (const ex of adminExcludedInSlot) {
+        excludedSurvivalRows.push({
+          slotId: s.slotId,
+          season: s.season,
+          tier: s.tier,
+          historicalDivisionName: s.historicalDivisionName,
+          relegationActiveSlot: relRows.length > 0,
+          pos: ex.pos,
+          team: ex.team,
+          outcomeType: ex.outcomeType,
+          officialPts: ex.points,
+          officialPpg: ex.officialPpg,
+          administrativeOutcome: ex.administrativeOutcome,
+        });
+      }
+
       if (relRows.length === 0) {
+        const reasonList = adminExcludedInSlot.map((r) => `${r.team} (${r.outcomeType})`).join(', ');
         noRelegationSlots.push({
           slotId: s.slotId,
           season: s.season,
           tier: s.tier,
           historicalDivisionName: s.historicalDivisionName,
           reElectionEra: Boolean(s.reElectionEra),
+          excludedOutcomeTypes: adminExcludedInSlot.map((r) => r.outcomeType),
           note: s.reElectionEra
             ? 'Football League re-election era (0 relegated)'
-            : s.startYear === 1990
-              ? 'League restructuring / expansion (0 relegated; Aldershot remained before 1991–92 withdrawal)'
-              : s.startYear === 1991
-                ? 'Aldershot expunged mid-season; zero bottom-place relegations'
-                : 'Zero teams relegated (Conference ground-grading reprieve)',
+            : adminExcludedInSlot.some((r) => r.outcomeType === 'withdrew')
+              ? `Zero bottom-place relegations (${reasonList})`
+              : adminExcludedInSlot.some((r) => r.outcomeType === 'reprieved')
+                ? `Zero teams relegated (Ground-grading reprieve: ${reasonList})`
+                : 'Zero teams relegated in final standings',
         });
         continue;
       }
-      // Standard relegation boundary: highest finishing relegated club vs club finishing immediately above the first relegated position (or highest surviving non-relegated club when expulsions/reprieves intervene).
+
       const highestRel = relRows.slice().sort((a, b) => a.pos - b.pos)[0];
-      const safeRows = s.enrichedTable.filter((r) => !r.relegated);
-      const lowestSafe = safeRows.slice().sort((a, b) => b.pos - a.pos)[0];
-      const safeAtLine = s.survivalLinePos !== null ? s.enrichedTable.find((r) => r.pos === s.survivalLinePos) : lowestSafe;
-      const surv = safeAtLine || lowestSafe;
+      const meritSafeRows = safeRows.filter((r) => !EXCLUDED_SURVIVAL_OUTCOMES.has(r.outcomeType));
+      const lowestSafe = meritSafeRows.slice().sort((a, b) => b.pos - a.pos)[0];
+      const safeAtLine = s.survivalLinePos !== null ? s.enrichedTable.find((r) => r.pos === s.survivalLinePos) : null;
+      const surv = (safeAtLine && !EXCLUDED_SURVIVAL_OUTCOMES.has(safeAtLine.outcomeType))
+        ? safeAtLine
+        : lowestSafe;
       if (!surv || !highestRel) continue;
 
-      const highRelPtsInTable = Math.max(...relRows.map((r) => r.pointsUsed));
-      const highRelPpgInTable = Math.max(...relRows.map((r) => r.ppg ?? 0));
+      const highRelPtsInTable = Math.max(...relRows.map((r) => r.points));
+      const highRelPpgInTable = Math.max(...relRows.map((r) => r.officialPpg ?? 0));
       const guaranteedSafePpg = highestRel.played > 0 ? (highRelPtsInTable + 1) / highestRel.played : null;
 
       survivalSeries.push({
@@ -825,27 +868,33 @@
         gamesPerTeam: s.plannedGamesPerTeam,
         survivingPos: surv.pos,
         survivingTeam: surv.team,
-        survivingPts: surv.pointsUsed,
-        survivingPpg: surv.ppg,
-        survivingPts38: surv.pts38,
-        survivingPts46: surv.pts46,
+        survivingPts: surv.points,
+        survivingPpg: surv.officialPpg,
+        survivingPts38: surv.officialPts38,
+        survivingPts46: surv.officialPts46,
         relegatedPos: highestRel.pos,
         relegatedTeam: highestRel.team,
-        relegatedPts: highestRel.pointsUsed,
+        relegatedPts: highestRel.points,
         relegatedHighPts: highRelPtsInTable,
-        relegatedPpg: highestRel.ppg,
+        relegatedPpg: highestRel.officialPpg,
         relegatedHighPpg: highRelPpgInTable,
-        relegatedPts38: highestRel.pts38,
-        relegatedPts46: highestRel.pts46,
+        relegatedPts38: highestRel.officialPts38,
+        relegatedPts46: highestRel.officialPts46,
         guaranteedSafePts: highRelPtsInTable + 1,
         guaranteedSafePpg,
-        hasDeductionImpact: relRows.some((r) => r.signedAdjustment !== 0) || s.enrichedTable.filter((r) => !r.relegated).slice(-3).some((r) => r.signedAdjustment !== 0),
+        hasDeductionImpact: relRows.some((r) => r.signedAdjustment !== 0) || safeRows.slice(-3).some((r) => r.signedAdjustment !== 0),
+        excludedReprievedTeams: adminExcludedInSlot.map((r) => {
+          const mod100 = r.pos % 100;
+          const ord = mod100 >= 11 && mod100 <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][r.pos % 10] || 'th');
+          return `${r.team} (${r.pos}${ord}, ${r.outcomeType})`;
+        }),
       });
     }
 
     const survivalStats = {
       slotCount: survivalSeries.length,
       excludedNoRelegationCount: noRelegationSlots.length,
+      excludedAdminBoundaryCount: excludedSurvivalRows.filter((x) => x.relegationActiveSlot).length,
       survivingPpg: statsSummary(survivalSeries.map((x) => x.survivingPpg)),
       relegatedPpg: statsSummary(survivalSeries.map((x) => x.relegatedPpg)),
       survivingPts38: statsSummary(survivalSeries.map((x) => x.survivingPts38)),
@@ -896,9 +945,9 @@
           tier: s.tier,
           lastAutoTeam: lastAuto.team,
           lastAutoPos: lastAuto.pos,
-          lastAutoPts: lastAuto.pointsUsed,
-          lastAutoPpg: lastAuto.ppg,
-          poWinner: poWin ? { team: poWin.team, pos: poWin.pos, pts: poWin.pointsUsed, ppg: poWin.ppg } : null,
+          lastAutoPts: lastAuto.points,
+          lastAutoPpg: lastAuto.officialPpg,
+          poWinner: poWin ? { team: poWin.team, pos: poWin.pos, pts: poWin.points, ppg: poWin.officialPpg } : null,
         });
       }
       if (poWin) {
@@ -908,7 +957,7 @@
           tier: s.tier,
           team: poWin.team,
           pos: poWin.pos,
-          ppg: poWin.ppg,
+          ppg: poWin.officialPpg,
         });
       }
     }
@@ -936,11 +985,14 @@
     const surv38Stats = survival38.length ? statsSummary(survival38.map((x) => x.survivingPts)) : null;
     const rel38Stats = survival38.length ? statsSummary(survival38.map((x) => x.relegatedPts)) : null;
 
-    // 4. Draws Analysis
+    // 4. Draws Analysis (outcomes anchored to official standings even when Points Basis = Raw)
     const seasonDrawLeaders = [];
+    let drawCoLeaderSlotsCount = 0;
     for (const s of slots) {
       const maxD = Math.max(...s.enrichedTable.map((r) => r.drawn));
-      for (const r of s.enrichedTable.filter((x) => x.drawn === maxD)) {
+      const leaders = s.enrichedTable.filter((x) => x.drawn === maxD);
+      if (leaders.length > 1) drawCoLeaderSlotsCount++;
+      for (const r of leaders) {
         seasonDrawLeaders.push(r);
       }
     }
@@ -950,15 +1002,32 @@
       .filter((t) => t.drawRate !== null && t.drawRate >= highDrawRateCutoff)
       .sort((a, b) => (b.drawRate - a.drawRate) || (b.drawn - a.drawn) || (a.startYear - b.startYear));
 
+    const dlChampionRows = seasonDrawLeaders.filter((x) => x.champion);
     const drawLeaderStats = {
       count: seasonDrawLeaders.length,
-      finishScore: statsSummary(seasonDrawLeaders.map((x) => x.finishScore)),
+      slotCount: slots.length,
+      coLeaderSlotsCount: drawCoLeaderSlotsCount,
+      finishScore: statsSummary(seasonDrawLeaders.map((x) => x.officialFinishScore)),
       pos: statsSummary(seasonDrawLeaders.map((x) => x.pos)),
       drawRate: statsSummary(seasonDrawLeaders.map((x) => x.drawRate)),
-      topHalfCount: seasonDrawLeaders.filter((x) => x.finishScore !== null && x.finishScore >= 0.5).length,
+      topHalfCount: seasonDrawLeaders.filter((x) => x.officialFinishScore !== null && x.officialFinishScore >= 0.5).length,
+      bottomQuarterCount: seasonDrawLeaders.filter((x) => x.officialFinishScore !== null && x.officialFinishScore < 0.25).length,
+      middleHalfCount: seasonDrawLeaders.filter((x) => x.officialFinishScore !== null && x.officialFinishScore >= 0.25 && x.officialFinishScore <= 0.75).length,
+      topQuarterCount: seasonDrawLeaders.filter((x) => x.officialFinishScore !== null && x.officialFinishScore > 0.75).length,
       relegatedCount: seasonDrawLeaders.filter((x) => x.relegated).length,
       promotedCount: seasonDrawLeaders.filter((x) => x.promoted).length,
-      championCount: seasonDrawLeaders.filter((x) => x.champion).length,
+      championCount: dlChampionRows.length,
+      championCampaigns: dlChampionRows.map((c) => ({
+        slotId: c.slotId,
+        season: c.season,
+        tier: c.tier,
+        historicalDivisionName: c.historicalDivisionName,
+        team: c.team,
+        won: c.won,
+        drawn: c.drawn,
+        lost: c.lost,
+        points: c.points,
+      })),
     };
 
     const byTierDraws = [1, 2, 3, 4]
@@ -972,8 +1041,8 @@
           slotCount: slots.filter((s) => s.tier === tierNum).length,
           leagueMeanDrawRate: mean(sub.map((x) => x.drawRate)),
           leaderMedianPos: median(leadSub.map((x) => x.pos)),
-          leaderMedianFinishScore: median(leadSub.map((x) => x.finishScore)),
-          leaderTopHalfShare: leadSub.length ? leadSub.filter((x) => (x.finishScore ?? -1) >= 0.5).length / leadSub.length : null,
+          leaderMedianFinishScore: median(leadSub.map((x) => x.officialFinishScore)),
+          leaderTopHalfShare: leadSub.length ? leadSub.filter((x) => (x.officialFinishScore ?? -1) >= 0.5).length / leadSub.length : null,
           leaderRelegatedCount: leadSub.filter((x) => x.relegated).length,
           highDrawCount: highDrawCampaigns.filter((x) => x.tier === tierNum).length,
         };
@@ -1055,9 +1124,9 @@
           runner: statsSummary(pos2Top4.map((x) => x.scorerShare)),
           thirdFourth: statsSummary(pos34Top4.map((x) => x.scorerShare)),
           allTop4: statsSummary(top4Teams.map((x) => x.scorerShare)),
-          rSharePpgTop4: pearson(top4Teams.map((x) => x.scorerShare), top4Teams.map((x) => x.ppg)),
+          rSharePpgTop4: pearson(top4Teams.map((x) => x.scorerShare), top4Teams.map((x) => x.officialPpg)),
           rShareGfTop4: pearson(top4Teams.map((x) => x.scorerShare), top4Teams.map((x) => x.gfPerGame)),
-          rGbPpgAll: pearson(availTeams.map((x) => (x.hasGoldenBootWinner ? 1 : 0)), availTeams.map((x) => x.ppg)),
+          rGbPpgAll: pearson(availTeams.map((x) => (x.hasGoldenBootWinner ? 1 : 0)), availTeams.map((x) => x.officialPpg)),
           rGbChampAll: pearson(availTeams.map((x) => (x.hasGoldenBootWinner ? 1 : 0)), availTeams.map((x) => (x.pos === 1 ? 1 : 0))),
         },
         note: unavailableScorerSlots.length > 0
@@ -1126,6 +1195,7 @@
       byTierChampions,
       eraSplits,
       noRelegationSlots,
+      excludedSurvivalRows,
       survivalSeries,
       survivalStats,
       byTierSurvival,

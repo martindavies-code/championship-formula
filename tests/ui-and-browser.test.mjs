@@ -441,3 +441,68 @@ test('D4: Zero [object, undefined, NaN, or Infinity strings appear in rendered U
     server.close();
   }
 });
+
+test('Stage 2 A1-A5 browser DOM invariants: dual GF/GA metrics, draw copy/quartiles, Raw mode official isolation, and small-sample grammar', { timeout: 35000 }, async () => {
+  const { server, baseUrl } = await startStaticServer();
+  const cdp = await launchCdpSession();
+  try {
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+    await cdp.navigateAndWait(`${baseUrl}/`);
+
+    const allTiers = await cdp.evalJs(`() => ({
+      body: document.body.innerText,
+      sec1: document.getElementById('sec-predictors').textContent,
+      sec4: document.getElementById('sec-draws').textContent,
+    })`);
+    assert.ok(!allTiers.body.includes('1 clubs'), 'Must never render "1 clubs"');
+    assert.ok(!allTiers.body.includes('Excludes 0'), 'Must omit zero-exclusion phrasing');
+    assert.ok(!allTiers.body.includes('flipping the PL-only'), 'Must not contain removed false PL-flip claim');
+    assert.ok(!allTiers.body.includes('22 from 11 draws'), 'Must not contain broken draw arithmetic');
+    assert.ok(allTiers.sec1.includes('Pooled R²(PPG)') && allTiers.sec1.includes('winning 11 and losing 11') && allTiers.sec1.includes('drawing all 22 yields 22 points'), 'Section 1 must include pooled R2 and fixed draw arithmetic');
+    assert.ok(allTiers.sec4.includes('63.1%') && allTiers.sec4.includes('tied co-leaders'), 'Section 4 must include quartile share and co-leader caveat');
+
+    // PL-only slice: must show zero Swindon mention in Section 4 and honest dual GF/GA wording in Section 1
+    await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2025"]').click()`);
+    await new Promise((r) => setTimeout(r, 150));
+    const plText = await cdp.evalJs(`() => ({
+      body: document.body.innerText,
+      sec1: document.getElementById('sec-predictors').textContent,
+      sec3: document.getElementById('sec-survival').textContent,
+      sec4: document.getElementById('sec-draws').textContent,
+    })`);
+    assert.ok(!plText.body.includes('Excludes 0') && !plText.sec3.includes('0 excl.'), 'PL scope must omit zero-exclusion text');
+    assert.ok(!plText.sec1.includes('attacking output slightly leads'));
+    assert.ok(!plText.sec4.includes('Swindon'), 'PL-only Section 4 must never hardcode Swindon');
+    assert.ok(plText.sec4.includes('No draw-leading side in scope won the league title'));
+
+    // Raw mode on T2 2022-23: survival tier table stays official (Reading 44 pts, never 50 pts)
+    await cdp.evalJs(`() => {
+      document.querySelector('[data-preset="all-4-tiers"]').click();
+      document.querySelector('[data-points-mode="raw"]').click();
+      document.querySelectorAll('#scope-tier-checkboxes input[type="checkbox"]').forEach((cb) => {
+        const want = cb.value === '2';
+        if (cb.checked !== want) cb.click();
+      });
+      const sSel = document.getElementById('scope-start-year');
+      const eSel = document.getElementById('scope-end-year');
+      sSel.value = '2022'; sSel.dispatchEvent(new Event('change'));
+      eSel.value = '2022'; eSel.dispatchEvent(new Event('change'));
+    }`);
+    await new Promise((r) => setTimeout(r, 150));
+    const rawSingle = await cdp.evalJs(`() => ({
+      sec1Title: document.getElementById('sec1-title').textContent,
+      sec3Tier: document.getElementById('sec3-tier-tbody').textContent,
+      sec3Prose: document.getElementById('sec3-prose').textContent,
+      sec3Callout: document.getElementById('sec3-callout-list').textContent,
+      sec4Title: document.getElementById('sec4-title').textContent,
+    })`);
+    assert.ok(rawSingle.sec1Title.includes('Small Sample'), 'Single-slot selection must trigger small-sample guard');
+    assert.ok(rawSingle.sec3Tier.includes('Reading') && rawSingle.sec3Tier.includes('44 pts') && rawSingle.sec3Tier.includes('0.957'), 'Raw mode survival tier table must keep official 44 pts / 0.957 PPG for Reading');
+    assert.ok(!rawSingle.sec3Tier.includes('50 pts') && !rawSingle.sec3Prose.includes('50 pts') && rawSingle.sec3Callout.includes('0 / 1'), 'Raw mode must NOT leak 50 raw points / 1.087 PPG into official Reading relegation');
+    assert.ok(rawSingle.sec4Title.includes('Draw Leaders in Selected Scope'));
+    assert.equal(cdp.pageErrors.length, 0);
+  } finally {
+    await cdp.close();
+    server.close();
+  }
+});

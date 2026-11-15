@@ -600,4 +600,25 @@ test('D1-D3 & C1-C4: Boundary conservation, per-slot relegation counts & 2007-20
   assert.ok(clubIds.has('afc-wimbledon'));
   assert.ok(clubIds.has('aldershot'));
   assert.ok(clubIds.has('aldershot-town'));
+
+  // Stage 2 A4: Closed-set typed outcomeType across all 4,047 rows & exact boundary tags
+  const ALLOWED_OUTCOMES = new Set(['none', 'reprieved', 'expelled', 'withdrew', 'administration_relegation']);
+  const specialRows = [];
+  for (const s of dataset.tierSeasons) {
+    for (const r of s.table) {
+      assert.equal(ALLOWED_OUTCOMES.has(r.outcomeType), true, `${s.slotId} ${r.team} invalid outcomeType=${String(r.outcomeType)}`);
+      if (r.outcomeType !== 'none') specialRows.push(`${s.slotId}:${r.team}=${r.outcomeType}`);
+    }
+  }
+  assert.equal(wim.outcomeType, 'none');
+  assert.equal(ald.outcomeType, 'withdrew');
+  assert.equal(maid.outcomeType, 'withdrew');
+  assert.equal(bySlot.get('2006-07-T4').table.find((r) => r.team === 'Boston United').outcomeType, 'administration_relegation');
+  assert.equal(bySlot.get('2018-19-T4').table.find((r) => r.team === 'Bury').outcomeType, 'expelled');
+  assert.equal(bySlot.get('2019-20-T3').expelledClubs.length, 1);
+  assert.equal(bySlot.get('2019-20-T4').table.find((r) => r.team === 'Stevenage').outcomeType, 'reprieved');
+  assert.equal(bySlot.get('1993-94-T4').table.find((r) => r.team === 'Northampton Town').outcomeType, 'reprieved');
+  assert.equal(bySlot.get('1994-95-T4').table.find((r) => r.team === 'Exeter City').outcomeType, 'reprieved');
+  assert.equal(bySlot.get('1995-96-T4').table.find((r) => r.team === 'Torquay United').outcomeType, 'reprieved');
+  assert.equal(specialRows.length, 8);
 });
