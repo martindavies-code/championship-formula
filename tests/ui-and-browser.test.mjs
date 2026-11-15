@@ -508,3 +508,107 @@ test('Stage 2 A1-A5 browser DOM invariants: dual GF/GA metrics, draw copy/quarti
     server.close();
   }
 });
+
+test('Final polish: neutral divergence prose without causal claim and PL 38-game survival baseline disclosure', { timeout: 35000 }, async () => {
+  const readmeText = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
+  const removedA = ['stretched', 'by', 'high-scoring'].join(' ');
+  const removedB = ['treats', 'every', 'division-year', 'identically'].join(' ');
+  assert.ok(!readmeText.toLowerCase().includes(removedA) && !readmeText.toLowerCase().includes(removedB), 'README must not contain removed causal phrases');
+  assert.ok(readmeText.includes('The measures use different outcomes and aggregation methods, so their rankings can differ.'), 'README must use neutral divergence wording');
+  assert.ok(readmeText.includes('33') && readmeText.includes('1992–95') && readmeText.includes('30') && readmeText.includes('intentional scope definition'), 'README must disclose PL preset 33 vs 30 38-game baseline');
+
+  const { server, baseUrl } = await startStaticServer();
+  const cdp = await launchCdpSession();
+  const bannedPatterns = ['[object', 'undefined', 'NaN', 'Infinity'];
+  try {
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+    await cdp.navigateAndWait(`${baseUrl}/`);
+
+    const assertNoBanned = (label, text) => {
+      const lower = text.toLowerCase();
+      assert.ok(!lower.includes(removedA) && !lower.includes(removedB), `${label} must not contain removed causal phrases`);
+      for (const pat of bannedPatterns) {
+        assert.ok(!text.includes(pat), `${label} must not contain "${pat}"`);
+      }
+    };
+
+    // 1. Default scope (all-4-tiers): neutral divergence wording present, PL-only baseline note absent
+    const defText = await cdp.evalJs(`() => ({
+      body: document.body.innerText,
+      sec1: document.getElementById('sec-predictors').textContent,
+      sec3: document.getElementById('sec3-prose').textContent,
+    })`);
+    assertNoBanned('default', defText.body);
+    assert.ok(defText.sec1.includes('The measures use different outcomes and aggregation methods, so their rankings can differ.'));
+    assert.ok(defText.sec1.includes('Both margins are modest descriptive associations rather than tactical prescriptions.'));
+    assert.ok(!defText.sec3.includes('38-game Premier League baseline'), 'Non-PL all-4-tiers scope must stay unchanged without PL baseline line');
+
+    // 2. PL preset (pl-1992-2025): neutral divergence wording AND computed 38-game PL baseline line with all 5 reference values
+    await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2025"]').click()`);
+    await new Promise((r) => setTimeout(r, 150));
+    const plText = await cdp.evalJs(`() => ({
+      body: document.body.innerText,
+      sec1: document.getElementById('sec-predictors').textContent,
+      sec3: document.getElementById('sec3-prose').textContent,
+    })`);
+    assertNoBanned('pl-1992-2025', plText.body);
+    assert.ok(plText.sec1.includes('The measures use different outcomes and aggregation methods, so their rankings can differ.'));
+    assert.ok(plText.sec3.includes('38-game Premier League baseline'), 'PL preset must render computed 38-game PL baseline line');
+    assert.ok(plText.sec3.includes('34.5 points') && plText.sec3.includes('median 34'), 'PL baseline must show mean 34.5 and median 34');
+    assert.ok(plText.sec3.includes('14 of 30 seasons'), 'PL baseline must show 14 of 30 at 35 points');
+    assert.ok(plText.sec3.includes('3 of 30') && plText.sec3.includes('40+ points'), 'PL baseline must show 3 of 30 on 40+ points');
+    assert.ok(plText.sec3.includes('22 of 30 seasons'), 'PL baseline must show 22 of 30 below 40 points');
+
+    // 3. PL small-sample guard (1992-93 to 1993-94, 2 slots): baseline line must not fire
+    await cdp.evalJs(`() => {
+      const sSel = document.getElementById('scope-start-year');
+      const eSel = document.getElementById('scope-end-year');
+      sSel.value = '1992'; sSel.dispatchEvent(new Event('change'));
+      eSel.value = '1993'; eSel.dispatchEvent(new Event('change'));
+    }`);
+    await new Promise((r) => setTimeout(r, 150));
+    const plSmall = await cdp.evalJs(`() => document.getElementById('sec3-prose').textContent`);
+    assertNoBanned('pl-small-sample', plSmall);
+    assert.ok(plSmall.includes('Small-sample scope') && !plSmall.includes('38-game Premier League baseline'));
+
+    // 4. Tier 4 only scope (1981-2024): PL baseline line must be absent
+    await cdp.evalJs(`() => {
+      document.querySelector('[data-preset="all-4-tiers"]').click();
+      document.querySelectorAll('#scope-tier-checkboxes input[type="checkbox"]').forEach((cb) => {
+        const want = cb.value === '4';
+        if (cb.checked !== want) cb.click();
+      });
+    }`);
+    await new Promise((r) => setTimeout(r, 150));
+    const t4Text = await cdp.evalJs(`() => ({
+      body: document.body.innerText,
+      sec3: document.getElementById('sec3-prose').textContent,
+    })`);
+    assertNoBanned('tier-4-only', t4Text.body);
+    assert.ok(!t4Text.sec3.includes('38-game Premier League baseline'), 'Tier 4 only scope must not show PL baseline line');
+
+    // 5. Tier 2 2022-23 Raw mode: clean render, PL baseline line absent
+    await cdp.evalJs(`() => {
+      document.querySelector('[data-points-mode="raw"]').click();
+      document.querySelectorAll('#scope-tier-checkboxes input[type="checkbox"]').forEach((cb) => {
+        const want = cb.value === '2';
+        if (cb.checked !== want) cb.click();
+      });
+      const sSel = document.getElementById('scope-start-year');
+      const eSel = document.getElementById('scope-end-year');
+      sSel.value = '2022'; sSel.dispatchEvent(new Event('change'));
+      eSel.value = '2022'; eSel.dispatchEvent(new Event('change'));
+    }`);
+    await new Promise((r) => setTimeout(r, 150));
+    const t2Raw = await cdp.evalJs(`() => ({
+      body: document.body.innerText,
+      sec3: document.getElementById('sec3-prose').textContent,
+    })`);
+    assertNoBanned('tier2-2022-23-raw', t2Raw.body);
+    assert.ok(!t2Raw.sec3.includes('38-game Premier League baseline'));
+    assert.equal(cdp.pageErrors.length, 0);
+  } finally {
+    await cdp.close();
+    server.close();
+  }
+});

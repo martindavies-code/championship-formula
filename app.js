@@ -599,7 +599,7 @@
             el('strong', { textContent: withinPhrase }),
             ` (GA/G ${fmtNum(atkDef.gaWithin, 3)} vs GF/G ${fmtNum(atkDef.gfWithin, 3)}, gap ${fmtNum(atkDef.withinDiff, 3)}; defence stronger in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables vs ${m.withinSlot.gfBeatsGaCount} for attack${atkDef.ties > 0 ? `, ${atkDef.ties} tied` : ''}), whereas `,
             el('strong', { textContent: pooledPhrase }),
-            ` (GF/G ${fmtNum(atkDef.gfR2 * 100, 1)}% from r = ${fmtSigned(gfPool?.rPpg, 3)} vs GA/G ${fmtNum(atkDef.gaR2 * 100, 1)}% from r = ${fmtSigned(gaPool?.rPpg, 3)}).${atkDef.diverges ? ' They diverge because within-slot rank treats every division-year identically from 1st to last, whereas pooled PPG variance is stretched by high-scoring champions.' : ''} Both margins are modest descriptive associations rather than tactical prescriptions.`
+            ` (GF/G ${fmtNum(atkDef.gfR2 * 100, 1)}% from r = ${fmtSigned(gfPool?.rPpg, 3)} vs GA/G ${fmtNum(atkDef.gaR2 * 100, 1)}% from r = ${fmtSigned(gaPool?.rPpg, 3)}).${atkDef.diverges ? ' The measures use different outcomes and aggregation methods, so their rankings can differ.' : ''} Both margins are modest descriptive associations rather than tactical prescriptions.`
           ),
           el('p', null,
             `Meanwhile draw rate ranks ${ordinal(drawRankOverall)} of 5 predictors ${tierDrawSummary}: `,
@@ -1228,6 +1228,35 @@
             highRelSlot ? ` (${highRelSlot.relegatedTeam} ${highRelSlot.relegatedHighPts} pts in ${highRelSlot.season} ${highRelSlot.historicalDivisionName}).` : '.'
           )
         );
+        const pl42Series = m.survivalSeries.filter((x) => x.tier === 1 && x.startYear >= 1992 && x.startYear <= 1994);
+        const pl38Series = m.survivalSeries.filter((x) => x.tier === 1 && x.startYear >= 1995 && x.gamesPerTeam === 38);
+        if (m.tiersPresent.length === 1 && m.tiersPresent[0] === 1 && pl42Series.length > 0 && pl38Series.length >= 3) {
+          const pl38RelStats = CA.statsSummary(pl38Series.map((x) => x.relegatedPts));
+          const pl38SurvStats = CA.statsSummary(pl38Series.map((x) => x.survivingPts));
+          if (pl38RelStats && pl38SurvStats) {
+            const n38 = pl38Series.length;
+            const pl38Rel40Plus = pl38Series.filter((x) => x.relegatedPts >= 40).length;
+            const pl38Rel35Plus = pl38Series.filter((x) => x.relegatedPts >= 35).length;
+            const pl38SurvUnder40 = pl38Series.filter((x) => x.survivingPts < 40).length;
+            const pl38SurvUnder40Pct = fmtNum((pl38SurvUnder40 / n38) * 100, 1);
+            proseEl.append(
+              el('p', null,
+                el('strong', { textContent: '38-game Premier League baseline' }),
+                ` (${n38} seasons, ${pl38Series[0].season} to ${pl38Series[n38 - 1].season}, excluding ${pl42Series.length} 1992–95 42-game ${plural(pl42Series.length, 'table')}): highest relegated club (18th place) averaged `,
+                el('strong', { textContent: `${fmtNum(pl38RelStats.mean, 1)} points` }),
+                ' (median ',
+                el('strong', { textContent: fmtNum(pl38RelStats.median, 0) }),
+                `), 35 points would not have beaten 18th place in `,
+                el('strong', { textContent: `${pl38Rel35Plus} of ${n38} seasons` }),
+                ', ',
+                el('strong', { textContent: `${pl38Rel40Plus} of ${n38}` }),
+                ' saw a club relegated on 40+ points, and 17th place finished below 40 points in ',
+                el('strong', { textContent: `${pl38SurvUnder40} of ${n38} seasons (${pl38SurvUnder40Pct}%)` }),
+                ` (17th mean ${fmtNum(pl38SurvStats.mean, 1)}, median ${fmtNum(pl38SurvStats.median, 0)}).`
+              )
+            );
+          }
+        }
       }
     }
 
