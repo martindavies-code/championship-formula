@@ -469,7 +469,7 @@ window.__DIVISION_LEADERS__ = {
    "winners": [
     {
      "player": "Steve Bull",
-     "club": "Wolves"
+     "club": "Wolverhampton Wanderers"
     }
    ],
    "basis": "footballsite league label + RSSSF agree",
@@ -484,7 +484,7 @@ window.__DIVISION_LEADERS__ = {
    "winners": [
     {
      "player": "Steve Bull",
-     "club": "Wolves"
+     "club": "Wolverhampton Wanderers"
     }
    ],
    "basis": "footballsite league label + RSSSF agree",
@@ -1554,7 +1554,7 @@ window.__DIVISION_LEADERS__ = {
    "basis": "Premier League records in the project dataset; RSSSF agrees",
    "sourceUrls": [
     "https://www.rsssf.org/tablese/engtops.html",
-    "https://github.com/martindavies-code/championship-formula/blob/main/data/premier-league-1992-2025.json"
+    "https://github.com/martindavies-code/championship-formula/blob/main/data/premier-league-2025-26-scorers.json"
    ]
   },
   "2025-26-T2": {
