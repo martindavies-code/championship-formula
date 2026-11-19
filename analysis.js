@@ -834,10 +834,13 @@
           tier: s.tier,
           historicalDivisionName: s.historicalDivisionName,
           reElectionEra: Boolean(s.reElectionEra),
+          expansionRestructure: Boolean(s.expansionRestructure),
           excludedOutcomeTypes: adminExcludedInSlot.map((r) => r.outcomeType),
           note: s.reElectionEra
             ? 'Football League re-election era (0 relegated)'
-            : adminExcludedInSlot.some((r) => r.outcomeType === 'withdrew')
+            : s.expansionRestructure
+              ? 'Zero teams relegated (Football League expansion/restructuring)'
+              : adminExcludedInSlot.some((r) => r.outcomeType === 'withdrew')
               ? `Zero bottom-place relegations (${reasonList})`
               : adminExcludedInSlot.some((r) => r.outcomeType === 'reprieved')
                 ? `Zero teams relegated (Ground-grading reprieve: ${reasonList})`
@@ -927,6 +930,10 @@
           relegatedPtsRaw46: statsSummary(raw46.map((x) => x.relegatedPts)),
           recent10RelegatedPpg: mean(sub.slice(-10).map((x) => x.relegatedPpg)),
           maxRelegatedRow: sub.reduce((best, cur) => ((cur.relegatedPpg ?? -1) > (best?.relegatedPpg ?? -1) ? cur : best), null),
+          maxRelegatedTies: (() => {
+            const mx = Math.max(...sub.map((x) => x.relegatedPpg ?? -1));
+            return sub.filter((x) => Math.abs((x.relegatedPpg ?? -1) - mx) < 1e-9);
+          })(),
           minSurvivedRow: sub.reduce((best, cur) => ((cur.survivingPpg ?? 99) < (best?.survivingPpg ?? 99) ? cur : best), null),
         };
       });

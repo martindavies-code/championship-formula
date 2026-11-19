@@ -750,6 +750,17 @@ body.voice-sicko .takeaways-section {
   .split-grid.wide-left {
     grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
   }
+  .split-grid.wide-left.archive-split {
+    grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr);
+  }
+}
+
+/* Wide table sections may borrow spare desktop space without widening the prose measure */
+@media (min-width: 1400px) {
+  .breakout-wide {
+    inline-size: min(1520px, calc(100vw - 4rem));
+    margin-inline-start: calc((100% - min(1520px, calc(100vw - 4rem))) / 2);
+  }
 }
 
 /* Chart Legend & Footnotes */
@@ -1439,6 +1450,46 @@ h3[id] {
   #sec3-promo-table th,
   #sec3-promo-table td {
     padding: 0.35rem 0.25rem;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+}
+
+/* ==========================================================================
+   PRINT (kept last so these rules win): wide tables stay legible instead of
+   clipping right-hand columns
+   ========================================================================== */
+@media print {
+  .page-shell {
+    max-inline-size: none;
+    padding-inline: 0.5rem;
+  }
+  /* Container-query containment fragments badly in print (overlapping content) */
+  .analysis-section,
+  section,
+  div {
+    container-type: normal;
+  }
+  .breakout-wide {
+    inline-size: 100%;
+    margin-inline-start: 0;
+  }
+  .table-wrapper {
+    overflow: visible;
+    max-block-size: none !important; /* beats inline max-block-size on the Golden Boot wrapper */
+    border: none;
+  }
+  .split-grid {
+    display: block; /* grid boxes fragment poorly in print, overlapping following sections */
+  }
+  table.data-table {
+    min-inline-size: 0;
+    inline-size: 100%;
+    font-size: 0.58rem;
+  }
+  table.data-table th,
+  table.data-table td {
+    padding: 0.2rem 0.25rem;
     white-space: normal;
     overflow-wrap: break-word;
   }

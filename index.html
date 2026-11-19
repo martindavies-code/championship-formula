@@ -40,7 +40,7 @@
         <div class="masthead-hero-copy">
           <h1 class="masthead-title" id="masthead-title" data-vk="masthead-title">The Championship Formula</h1>
           <p class="masthead-deck" id="masthead-deck" data-vk="masthead-deck">
-            Forty-five seasons of English league tables—from the Premier League down to League Two—distilled into a clear picture of what actually wins titles, beats the drop, and survives the play-offs.
+            Forty-five seasons of English league tables—from the top flight down to the fourth tier—distilled into a clear picture of what actually wins titles, beats the drop, and survives the play-offs.
           </p>
         </div>
         <figure class="sicko-hero-card" id="sicko-hero-card" hidden>
@@ -67,7 +67,7 @@
           <button type="button" class="btn-toggle" data-preset="all-4-tiers" data-vk="preset-all" aria-pressed="true">All 4 Tiers (1981–2026)</button>
           <button type="button" class="btn-toggle" data-preset="pl-1992-2026" data-vk="preset-pl" aria-pressed="false">Premier League (1992–2026)</button>
           <button type="button" class="btn-toggle" data-preset="tier1-full" data-vk="preset-t1" aria-pressed="false">Top Flight (1981–2026)</button>
-          <button type="button" class="btn-toggle" data-preset="efl-tiers-2-4" data-vk="preset-efl" aria-pressed="false">EFL Tiers 2–4 (1981–2026)</button>
+          <button type="button" class="btn-toggle" data-preset="efl-tiers-2-4" data-vk="preset-efl" aria-pressed="false">Tiers 2–4 (1981–2026)</button>
         </div>
         <div class="scope-points-mode" role="group" aria-label="Points basis">
           <span class="control-group-label" data-vk="scope-points-label">Points:</span>
@@ -216,8 +216,8 @@
                     <th scope="col" class="text-col" data-vk="sec1-th-stat">Stat</th>
                     <th scope="col" data-vk="sec1-th-signed">Signed</th>
                     <th scope="col" data-vk="sec1-th-abs">Strength (Mid)</th>
-                    <th scope="col" data-vk="sec1-th-ppg">Pts Link</th>
-                    <th scope="col" data-vk="sec1-th-r2">Pts Var.</th>
+                    <th scope="col" data-vk="sec1-th-ppg">Pts Link (Median r)</th>
+                    <th scope="col" data-vk="sec1-th-r2">Pts Var. (Pooled R²)</th>
                   </tr>
                 </thead>
                 <tbody id="sec1-corr-tbody"></tbody>
@@ -297,7 +297,7 @@
             <div class="chart-panel-header">
               <div>
                 <h3 class="chart-title" data-vk="sec2-tbl-title">Title Numbers by Stat and Tier</h3>
-                <p class="chart-subtitle" data-vk="sec2-tbl-sub">Per-game rates compare 38- to 46-game seasons on equal footing</p>
+                <p class="chart-subtitle" data-vk="sec2-tbl-sub" id="sec2-tbl-sub">Per-game rates compare completed 38- to 46-game seasons on equal footing</p>
               </div>
             </div>
             <div tabindex="0" role="region" aria-labelledby="sec2-table-caption" class="table-wrapper">
@@ -359,7 +359,7 @@
             <div class="chart-controls" role="group" aria-label="Select survival chart scale">
               <span class="control-group-label" data-vk="sec3-scale-label">Scale:</span>
               <button type="button" class="btn-toggle" data-sec3-mode="ppg" data-vk="s3-ppg" aria-pressed="true">Points / Game (All Leagues)</button>
-              <button type="button" class="btn-toggle" data-sec3-mode="pts46" data-vk="s3-46" aria-pressed="false">46-Game Scale (EFL)</button>
+              <button type="button" class="btn-toggle" data-sec3-mode="pts46" data-vk="s3-46" aria-pressed="false">46-Game Scale (Tiers 2–4)</button>
               <button type="button" class="btn-toggle" data-sec3-mode="pts38" data-vk="s3-38" aria-pressed="false">38-Game Scale (PL)</button>
             </div>
           </div>
@@ -403,7 +403,7 @@
             <div class="chart-panel-header">
               <div>
                 <h3 class="chart-title" data-vk="sec3-t2-title">Promotion Cutoffs &amp; Play-Off Winners (Tiers 2–4)</h3>
-                <p class="chart-subtitle" data-vk="sec3-t2-sub">Official automatic promotion floor and all EFL play-offs since 1986–87 (four-team seed breakdown below)</p>
+                <p class="chart-subtitle" data-vk="sec3-t2-sub">Official automatic promotion floor and English league play-off promotions since 1986–87 in the current filter (four-team seed breakdown below)</p>
               </div>
             </div>
             <div tabindex="0" role="region" aria-labelledby="sec3-promo-caption" class="table-wrapper">
@@ -414,7 +414,7 @@
                     <th scope="col" class="text-col">Tier</th>
                     <th scope="col" data-vk="sec3-t2-mauto">Median Auto</th>
                     <th scope="col" data-vk="sec3-t2-lauto">Lowest Auto</th>
-                    <th scope="col" data-vk="sec3-t2-po">Play-Offs</th>
+                    <th scope="col" data-vk="sec3-t2-po">Play-Off Promotions (in filter)</th>
                     <th scope="col" data-vk="sec3-t2-top">Top Seed</th>
                     <th scope="col" data-vk="sec3-t2-bot">Bottom Seed</th>
                   </tr>
@@ -438,7 +438,7 @@
           <div id="chart-sec3-playoffs"></div>
           <div tabindex="0" role="region" aria-labelledby="sec3-playoff-seed-caption" class="table-wrapper playoff-seed-table-wrap" id="sec3-playoff-table-wrap">
             <table class="data-table" id="sec3-playoff-seed-table">
-              <caption id="sec3-playoff-seed-caption" data-vk="sec3-po-cap">Four-Team EFL Play-Off Promotion Rate by Seed (1988–89 Onward)</caption>
+              <caption id="sec3-playoff-seed-caption" data-vk="sec3-po-cap">Same-Division Four-Team Play-Off Promotion Rate by Seed (1988–89 Onward)</caption>
               <thead>
                 <tr>
                   <th scope="col" class="text-col" data-vk="sec3-po-tier">Tier</th>
@@ -488,7 +488,7 @@
             <div class="chart-panel-header">
               <div>
                 <h3 class="chart-title" data-vk="sec4-c2-title">Most Draw-Heavy Seasons (36.8%+ Draws)</h3>
-                <p class="chart-subtitle" data-vk="sec4-c2-sub">14+ draws in 38 games, 16+ in 42, or 17+ in 46 — top 20 in current filter</p>
+                <p class="chart-subtitle" data-vk="sec4-c2-sub">14+ draws in 38 games, 15+ in 40, 16+ in 42, or 17+ in 44 or 46 — top 20 in current filter</p>
               </div>
             </div>
             <div tabindex="0" role="region" aria-labelledby="sec4-table-caption" class="table-wrapper">
@@ -615,7 +615,7 @@
             </div>
           </div>
 
-          <div class="split-grid wide-left">
+          <div class="split-grid wide-left archive-split breakout-wide">
             <div tabindex="0" role="region" aria-labelledby="archive-league-caption" class="table-wrapper">
               <table class="data-table" id="archive-league-table">
                 <caption id="archive-league-caption">Final League Standings</caption>
@@ -667,7 +667,7 @@
                     <th scope="col" class="text-col">Player</th>
                     <th scope="col" class="text-col">Club(s)</th>
                     <th scope="col">Goals</th>
-                    <th scope="col" data-vk="sec6-sc-p38">Per 38</th>
+                    <th scope="col" data-vk="sec6-sc-p38">Per 38 Team Games</th>
                   </tr>
                 </thead>
                 <tbody id="archive-scorers-tbody"></tbody>
@@ -696,7 +696,7 @@
 
     <footer class="site-footer">
       <div id="footer-brand-line">
-        <strong>The Championship Formula</strong> — Plain-English study of English Tiers 1–4 across 1981–82 through 2025–26 (completed seasons only; no forecasts or betting advice).
+        <strong>The Championship Formula</strong> — Plain-English study of English Tiers 1–4 across 1981–82 through 2025–26 (178 completed seasons plus the two curtailed 2019–20 tables; no forecasts or betting advice).
       </div>
       <div id="footer-verification-note"></div>
     </footer>

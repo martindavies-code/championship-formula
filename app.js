@@ -284,7 +284,7 @@
     'tier-check-2': 'Stratum T2 · Second Div / Championship',
     'tier-check-3': 'Stratum T3 · Third Div / League One',
     'tier-check-4': 'Stratum T4 · Fourth Div / League Two',
-    'scope-years-legend': 'Panel Window [t₀, t₁] (3-Pt Era Only)',
+    'scope-years-legend': 'Panel Window [t₀, t₁] (3-Pt Era Only; seasons indexed by start year)',
     'scope-from': 't₀',
     'scope-to': 't₁',
     'scope-curtail-legend': 'COVID-Truncated 2019–20 Slots',
@@ -385,7 +385,7 @@
     'sec3-t1-hdrop': 'Max Drop PPG',
     'sec3-t1-club': 'Max-PPG Relegated Outlier',
     'sec3-t2-title': 'Automatic-Promotion Floor & All-Format Play-Off Seed Counts (T2–T4)',
-    'sec3-t2-sub': 'Official last automatic-promotion PPG + all 1986–2026 EFL play-off winners (4-team χ² matrix below)',
+    'sec3-t2-sub': 'Official last automatic-promotion PPG + all 1986–2026 English league play-off winners (4-team χ² matrix below)',
     'sec3-t2-cap': 'Auto-Promotion PPG Floor & Top/Bottom Seed Conversions',
     'sec3-t2-mauto': 'Med. Auto PPG',
     'sec3-t2-lauto': 'Min Auto PPG',
@@ -393,7 +393,7 @@
     'sec3-t2-top': 'Top Seed',
     'sec3-t2-bot': 'Bottom Seed',
     'sec3-po-title': 'Empirical Play-Off Promotion Probability P(promo | seed_k) & Stratum Homogeneity (χ²)',
-    'sec3-po-cap': 'Homogeneous 4-Team EFL Play-Off Contingency Matrix (1988–89 Onward)',
+    'sec3-po-cap': 'Homogeneous 4-Team English League Play-Off Contingency Matrix (1988–89 Onward)',
     'sec3-po-tier': 'Stratum',
     'sec3-po-n': 'n',
     'sec3-po-s1': 'Seed 1',
@@ -407,7 +407,7 @@
     'sec4-c1-title': 'Empirical Finish-Percentile Quartile Capture of Slot Draw Leaders',
     'sec4-c1-sub': 'All argmax(D) club-seasons per slot (tied co-leaders retained; official finish percentiles)',
     'sec4-c2-title': 'Extreme Right-Tail Draw-Rate Outliers (D/G ≥ 14/38 ≈ 36.84%)',
-    'sec4-c2-sub': '14+ D in 38g, 16+ in 42g, or 17+ in 46g — top 20 sorted by D/G',
+    'sec4-c2-sub': '14+ D in 38g, 15+ in 40g, 16+ in 42g, or 17+ in 44g or 46g — top 20 sorted by D/G',
     'sec4-t-cap': 'High-Stalemate Tail Tuples (D/G ≥ 0.3684)',
     'sec4-th-s': 'Slot (Tier)',
     'sec4-th-d': 'D',
@@ -478,7 +478,7 @@
       } else {
         footerBrand.append(
           el('strong', { textContent: 'The Championship Formula' }),
-          ' — Plain-English study of English Tiers 1–4 across 1981–82 through 2025–26 (completed seasons only; no forecasts or betting advice).'
+          ' — Plain-English study of English Tiers 1–4 across 1981–82 through 2025–26 (178 completed seasons plus the two curtailed 2019–20 tables; no forecasts or betting advice).'
         );
       }
     }
@@ -624,7 +624,7 @@
       } else {
         banner.append(
           el('strong', { textContent: 'How the numbers stay fair: ' }),
-          `This study covers all ${ds.metadata.totalTierSeasonSlots} completed and curtailed league tables (${fmtInt(ds.metadata.totalTeamSeasons)} team seasons, ${fmtInt(ds.metadata.totalMatchesPlayed)} matches) across Tiers 1–4 from 1981–82—when three points for a win arrived—through 2025–26. Because seasons run anywhere from 38 to 46 matches and divisions hold 20 to 24 clubs, we measure stats per game and place every finish on a clean 0-to-1 scale (1 = first, 0 = last). Unfinished seasons after 2025–26 are left out.`
+          `This study covers all ${ds.metadata.totalTierSeasonSlots} completed and curtailed league tables (${fmtInt(ds.metadata.totalTeamSeasons)} team seasons, ${fmtInt(ds.metadata.totalMatchesPlayed)} matches) across Tiers 1–4 from 1981–82—when three points for a win arrived—through 2025–26. Completed seasons run anywhere from 38 to 46 matches and divisions hold 20 to 24 clubs; the two curtailed 2019–20 tables ended early after 34–37 games. We measure stats per game and place every finish on a clean 0-to-1 scale (1 = first, 0 = last). Unfinished seasons after 2025–26 are left out. The filters above narrow every figure on this page; the Showing line always lists the slice in use.`
         );
       }
     }
@@ -739,7 +739,7 @@
           ? `${noRel.length} non-relegating ${plural(noRel.length, 'slot')} (0 relegation-active)`
           : `${ss.slotCount} relegation-active ${plural(ss.slotCount, 'slot')}${noRel.length > 0 ? ` (${noRel.length} non-relegating excluded)` : ''}`,
         detail: ss.slotCount === 0
-          ? `No left-tail truncation boundary exists in this slice (${noRel.length} slots lacked automatic relegation via re-election, withdrawal, or reprieve).`
+          ? `No left-tail truncation boundary exists in this slice (${noRel.length} slots lacked automatic relegation via re-election, expansion, withdrawal, or reprieve).`
           : `Median lowest merit survivor = ${fmtNum(ss.survivingPpg?.median, 3)} official PPG (${fmtNum(ss.survivingPts38?.median, 1)}/38g; ${fmtNum(ss.survivingPts46?.median, 1)}/46g); relegated clubs hit ≥1.053 PPG (40/38g) in ${ss.relegatedAtOrAbove40Over38Rate.length}/${ss.slotCount} slots. Typed outcomeType guards exclude reprieved/expelled boundary rows.`,
       },
       {
@@ -873,12 +873,14 @@
     const activeBoundaryExcl = (m.excludedSurvivalRows || []).filter((r) => r.relegationActiveSlot);
 
     const reElecSlots = noRel.filter((x) => x.reElectionEra);
-    const withdrewSlots = noRel.filter((x) => !x.reElectionEra && (x.excludedOutcomeTypes || []).includes('withdrew'));
-    const reprieveNoRelSlots = noRel.filter((x) => !x.reElectionEra && !(x.excludedOutcomeTypes || []).includes('withdrew') && (x.excludedOutcomeTypes || []).includes('reprieved'));
-    const otherNoRelSlots = noRel.filter((x) => !x.reElectionEra && !(x.excludedOutcomeTypes || []).includes('withdrew') && !(x.excludedOutcomeTypes || []).includes('reprieved'));
+    const expansionSlots = noRel.filter((x) => !x.reElectionEra && x.expansionRestructure);
+    const withdrewSlots = noRel.filter((x) => !x.reElectionEra && !x.expansionRestructure && (x.excludedOutcomeTypes || []).includes('withdrew'));
+    const reprieveNoRelSlots = noRel.filter((x) => !x.reElectionEra && !x.expansionRestructure && !(x.excludedOutcomeTypes || []).includes('withdrew') && (x.excludedOutcomeTypes || []).includes('reprieved'));
+    const otherNoRelSlots = noRel.filter((x) => !x.reElectionEra && !x.expansionRestructure && !(x.excludedOutcomeTypes || []).includes('withdrew') && !(x.excludedOutcomeTypes || []).includes('reprieved'));
 
     const noRelReasons = [];
     if (reElecSlots.length > 0) noRelReasons.push(`${reElecSlots.length} Fourth Division re-election ${plural(reElecSlots.length, 'season')} where automatic relegation was not in place`);
+    if (expansionSlots.length > 0) noRelReasons.push(`${expansionSlots.length} after Football League expansion or restructuring`);
     if (withdrewSlots.length > 0) noRelReasons.push(`${withdrewSlots.length} after club withdrawal or resignation`);
     if (reprieveNoRelSlots.length > 0) noRelReasons.push(`${reprieveNoRelSlots.length} after ground-grading reprieve`);
     if (otherNoRelSlots.length > 0) noRelReasons.push(`${otherNoRelSlots.length} without automatic relegation`);
@@ -1111,7 +1113,7 @@
     if (ss.slotCount === 0) {
       bullets.push({
         lead: 'Zero relegation-active truncation boundaries in slice.',
-        body: `All ${m.noRelegationSlots.length} selected slots lacked automatic relegation (re-election, withdrawal, or ground-grading reprieve).`,
+        body: `All ${m.noRelegationSlots.length} selected slots lacked automatic relegation (re-election, expansion, withdrawal, or ground-grading reprieve).`,
       });
     } else if (m.tiersPresent.length === 1 && m.tiersPresent[0] === 1 && pl38.length >= 3) {
       const under40 = pl38.filter((x) => x.survivingPts < 40).length;
@@ -1366,7 +1368,7 @@
       const poTop = m.byTierPromotion.reduce((a, t) => a + (t.poWinnerTopSeedCount ?? t.poWinnerThirdCount), 0);
       const hasAll25Efl = hasSlot('2025-26-T2') && hasSlot('2025-26-T3') && hasSlot('2025-26-T4');
       const po25Note = hasAll25Efl
-        ? ' In 2025–26, all three EFL play-off finals went to lower seeds (6th-placed Hull City, 5th-placed Bolton Wanderers and 5th-placed Notts County).'
+        ? ' In 2025–26, all three English league play-off finals were won by the lower-seeded finalist (6th-placed Hull City, 5th-placed Bolton Wanderers and 5th-placed Notts County).'
         : '';
       let dedPart = '';
       if (ds.relegatedDueToDeductionCount > 0) {
@@ -1388,7 +1390,7 @@
           lead: s1.count * 2 < ov.total
             ? 'Top play-off seeds miss out most of the time—and below 1st seed, seeding barely matters.'
             : 'Top play-off seeds won most finals here, though lower seeds still broke through.',
-          body: `Across ${ov.total} four-team EFL play-offs since 1988–89, 1st seeds went up ${fmtNum(s1.pct, 0)}% of the time (${s1.count}), vs ${fmtNum(s2.pct, 0)}% for 2nd (${s2.count}), ${fmtNum(s3.pct, 0)}% for 3rd (${s3.count}), and ${fmtNum(s4.pct, 0)}% for 4th (${s4.count})${tierClause}.${po25Note}${dedPart}`,
+          body: `Across ${ov.total} four-team English league play-offs since 1988–89, 1st seeds went up ${fmtNum(s1.pct, 0)}% of the time (${s1.count}), vs ${fmtNum(s2.pct, 0)}% for 2nd (${s2.count}), ${fmtNum(s3.pct, 0)}% for 3rd (${s3.count}), and ${fmtNum(s4.pct, 0)}% for 4th (${s4.count})${tierClause}.${po25Note}${dedPart}`,
         });
       } else if (poTotal >= 3) {
         const poTopPct = (poTop / poTotal) * 100;
@@ -1396,7 +1398,7 @@
           lead: poTop * 2 < poTotal
             ? 'Top play-off seeds miss out most of the time—and deductions can decide relegation.'
             : 'Play-offs remain volatile across seeds.',
-          body: `Across ${poTotal} EFL play-off tournaments, the top play-off seed won promotion ${poTop} times (${fmtNum(poTopPct, 0)}%).${po25Note}${dedPart}`,
+          body: `Across ${poTotal} English league play-off tournaments, the top play-off seed won promotion ${poTop} times (${fmtNum(poTopPct, 0)}%).${po25Note}${dedPart}`,
         });
       }
     } else if (ds.relegatedDueToDeductionCount > 0) {
@@ -1619,7 +1621,7 @@
           el('p', null,
             'Between attack and defence, two common ways of measuring strength can point differently: ',
             el('strong', { textContent: withinPhrase }),
-            ` (goals conceded ${fmtNum(atkDef.gaWithin, 3)} vs goals scored ${fmtNum(atkDef.gfWithin, 3)}, gap ${fmtNum(atkDef.withinDiff, 3)}; defence stronger in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables vs ${m.withinSlot.gfBeatsGaCount} for scoring${atkDef.ties > 0 ? `, ${atkDef.ties} tied` : ''}), whereas `,
+            ` (goals conceded ${fmtNum(atkDef.gaWithin, 3)} vs goals scored ${fmtNum(atkDef.gfWithin, 3)}, gap ${fmtNum(Math.abs(Number(fmtNum(atkDef.gaWithin, 3)) - Number(fmtNum(atkDef.gfWithin, 3))), 3)}; defence stronger in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables vs ${m.withinSlot.gfBeatsGaCount} for scoring${atkDef.ties > 0 ? `, ${atkDef.ties} tied` : ''}), whereas `,
             el('strong', { textContent: pooledPhrase }),
             ` (goals scored ${fmtNum(atkDef.gfR2 * 100, 1)}% vs goals conceded ${fmtNum(atkDef.gaR2 * 100, 1)}%, overlapping descriptive links rather than additive shares).${sec1Differs ? ' The measures use different outcomes and aggregation methods, so their rankings can differ.' : ''} Both margins are modest descriptive associations rather than tactical prescriptions.`
           ),
@@ -2302,7 +2304,10 @@
           : '';
         proseEl.append(el('p', null, `Small-sample scope (${ss.slotCount} ${plural(ss.slotCount, sicko ? 'slot' : 'table')} with relegation, fewer than three): cross-season medians are suppressed. ${slotDesc}.${reprieveDesc}${rawNote}`));
       } else if (sicko) {
-        const highRelSlot = m.survivalSeries.reduce((b, x) => ((x.relegatedHighPpg ?? 0) > (b?.relegatedHighPpg ?? 0) ? x : b), null);
+        const highRelMax = Math.max(...m.survivalSeries.map((x) => x.relegatedHighPpg ?? 0));
+        const highRelTies = m.survivalSeries.filter((x) => Math.abs((x.relegatedHighPpg ?? 0) - highRelMax) < 1e-9);
+        const highRelSlot = highRelTies[0] || null;
+        const highRelDesc = highRelTies.map((x) => `${x.relegatedTeam}, ${x.relegatedHighPts} pts in ${x.season} T${x.tier}`).join('; ');
         proseEl.append(
           el('p', null,
             `Across N_rel = ${ss.slotCount} relegation-active slots (${ss.excludedNoRelegationCount} non-relegating slots separated via typed outcomeType enum), the empirical median lowest merit survivor sits at `,
@@ -2311,7 +2316,7 @@
             el('strong', { textContent: `${ss.relegatedAtOrAbove40Over38Rate.length}/${ss.slotCount} slots (${fmtNum(relAbove40Pct, 1)}%)` }),
             ` and ≥1.087 PPG (50/46g) in ${ss.relegatedAtOrAbove50Over46Rate.length}/${ss.slotCount}. Max-PPG relegated outlier: `,
             el('strong', { textContent: `${fmtNum(highRelSlot?.relegatedHighPpg, 3)} PPG` }),
-            highRelSlot ? ` (${highRelSlot.relegatedTeam}, ${highRelSlot.relegatedHighPts} pts in ${highRelSlot.season} T${highRelSlot.tier}).${rawNote}` : `.${rawNote}`
+            highRelSlot ? ` (${highRelDesc}${highRelTies.length > 1 ? ' — tied' : ''}).${rawNote}` : `.${rawNote}`
           )
         );
         const pb = m.playoffSeedBreakdown;
@@ -2345,7 +2350,10 @@
           }
         }
       } else {
-        const highRelSlot = m.survivalSeries.reduce((b, x) => ((x.relegatedHighPpg ?? 0) > (b?.relegatedHighPpg ?? 0) ? x : b), null);
+        const highRelMax = Math.max(...m.survivalSeries.map((x) => x.relegatedHighPpg ?? 0));
+        const highRelTies = m.survivalSeries.filter((x) => Math.abs((x.relegatedHighPpg ?? 0) - highRelMax) < 1e-9);
+        const highRelSlot = highRelTies[0] || null;
+        const highRelDesc = highRelTies.map((x) => `${x.relegatedTeam}, ${x.relegatedHighPts} pts in the ${x.season} ${x.historicalDivisionName}`).join('; ');
         const exclParts = [];
         if (ss.excludedNoRelegationCount > 0) exclParts.push(`${ss.excludedNoRelegationCount} ${plural(ss.excludedNoRelegationCount, 'table')} without relegation separated`);
         if (boundaryReprieves.length > 0) exclParts.push(`${boundaryReprieves.length} reprieved boundary ${plural(boundaryReprieves.length, 'club')} excluded from lowest merit survivor`);
@@ -2354,12 +2362,12 @@
           el('p', null,
             `Across ${ss.slotCount} ${plural(ss.slotCount, 'table')} with relegation${exclClause}, the typical lowest surviving club needed `,
             el('strong', { textContent: `${fmtNum(ss.survivingPpg?.median, 3)} points per game` }),
-            `—about ${fmtNum(ss.survivingPts38?.median, 1)} points over a 38-game season, or ${fmtNum(ss.survivingPts46?.median, 1)} over 46. Premier League folklore clings to 40 points (1.053 per game), yet Championship and League One relegation scraps routinely climb toward 49–50 points over 46 games (1.067–1.087 per game).${rawNote}`
+            `—about ${fmtNum(ss.survivingPts38?.median, 1)} points over a 38-game season, or ${fmtNum(ss.survivingPts46?.median, 1)} over 46. Premier League folklore clings to 40 points (1.053 per game), yet Championship and League One relegation scraps routinely climb toward 49–50 points over 46 games (1.065–1.087 per game).${rawNote}`
           ),
           el('p', null,
-            `In ${ss.relegatedAtOrAbove40Over38Rate.length} of ${ss.slotCount} ${plural(ss.slotCount, 'table')} (${fmtNum(relAbove40Pct, 1)}%), a club still went down despite keeping 40-point Premier League pace (1.053 per game or better). The unluckiest relegated side in this slice earned `,
+            `In ${ss.relegatedAtOrAbove40Over38Rate.length} of ${ss.slotCount} ${plural(ss.slotCount, 'table')} (${fmtNum(relAbove40Pct, 1)}%), a club still went down despite keeping 40-point Premier League pace (1.053 per game or better). The unluckiest relegated ${highRelTies.length > 1 ? 'sides' : 'side'} in this slice earned `,
             el('strong', { textContent: `${fmtNum(highRelSlot?.relegatedHighPpg, 3)} points per game` }),
-            highRelSlot ? ` (${highRelSlot.relegatedTeam}, ${highRelSlot.relegatedHighPts} pts in the ${highRelSlot.season} ${highRelSlot.historicalDivisionName}).` : '.'
+            highRelSlot ? ` (${highRelDesc}${highRelTies.length > 1 ? ' — tied' : ''}).` : '.'
           )
         );
         if (m.byTierPromotion.length > 0) {
@@ -2375,7 +2383,7 @@
               ? ` (${poTop} of ${poTotal} top lower-tier seeds including ${pb.transitionalCount} inter-divisional 1986–88 ${plural(pb.transitionalCount, 'final')})`
               : '';
             const po25Clause = has25EflAll
-              ? ' In 2025–26, all three EFL play-off finals went to lower seeds: 6th-placed Hull City (after 4th-placed Southampton were expelled for filming opposition training), 5th-placed Bolton Wanderers, and 5th-placed Notts County.'
+              ? ' In 2025–26, all three English league play-off finals were won by the lower-seeded finalist: 6th-placed Hull City (after 4th-placed Southampton were expelled for filming opposition training), 5th-placed Bolton Wanderers, and 5th-placed Notts County.'
               : '';
             const ded25Clause = has25T2
               ? ' Points deductions also reshaped the 2025–26 Championship bottom three: Leicester City (−6) dropped from 52 on-pitch points to 46 and went down, while Sheffield Wednesday (−18) finished on 0 points—the lowest official points total in the dataset.'
@@ -2390,7 +2398,7 @@
           } else if (poTotal >= 3) {
             proseEl.append(
               el('p', null,
-                `At the top of Tiers 2–4, play-off seeding is rarely decisive: across ${poTotal} EFL play-off tournaments, the highest-ranked play-off entrant won promotion `,
+                `At the top of Tiers 2–4, play-off seeding is rarely decisive: across ${poTotal} English league play-off tournaments, the highest-ranked play-off entrant won promotion `,
                 el('strong', { textContent: `${poTop} times (${fmtNum((poTop / poTotal) * 100, 1)}%)` }),
                 '.'
               )
@@ -2448,13 +2456,15 @@
       clearEl(tierTbody);
       for (const t of m.byTierSurvival) {
         const mr = t.maxRelegatedRow;
+        const mrTies = (t.maxRelegatedTies && t.maxRelegatedTies.length > 0) ? t.maxRelegatedTies : (mr ? [mr] : []);
+        const mrDesc = mrTies.map((x) => `${x.relegatedTeam} (${x.season}, ${x.relegatedPts} pts)`).join('; ') + (mrTies.length > 1 ? ' — tied' : '');
         tierTbody.appendChild(el('tr', null,
           el('td', { className: 'text-col', textContent: `Tier ${t.tier}` }),
           el('td', { textContent: String(t.slotCount) }),
           el('td', { textContent: fmtNum(t.survivingPpg?.median, 3) }),
           el('td', { textContent: fmtNum(t.survivingPpg?.min, 3) }),
           el('td', { textContent: fmtNum(t.relegatedHighPpg?.max, 3) }),
-          el('td', { className: 'text-col', textContent: mr ? `${mr.relegatedTeam} (${mr.season}, ${mr.relegatedHighPts} pts)` : '—' })
+          el('td', { className: 'text-col', textContent: mr ? mrDesc : '—' })
         ));
       }
     }
@@ -2479,7 +2489,7 @@
 
     if (dedNoteEl) {
       const ds = m.deductionSensitivity;
-      const examples = ds.relegatedDueToDeduction.slice(0, 4).map((x) => `${x.team} ${x.season} ${x.signedAdjustment}`).join(', ');
+      const examples = ds.relegatedDueToDeduction.slice(0, 4).map((x) => `${x.team} (${x.season}, ${x.signedAdjustment} pts)`).join(', ');
       const relClause = ds.relegatedDueToDeductionCount > 0
         ? `${ds.relegatedDueToDeductionCount} ${ds.relegatedDueToDeductionCount === 1 ? 'club went' : 'clubs went'} down after deductions despite finishing above the relegation line on pitch points alone (e.g. ${examples}).`
         : 'no clubs changed relegation status on pitch points alone in this selection.';
@@ -2513,14 +2523,17 @@
     const basisTag = isRawMode()
       ? (sicko ? ' · Official tables invariant under raw 3W+D toggle' : ' · Official league tables (unaffected by on-pitch toggle)')
       : '';
+    const curtOn3 = (m.includedCurtailedSlots?.length ?? 0) > 0;
+    const rangeTag = curtOn3 ? 'completed 38g–46g plus curtailed 34g–37g schedules' : 'completed 38g–46g schedules';
+    const rangeTagPlain = curtOn3 ? 'completed 38- to 46-game seasons and the curtailed 34–37-game 2019–20 tables' : 'completed 38- to 46-game seasons';
 
     if (subEl) {
       subEl.textContent = sicko
         ? (mode === 'ppg'
-          ? `Observed lowest merit survivor vs. highest relegated ceiling in official PPG (invariant across 38g–46g schedules)${basisTag}`
+          ? `Observed lowest merit survivor vs. highest relegated ceiling in official PPG (invariant across ${rangeTag})${basisTag}`
           : `${mult}g linear point-equivalent projection across N_rel = ${m.survivalSeries.length} relegation-active ${plural(m.survivalSeries.length, 'slot')}${basisTag}`)
         : (mode === 'ppg'
-          ? `Lowest safe vs. highest relegated club in official points per game (comparable across 38- to 46-game seasons)${basisTag}`
+          ? `Lowest safe vs. highest relegated club in official points per game (comparable across ${rangeTagPlain})${basisTag}`
           : `${mult}-game official point equivalent across ${m.survivalSeries.length} ${plural(m.survivalSeries.length, 'table')} with relegation${basisTag}`);
     }
     if (noteEl) {
@@ -2643,7 +2656,7 @@
 
     if (pb.overall.total === 0) {
       if (tableWrap) tableWrap.hidden = true;
-      if (subEl) subEl.textContent = 'No standard four-team EFL play-offs in the current filter';
+      if (subEl) subEl.textContent = 'No standard four-team English league play-offs in the current filter';
       if (proseEl) {
         if (pb.transitionalCount > 0) {
           const listStr = (pb.transitionalWinners || [])
@@ -2763,7 +2776,7 @@
             : '';
         const scopeSubject = pb.byTier.length === 1
           ? `${tierPalette[pb.byTier[0].tier]?.plainName || `Tier ${pb.byTier[0].tier}`} four-team play-offs`
-          : 'standard four-team EFL play-offs';
+          : 'standard four-team English league play-offs';
 
         proseEl.append(
           el('p', null,
@@ -2863,7 +2876,7 @@
     const svg = svgEl('svg', {
       viewBox: `0 0 ${W} ${H}`,
       role: 'img',
-      'aria-label': 'EFL play-off promotion rate by seed across tiers',
+      'aria-label': 'English league play-off promotion rate by seed across tiers',
     });
 
     for (let pct = 0; pct <= yMax; pct += 10) {
@@ -3032,7 +3045,7 @@
     // Footnote
     if (noteEl) {
       const notes = [
-        'Covers standard single-division four-team EFL play-offs (1988–89 onward; normally 3rd–6th in Tiers 2–3 and 4th–7th in Tier 4, plus restructuring seasons 1990–91 and 1994–95).',
+        'Covers standard same-division four-team English league play-offs (1988–89 onward; normally 3rd–6th in Tiers 2–3 and 4th–7th in Tier 4, plus restructuring seasons 1990–91 and 1994–95).',
       ];
       if (pb.transitionalCount > 0) {
         notes.push(`Excludes ${pb.transitionalCount} transitional 1986–88 inter-divisional ${plural(pb.transitionalCount, 'promotion')} (three lower-tier clubs plus one higher-tier club, so no 4th seed existed; included in the all-format table above).`);
@@ -3458,7 +3471,7 @@
         { label: '1st (Champ)', n: sa.gbInstances.filter((x) => x.pos === 1).length, col: '#b8291f' },
         { label: '2nd Place', n: sa.gbInstances.filter((x) => x.pos === 2).length, col: '#1b5670' },
         { label: '3rd–4th', n: sa.gbInstances.filter((x) => x.pos === 3 || x.pos === 4).length, col: '#2e6f52' },
-        { label: '5th–20th', n: sa.gbInstances.filter((x) => x.pos >= 5).length, col: '#8b8578' },
+        { label: '5th+', n: sa.gbInstances.filter((x) => x.pos >= 5).length, col: '#8b8578' },
       ];
       const maxN = Math.max(1, ...buckets.map((b) => b.n));
       const W = 500;
@@ -3816,6 +3829,19 @@
     renderSection4();
     renderSection5();
     renderArchive();
+
+    // Curtailed-aware season-length captions (rendered after voice chrome so the override sticks)
+    const curtOn = (state.model?.includedCurtailedSlots?.length ?? 0) > 0;
+    const sec2Sub = document.getElementById('sec2-tbl-sub');
+    if (sec2Sub) {
+      sec2Sub.textContent = isSicko()
+        ? (curtOn
+          ? 'Per-match normalization removes schedule heteroskedasticity (completed 38g–46g plus curtailed 34g–37g strata)'
+          : 'Per-match normalization removes 38g vs. 46g schedule heteroskedasticity')
+        : (curtOn
+          ? 'Per-game rates compare completed 38- to 46-game seasons and the curtailed 34–37-game 2019–20 tables on equal footing'
+          : 'Per-game rates compare completed 38- to 46-game seasons on equal footing');
+    }
   }
 
   function setVoiceMode(mode) {
