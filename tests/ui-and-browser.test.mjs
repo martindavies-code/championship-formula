@@ -655,7 +655,7 @@ test('Headline ledger semantic DOM invariants: plain English without statistical
       text: document.getElementById('key-takeaways').innerText,
     })`);
     assert.equal(takeawaysSnap.count, 6);
-    assert.ok(takeawaysSnap.text.includes('Bromley') && takeawaysSnap.text.includes('112 four-team EFL play-offs') && takeawaysSnap.text.includes('Sheffield Wednesday'));
+    assert.ok(takeawaysSnap.text.includes('Bromley') && takeawaysSnap.text.includes('112 four-team English league play-offs') && takeawaysSnap.text.includes('Sheffield Wednesday'));
     // Verify #sec3-playoff-panel renders grouped SVG bars, 4-row seed table, and zero jargon
     const poSnap = await cdp.evalJs(`() => ({
       panelText: document.getElementById('sec3-playoff-panel').innerText,
