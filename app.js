@@ -6,7 +6,9 @@
 (function () {
   'use strict';
 
-  const CA = typeof window !== 'undefined' ? window.ChampionshipAnalysis : null;
+  const CA = (typeof globalThis !== 'undefined' && globalThis.ChampionshipAnalysis)
+    ? globalThis.ChampionshipAnalysis
+    : (typeof window !== 'undefined' ? window.ChampionshipAnalysis : null);
   const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
   const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -124,21 +126,31 @@
     const gfR2 = gfPool?.r2Ppg ?? 0;
 
     const withinDiff = Math.abs(gaWithin - gfWithin);
-    const withinLeader = withinDiff < 0.0005 ? 'tie' : (gaWithin > gfWithin ? 'ga' : 'gf');
-    const pooledLeader = Math.abs(gaR2 - gfR2) < 0.0005 ? 'tie' : (gfR2 > gaR2 ? 'gf' : 'ga');
+    const pooledDiff = Math.abs(gaR2 - gfR2);
+    const withinExactTie = withinDiff < 1e-12;
+    const withinNearTie = !withinExactTie && withinDiff < 0.0005;
+    const withinLeader = withinExactTie ? 'tie' : withinNearTie ? 'near-tie' : (gaWithin > gfWithin ? 'ga' : 'gf');
+    const pooledExactTie = pooledDiff < 1e-12;
+    const pooledNearTie = !pooledExactTie && pooledDiff < 0.0005;
+    const pooledLeader = pooledExactTie ? 'tie' : pooledNearTie ? 'near-tie' : (gfR2 > gaR2 ? 'gf' : 'ga');
     const ties = Math.max(0, (m.withinSlot.comparableGfGaSlots ?? 0) - (m.withinSlot.gaBeatsGfCount ?? 0) - (m.withinSlot.gfBeatsGaCount ?? 0));
 
     return {
       gaWithin,
       gfWithin,
       withinDiff,
+      withinExactTie,
+      withinNearTie,
       withinLeader,
       gaR2,
       gfR2,
+      pooledDiff,
+      pooledExactTie,
+      pooledNearTie,
       gaPooledRPpg: gaPool?.rPpg ?? null,
       gfPooledRPpg: gfPool?.rPpg ?? null,
       pooledLeader,
-      diverges: withinLeader !== 'tie' && pooledLeader !== 'tie' && withinLeader !== pooledLeader,
+      diverges: (withinLeader === 'ga' || withinLeader === 'gf') && (pooledLeader === 'ga' || pooledLeader === 'gf') && withinLeader !== pooledLeader,
       ties,
     };
   }
@@ -146,7 +158,7 @@
   /* ========================================================================
      SAFE STRUCTURED TOOLTIP
      ======================================================================== */
-  const tooltipEl = document.getElementById('chart-tooltip');
+  const tooltipEl = typeof document !== 'undefined' ? document.getElementById('chart-tooltip') : null;
 
   function showTooltipData(data, clientX, clientY) {
     if (!tooltipEl || !data) return;
@@ -336,12 +348,22 @@
     const activeBanner = document.getElementById('active-scope-banner');
 
     if (m.isEmpty) {
-      if (metaCov) metaCov.textContent = '0 Tier-Seasons Selected';
+      if (metaCov) {
+        metaCov.textContent = m.excludedCurtailedSlots?.length > 0
+          ? `0 Active Tables (${m.excludedCurtailedSlots.length} Curtailed Excluded)`
+          : '0 Tier-Seasons Selected';
+      }
       if (metaMat) metaMat.textContent = '';
       if (metaGoals) metaGoals.textContent = '';
       if (activeBanner) {
         clearEl(activeBanner);
-        activeBanner.append('No tier-season tables match this filter. Select at least one pyramid tier above.');
+        if (m.excludedCurtailedSlots?.length > 0) {
+          activeBanner.append(
+            `All ${m.excludedCurtailedSlots.length} matching ${plural(m.excludedCurtailedSlots.length, 'table')} (${m.excludedCurtailedSlots.map((s) => `${s.season} ${s.historicalDivisionName}`).join(' and ')}) were curtailed and excluded by default. Enable "Include Curtailed" above or broaden your filter.`
+          );
+        } else {
+          activeBanner.append('No tier-season tables match this filter. Select at least one pyramid tier above.');
+        }
       }
       return;
     }
@@ -386,116 +408,288 @@
     }
   }
 
-  function renderLedger() {
-    const m = state.model;
-    const grid = document.getElementById('ledger-grid');
-    const note = document.getElementById('ledger-sample-note');
-    if (!grid) return;
-    clearEl(grid);
-    if (note) note.textContent = `${m.numSlots} ${plural(m.numSlots, 'slot')} · ${fmtInt(m.allTeams.length)} club-seasons (${state.scope.pointsMode === 'raw' ? 'Raw 3W+D' : 'Official'})`;
+  function buildLedgerView(m, scope) {
+    const activeScope = scope || m?.scope || state.scope;
+    const isRaw = (activeScope?.pointsMode || m?.scope?.pointsMode) === 'raw';
 
-    const gfPred = m.correlations.find((c) => c.key === 'gfPerGame');
-    const gaPred = m.correlations.find((c) => c.key === 'gaPerGame');
+    if (!m || m.isEmpty) {
+      const curtExcl = m?.excludedCurtailedSlots?.length ?? 0;
+      const note = curtExcl > 0
+        ? `0 active tables (${curtExcl} curtailed ${plural(curtExcl, 'table')} excluded by default)`
+        : '0 league tables selected';
+      return { isEmpty: true, note, cards: [] };
+    }
+
+    const note = isRaw
+      ? `${m.numSlots} league ${plural(m.numSlots, 'table')} · ${fmtInt(m.allTeams.length)} team ${plural(m.allTeams.length, 'season')} (Cards 01–02: raw 3W+D points; Cards 03–06: official standings)`
+      : `${m.numSlots} league ${plural(m.numSlots, 'table')} · ${fmtInt(m.allTeams.length)} team ${plural(m.allTeams.length, 'season')} (official standings)`;
+
     const drawPred = m.correlations.find((c) => c.key === 'drawRate');
     const winPred = m.correlations.find((c) => c.key === 'winRate');
     const gdPred = m.correlations.find((c) => c.key === 'gdPerGame');
     const atkDef = describeAtkVsDef(m);
     const smallSample = m.numSlots < 3;
 
+    // Card 01: Within-table rank strength & exact draw-correlation sign counts
+    const drawSlotVals = drawPred?.slotValues ?? [];
+    const drawTotalSlots = drawSlotVals.length;
+    const drawNegCount = drawSlotVals.filter((sv) => sv.rFinish < 0).length;
+    const drawPosCount = drawSlotVals.filter((sv) => sv.rFinish > 0).length;
+    const drawZeroCount = drawTotalSlots - drawNegCount - drawPosCount;
+    const drawAlwaysLast = m.byTierCorrelations.length > 0 && m.byTierCorrelations.every((t) => t.drawIsLastInTier);
+
+    let drawSignSentence = '';
+    if (drawTotalSlots > 0) {
+      if (drawNegCount === drawTotalSlots) {
+        drawSignSentence = ` Signed draw correlations were negative in all ${drawTotalSlots} tables (median signed correlation ${fmtSigned(drawPred?.medianRFinish, 3)}).`;
+      } else if (drawPosCount === drawTotalSlots) {
+        drawSignSentence = ` Signed draw correlations were positive in all ${drawTotalSlots} tables (median signed correlation ${fmtSigned(drawPred?.medianRFinish, 3)}).`;
+      } else {
+        drawSignSentence = ` Signed draw correlations were negative in ${drawNegCount} of ${drawTotalSlots} tables and positive in ${drawPosCount}${drawZeroCount > 0 ? ` (${drawZeroCount} zero)` : ''} (median signed correlation ${fmtSigned(drawPred?.medianRFinish, 3)}).`;
+      }
+    }
+
+    // Card 02: Attack vs Defence (within-table rank medians, separate table wins count, pooled PPG variation)
     const atkDefStat = smallSample
-      ? `${m.numSlots} ${plural(m.numSlots, 'slot')}`
+      ? `${m.numSlots} ${plural(m.numSlots, 'table')}`
       : `${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)}`;
 
-    const survCardStat = smallSample
-      ? (m.survivalSeries[0] ? `${fmtNum(m.survivalSeries[0].survivingPpg, 3)} PPG` : 'N/A')
-      : (m.survivalStats.slotCount > 0 && m.survivalStats.survivingPpg
-        ? `${fmtNum(m.survivalStats.survivingPpg.median, 3)} PPG`
-        : 'N/A');
+    const rankHead = atkDef.withinLeader === 'ga'
+      ? 'Defence edges within-table rank'
+      : atkDef.withinLeader === 'gf'
+        ? 'Scoring edges within-table rank'
+        : atkDef.withinLeader === 'near-tie'
+          ? 'Attack and defence are nearly equal on table rank'
+          : 'Attack and defence are equal on table rank';
+    const poolHead = atkDef.pooledLeader === 'gf'
+      ? 'scoring tracks more points variation'
+      : atkDef.pooledLeader === 'ga'
+        ? 'defence tracks more points variation'
+        : atkDef.pooledLeader === 'near-tie'
+          ? 'both track nearly equal points variation'
+          : 'both track equal points variation';
+    const atkDefSameClaim = atkDef.withinLeader === 'ga'
+      ? 'Defence leads on within-table rank and points variation'
+      : atkDef.withinLeader === 'gf'
+        ? 'Scoring leads on within-table rank and points variation'
+        : atkDef.withinLeader === 'near-tie'
+          ? 'Attack and defence are nearly equal on table rank and points variation'
+          : 'Attack and defence are equal on table rank and points variation';
+    const atkDefClaim = smallSample
+      ? `Too few tables to compare attack and defence${isRaw ? ' (raw 3W+D)' : ''}`
+      : `${atkDef.withinLeader === atkDef.pooledLeader ? atkDefSameClaim : `${rankHead}; ${poolHead}`}${isRaw ? ' (raw 3W+D)' : ''}`;
 
-    const scorerCardStat = m.scorerAnalysis.status === 'unavailable'
-      ? 'Unavailable'
-      : `${m.scorerAnalysis.champWithGbCount} / ${m.scorerAnalysis.availableSlotsCount}`;
+    const tieClause = atkDef.ties > 0 ? `, ${atkDef.ties} tied` : '';
+    const atkDefRankSentence = atkDef.withinLeader === 'ga'
+      ? `Within a table, goals conceded have a slightly stronger median link to final rank than goals scored (${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)} on a 0–1 scale); separately, defence had the stronger link in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables (${m.withinSlot.gfBeatsGaCount} for scoring${tieClause}).`
+      : atkDef.withinLeader === 'gf'
+        ? `Within a table, goals scored have a stronger median link to final rank than goals conceded (${fmtNum(atkDef.gfWithin, 3)} vs ${fmtNum(atkDef.gaWithin, 3)} on a 0–1 scale); separately, scoring had the stronger link in ${m.withinSlot.gfBeatsGaCount} of ${m.withinSlot.comparableGfGaSlots} tables (${m.withinSlot.gaBeatsGfCount} for defence${tieClause}).`
+        : atkDef.withinLeader === 'near-tie'
+          ? `Within a table, goals conceded and goals scored have a nearly equal median link to final rank (${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)} on a 0–1 scale, within the 0.0005 near-tie threshold); separately, defence led in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables and scoring in ${m.withinSlot.gfBeatsGaCount}${tieClause ? ` (${atkDef.ties} tied)` : ''}.`
+          : `Within a table, goals conceded and goals scored have an equal median link to final rank (${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)} on a 0–1 scale); across individual tables, defence led in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} and scoring in ${m.withinSlot.gfBeatsGaCount}${tieClause ? ` (${atkDef.ties} tied)` : ''}.`;
 
+    const poolModeTag = isRaw ? ' (on raw 3W+D points)' : '';
+    const atkDefPtsSentence = atkDef.pooledLeader === 'gf'
+      ? ` Across all clubs pooled${poolModeTag}, linear comparison associates ${fmtNum(atkDef.gfR2 * 100, 1)}% of variation in clubs’ points per game with scoring and ${fmtNum(atkDef.gaR2 * 100, 1)}% with conceding (overlapping descriptive associations, not additive shares or causes).`
+      : atkDef.pooledLeader === 'ga'
+        ? ` Across all clubs pooled${poolModeTag}, linear comparison associates ${fmtNum(atkDef.gaR2 * 100, 1)}% of variation in clubs’ points per game with conceding and ${fmtNum(atkDef.gfR2 * 100, 1)}% with scoring (overlapping descriptive associations, not additive shares or causes).`
+        : atkDef.pooledLeader === 'near-tie'
+          ? ` Across all clubs pooled${poolModeTag}, linear comparison associates nearly equal shares of variation in clubs’ points per game with scoring (${fmtNum(atkDef.gfR2 * 100, 1)}%) and conceding (${fmtNum(atkDef.gaR2 * 100, 1)}%) (within the 0.05 percentage-point near-tie threshold; descriptive associations, not additive shares or causes).`
+          : ` Across all clubs pooled${poolModeTag}, linear comparison associates an equal ${fmtNum(atkDef.gfR2 * 100, 1)}% of variation in clubs’ points per game with scoring and ${fmtNum(atkDef.gaR2 * 100, 1)}% with conceding (descriptive associations, not additive shares or causes).`;
+
+    // Card 03: Champions (official standings; middle-half interpolated quartiles vs majority)
+    const champMedianTxt = fmtNum(m.champStats.ppg?.median, 2);
+    const runnerMedianTxt = fmtNum(m.runnerStats.ppg?.median, 2);
+    const champQ1Txt = fmtNum(m.champStats.ppg?.q1, 2);
+    const champQ3Txt = fmtNum(m.champStats.ppg?.q3, 2);
+    const champUnitShort = isRaw ? 'official pts/g' : 'pts/game';
+    const champDetailSmall = `${m.champs.map((c) => {
+      const rawDiff = isRaw && c.rawPoints !== undefined && c.rawPoints !== c.points
+        ? `; ${c.rawPoints} raw points (${fmtNum(c.rawPpg, 2)} raw)`
+        : '';
+      return `${c.team} won the ${c.season} Tier ${c.tier} official title on ${c.points} official points (${fmtNum(c.officialPpg, 2)} official per game${rawDiff})`;
+    }).join('; ')}.`;
+
+    // Card 04: Survival (explicitly distinguish included relegating tables, excluded no-relegation reasons, and raw vs official deductions)
+    const ss = m.survivalStats;
+    const survSmallSample = ss.slotCount < 3;
+    const noRel = m.noRelegationSlots || [];
+    const activeBoundaryExcl = (m.excludedSurvivalRows || []).filter((r) => r.relegationActiveSlot);
+
+    const reElecSlots = noRel.filter((x) => x.reElectionEra);
+    const withdrewSlots = noRel.filter((x) => !x.reElectionEra && (x.excludedOutcomeTypes || []).includes('withdrew'));
+    const reprieveNoRelSlots = noRel.filter((x) => !x.reElectionEra && !(x.excludedOutcomeTypes || []).includes('withdrew') && (x.excludedOutcomeTypes || []).includes('reprieved'));
+    const otherNoRelSlots = noRel.filter((x) => !x.reElectionEra && !(x.excludedOutcomeTypes || []).includes('withdrew') && !(x.excludedOutcomeTypes || []).includes('reprieved'));
+
+    const noRelReasons = [];
+    if (reElecSlots.length > 0) noRelReasons.push(`${reElecSlots.length} Fourth Division re-election ${plural(reElecSlots.length, 'season')} where automatic relegation was not in place`);
+    if (withdrewSlots.length > 0) noRelReasons.push(`${withdrewSlots.length} after club withdrawal or resignation`);
+    if (reprieveNoRelSlots.length > 0) noRelReasons.push(`${reprieveNoRelSlots.length} after ground-grading reprieve`);
+    if (otherNoRelSlots.length > 0) noRelReasons.push(`${otherNoRelSlots.length} without automatic relegation`);
+
+    const survCardStat = ss.slotCount === 0
+      ? 'No relegation'
+      : survSmallSample
+        ? (m.survivalSeries[0] ? `${fmtNum(m.survivalSeries[0].survivingPpg, 3)} ${isRaw ? 'official pts/g' : 'pts/game'}` : 'N/A')
+        : (ss.survivingPpg ? `${fmtNum(ss.survivingPpg.median, 3)} ${isRaw ? 'official pts/g' : 'pts/game'}` : 'N/A');
+
+    const survClaim = ss.slotCount === 0
+      ? `${noRel.length} ${plural(noRel.length, 'table')} without relegation (0 with relegation)`
+      : `${ss.slotCount} ${plural(ss.slotCount, 'table')} with relegation${noRel.length > 0 ? `; ${noRel.length} without it` : ''}${activeBoundaryExcl.length > 0 ? `; ${activeBoundaryExcl.length} reprieved boundary ${plural(activeBoundaryExcl.length, 'club')} excluded` : ''}${isRaw ? ' (official standings)' : ''}`;
+
+    let survDetail = '';
+    if (ss.slotCount === 0) {
+      if (reElecSlots.length === noRel.length && noRel.length > 0) {
+        survDetail = `No survival cutoff applies: automatic relegation was not in place across ${noRel.length === 1 ? 'this Fourth Division re-election season' : `these ${noRel.length} Fourth Division re-election seasons`} (bottom clubs faced re-election).`;
+      } else {
+        survDetail = `No survival cutoff applies across ${noRel.length === 1 ? 'this table' : `these ${noRel.length} tables`}: ${noRelReasons.join('; ')}.`;
+      }
+    } else if (survSmallSample) {
+      const slotNotes = m.survivalSeries.map((s) => {
+        const survRow = m.allTeams.find((r) => r.slotId === s.slotId && r.team === s.survivingTeam);
+        const relRow = m.allTeams.find((r) => r.slotId === s.slotId && r.team === s.relegatedTeam);
+        const survAdjWord = survRow && survRow.signedAdjustment < 0 ? 'deduction' : survRow && survRow.signedAdjustment > 0 ? 'addition' : 'adjustment';
+        const relAdjWord = relRow && relRow.signedAdjustment < 0 ? 'deduction' : relRow && relRow.signedAdjustment > 0 ? 'addition' : 'adjustment';
+        const survRawNote = isRaw && survRow && survRow.rawPoints !== s.survivingPts
+          ? `; ${survRow.rawPoints} raw points, ${fmtNum(survRow.rawPpg, 3)} raw before a ${Math.abs(survRow.signedAdjustment)}-point ${survAdjWord}`
+          : '';
+        const relRawNote = isRaw && relRow && relRow.rawPoints !== s.relegatedHighPts
+          ? `; ${relRow.rawPoints} raw points, ${fmtNum(relRow.rawPpg, 3)} raw before a ${Math.abs(relRow.signedAdjustment)}-point ${relAdjWord}`
+          : '';
+        return `In ${s.season} Tier ${s.tier}, ${s.survivingTeam} stayed up on ${s.survivingPts} official points (${fmtNum(s.survivingPpg, 3)} official per game${survRawNote}) while ${s.relegatedTeam} went down on ${s.relegatedHighPts} official points (${fmtNum(s.relegatedHighPpg, 3)} official per game${relRawNote})`;
+      }).join('; ');
+      const extraNoRel = noRel.length > 0 ? ` Outside those cutoffs: ${noRelReasons.join('; ')}.` : '';
+      const extraReprieve = activeBoundaryExcl.length > 0
+        ? ` Boundary reprieves excluded from lowest merit survivor: ${activeBoundaryExcl.map((r) => `${r.team} (${r.season} Tier ${r.tier}, ${ordinal(r.pos)})`).join(', ')}.`
+        : '';
+      const rawFloorNote = isRaw ? ' Survival cutoffs remain on official standings.' : '';
+      survDetail = `${slotNotes}.${extraNoRel}${extraReprieve}${rawFloorNote}`;
+    } else {
+      const maxRelPpg = Math.max(...m.survivalSeries.map((s) => s.relegatedHighPpg ?? 0));
+      const exclOutside = noRel.length > 0
+        ? ` Outside those ${ss.slotCount} tables sit ${noRel.length} without relegation (${noRelReasons.join('; ')}).`
+        : '';
+      const exclReprieve = activeBoundaryExcl.length > 0
+        ? ` Boundary reprieves excluded from lowest merit survivor: ${activeBoundaryExcl.map((r) => `${r.team} (${r.season} Tier ${r.tier}, ${ordinal(r.pos)})`).join(', ')}.`
+        : '';
+      const rawFloorNote = isRaw ? ' Survival cutoffs remain on official standings.' : '';
+      survDetail = `Across those ${ss.slotCount} tables, the median lowest surviving team earned ${fmtNum(ss.survivingPpg?.median, 3)} official points per game (roughly ${fmtNum(ss.survivingPts38?.median, 1)} over 38 games; ${fmtNum(ss.survivingPts46?.median, 1)} over 46); the highest relegated club earned ${fmtNum(maxRelPpg, 3)} per game.${exclOutside}${exclReprieve}${rawFloorNote}`;
+    }
+
+    // Card 05: Draw Leaders (official standings)
     const dl = m.drawLeaderStats;
     const dlMidPct = dl.count > 0 ? (dl.middleHalfCount / dl.count) * 100 : 0;
-    const dlChampNames = (dl.championCampaigns || []).map((c) => `${c.team} ${c.season} T${c.tier}`).join(', ');
-    const drawAlwaysLast = m.byTierCorrelations.length > 0 && m.byTierCorrelations.every((t) => t.drawIsLastInTier);
-    const ss = m.survivalStats;
-    const survExclParts = [];
-    if (m.noRelegationSlots.length > 0) survExclParts.push(`${m.noRelegationSlots.length} non-relegating`);
-    if (ss.excludedAdminBoundaryCount > 0) survExclParts.push(`${ss.excludedAdminBoundaryCount} reprieved`);
-    const survExclNote = survExclParts.length > 0 ? ` (${survExclParts.join(', ')} excl.)` : '';
+    const dlChampNames = (dl.championCampaigns || []).map((c) => `${c.team}, ${c.season} Tier ${c.tier}`).join('; ');
+
+    // Card 06: Top Scorers (verified coverage only; neutral minority/half/majority wording, co-winners preserved)
+    const avail = m.scorerAnalysis.availableSlotsCount ?? 0;
+    const withGb = m.scorerAnalysis.champWithGbCount ?? 0;
+    const unavail = m.scorerAnalysis.unavailableSlotsCount ?? 0;
+    const gbWinnerCount = (m.scorerAnalysis.gbInstances || []).length;
+    const scorerCardStat = m.scorerAnalysis.status === 'unavailable' ? 'Unavailable' : `${withGb} / ${avail}`;
+
+    let scorerClaim = 'No uniform scorer data before 1992 or below Tier 1';
+    let scorerDetail = 'Verified Golden Boot and club scorer tables cover the Premier League (1992–93 to 2024–25) only; widen your filter to inspect them.';
+    if (m.scorerAnalysis.status !== 'unavailable') {
+      if (withGb === 0) {
+        scorerClaim = avail === 1
+          ? 'The champion did not field the league’s top scorer'
+          : `0 of ${avail} champions fielded the league’s top scorer`;
+      } else if (withGb === avail) {
+        scorerClaim = avail === 1
+          ? 'The champion fielded the league’s top scorer'
+          : `All ${avail} champions fielded the league’s top scorer`;
+      } else if (withGb * 2 < avail) {
+        scorerClaim = `A minority (${withGb} of ${avail}) of champions fielded the league’s top scorer`;
+      } else if (withGb * 2 === avail) {
+        scorerClaim = `Half (${withGb} of ${avail}) of champions fielded the league’s top scorer`;
+      } else {
+        scorerClaim = `A majority (${withGb} of ${avail}) of champions fielded the league’s top scorer`;
+      }
+      if (isRaw) scorerClaim += ' (official champions)';
+      const coWinnerClause = gbWinnerCount !== avail
+        ? ` (${gbWinnerCount} Golden Boot ${plural(gbWinnerCount, 'winner-season', 'winner-seasons')} including shared awards)`
+        : '';
+      const omitClause = unavail > 0
+        ? `; ${unavail} pre-1992 or lower-tier ${plural(unavail, 'table')} omitted for lacking matching records`
+        : '';
+      scorerDetail = `Across ${avail} verified Premier League ${plural(avail, 'season')}${coWinnerClause}, ${withGb} ${plural(withGb, 'champion')} fielded the Golden Boot winner${isRaw ? ' (official standings)' : ''}${omitClause}.`;
+    }
+
+    const topLeadPhrase = m.correlations[0]?.key === 'gdPerGame'
+      ? 'Goal difference and win rate track final rank closely'
+      : 'Win rate tracks final rank closely';
+    const quartileNote = m.champs.length < 8
+      ? `quartiles roughly ${champQ1Txt} to ${champQ3Txt}, interpolated across ${m.champs.length} ${plural(m.champs.length, 'season')}`
+      : `middle half roughly ${champQ1Txt} to ${champQ3Txt}, interpolated quartiles`;
 
     const cards = [
       {
-        idx: '01 · Predictor Hierarchy',
-        stat: smallSample ? `${m.numSlots} ${plural(m.numSlots, 'table')}` : (winPred ? fmtNum(winPred.medianRFinish, 3) : 'N/A'),
+        idx: '01 · What Tracks Rank',
+        stat: smallSample ? `${m.numSlots} ${plural(m.numSlots, 'table')}` : (winPred ? fmtNum(winPred.medianAbsRFinish, 3) : 'N/A'),
         claim: smallSample
-          ? 'Too few tables (< 3) for cross-season medians'
-          : (drawAlwaysLast ? 'Win rate & GD lead by definition; Draws rank last' : 'Win rate & GD lead by definition; Draws rank weakest'),
+          ? `Too few tables to summarise rank correlations${isRaw ? ' (raw 3W+D)' : ''}`
+          : `${topLeadPhrase}; ${drawAlwaysLast ? 'draw rate shows the weakest link' : 'draw rate shows a weak link'}${isRaw ? ' (raw 3W+D)' : ''}`,
         detail: smallSample
-          ? `Only ${m.numSlots} ${plural(m.numSlots, 'table')} selected (${fmtInt(m.allTeams.length)} club-seasons). Cross-season median r and percentiles are suppressed below 3 tables.`
-          : `Within-slot median |r| (finish): W/G ${fmtNum(winPred?.medianAbsRFinish, 3)}, GD/G ${fmtNum(gdPred?.medianAbsRFinish, 3)} (PPG = 3·W/G + D/G; GD = GF − GA). Draws: med signed r = ${fmtSigned(drawPred?.medianRFinish, 3)}, med |r| = ${fmtNum(drawPred?.medianAbsRFinish, 3)}.`,
+          ? `Choose at least three divisions or seasons (${m.numSlots} ${plural(m.numSlots, 'table')}, ${fmtInt(m.allTeams.length)} team ${plural(m.allTeams.length, 'season')} selected) to summarise within-table rank correlations${isRaw ? ' on raw 3W+D points' : ''}.`
+          : `Across the ${m.numSlots} selected tables${isRaw ? ' (on raw 3W+D points and rank)' : ''} on a 0–1 scale (0 = no linear link, 1 = perfect link with final rank), median within-table strength is ${fmtNum(winPred?.medianAbsRFinish, 3)} for wins per game, ${fmtNum(gdPred?.medianAbsRFinish, 3)} for goal difference, and ${fmtNum(drawPred?.medianAbsRFinish, 3)} for draws per game.${drawSignSentence}`,
       },
       {
         idx: '02 · Attack vs. Defence',
         stat: atkDefStat,
-        claim: smallSample
-          ? 'Within-slot Attack vs. Defence suppressed (< 3 slots)'
-          : atkDef.diverges
-            ? `${atkDef.withinLeader === 'ga' ? 'GA/G' : 'GF/G'} edges finish rank; ${atkDef.pooledLeader === 'gf' ? 'GF/G' : 'GA/G'} leads R²(PPG)`
-            : atkDef.withinLeader === 'tie'
-              ? 'Attack and defence virtually tied within-slot'
-              : `${atkDef.withinLeader === 'ga' ? 'Goals Against' : 'Goals For'} leads both finish rank & R²(PPG)`,
+        claim: atkDefClaim,
         detail: smallSample
-          ? `Select at least 3 tables to compare within-slot GF/G vs GA/G medians and pooled R²(PPG).`
-          : `Within-slot med |r| (finish): GA/G ${fmtNum(atkDef.gaWithin, 3)} vs GF/G ${fmtNum(atkDef.gfWithin, 3)} (${m.withinSlot.gaBeatsGfCount}–${m.withinSlot.gfBeatsGaCount} across ${m.withinSlot.comparableGfGaSlots} tables); pooled R²(PPG): GF/G ${fmtNum(atkDef.gfR2 * 100, 1)}% vs GA/G ${fmtNum(atkDef.gaR2 * 100, 1)}%.`,
+          ? `Choose at least three tables to compare within-table rank correlations and pooled points-per-game variation for goals scored and conceded${isRaw ? ' (raw 3W+D)' : ''}.`
+          : `${atkDefRankSentence}${atkDefPtsSentence}`,
       },
       {
         idx: '03 · Champions & Wins',
         stat: smallSample
-          ? (m.champs[0] ? `${fmtNum(m.champs[0].officialPpg, 2)} PPG` : 'N/A')
-          : `${fmtNum(m.champStats.ppg?.median, 2)} PPG`,
-        claim: `${m.champFewerWinsCases.length} ${plural(m.champFewerWinsCases.length, 'champion')} won fewer matches than a rival`,
+          ? (m.champs[0] ? `${fmtNum(m.champs[0].officialPpg, 2)} ${champUnitShort}` : 'N/A')
+          : `${champMedianTxt} ${champUnitShort}`,
+        claim: `${m.champFewerWinsCases.length} ${plural(m.champFewerWinsCases.length, 'champion')} won fewer matches than a rival${isRaw ? ' (official standings)' : ''}`,
         detail: smallSample
-          ? `${m.champs.map((c) => `${c.season} T${c.tier}: ${c.team} (${c.points} official pts, ${fmtNum(c.officialPpg, 2)} PPG)`).join('; ')}.`
-          : `Official 1st-place median is ${fmtNum(m.champStats.ppg?.median, 2)} PPG (IQR ${fmtNum(m.champStats.ppg?.q1, 2)}–${fmtNum(m.champStats.ppg?.q3, 2)}) vs ${fmtNum(m.runnerStats.ppg?.median, 2)} PPG for 2nd. ${m.champFewerWinsCases.length > 0 ? `Includes ${m.champFewerWinsCases[0].champion.team} (${m.champFewerWinsCases[0].season} ${m.champFewerWinsCases[0].historicalDivisionName}, ${m.champFewerWinsCases[0].champion.won}W).` : 'Every champion led or co-led in wins within this filter.'}`,
+          ? champDetailSmall
+          : `The median champion earned ${champMedianTxt} official points a game (${quartileNote}), against a ${runnerMedianTxt} median for runners-up.${isRaw ? ' Titles and points here remain official standings.' : ''} ${m.champFewerWinsCases.length > 0 ? `${m.champFewerWinsCases[0].champion.team} won the ${m.champFewerWinsCases[0].season} ${m.champFewerWinsCases[0].historicalDivisionName} with ${m.champFewerWinsCases[0].champion.won} wins.` : 'Every champion here at least matched rivals for wins.'}`,
       },
       {
-        idx: '04 · Survival Thresholds',
+        idx: '04 · Survival Line',
         stat: survCardStat,
-        claim: smallSample
-          ? (ss.slotCount > 0 ? `${ss.slotCount} ${plural(ss.slotCount, 'relegation table')} (official)` : 'Zero relegation in selected slice')
-          : `${ss.slotCount} ${plural(ss.slotCount, 'relegation battle')}${survExclNote}`,
-        detail: ss.slotCount === 0
-          ? 'All selected slots had zero relegation (re-election or reprieve era).'
-          : smallSample
-            ? m.survivalSeries.map((s) => `${s.season} T${s.tier}: safe ${s.survivingTeam} ${s.survivingPts} pts (${fmtNum(s.survivingPpg, 3)} PPG) vs rel ${s.relegatedTeam} ${s.relegatedHighPts} pts (${fmtNum(s.relegatedHighPpg, 3)} PPG)`).join('; ')
-            : `Official median lowest survivor: ${fmtNum(ss.survivingPpg?.median, 3)} PPG (~${fmtNum(ss.survivingPts38?.median, 1)}/38g or ${fmtNum(ss.survivingPts46?.median, 1)}/46g); highest relegated hit ${fmtNum(Math.max(...m.survivalSeries.map((s) => s.relegatedHighPpg ?? 0)), 3)} PPG.`,
+        claim: survClaim,
+        detail: survDetail,
       },
       {
         idx: '05 · Draw Leaders',
-        stat: smallSample
-          ? `${dl.count} ${plural(dl.count, 'club')}`
-          : (dl.finishScore?.median !== null && dl.finishScore?.median !== undefined ? `${fmtNum(dl.finishScore.median * 100, 1)}% Pct` : 'N/A'),
+        stat: smallSample ? `${dl.count} ${plural(dl.count, 'club')}` : `${fmtNum(dlMidPct, 0)}%`,
         claim: smallSample
-          ? `${dl.count} draw-leading ${plural(dl.count, 'club')} in ${m.numSlots} selected ${plural(m.numSlots, 'table')}`
-          : `${dl.middleHalfCount} of ${dl.count} (${fmtNum(dlMidPct, 0)}%) in middle half; ${dl.championCount} ${plural(dl.championCount, 'title')}`,
+          ? `${dl.count} ${plural(dl.count, 'club')} led or tied in draws across ${m.numSlots} ${plural(m.numSlots, 'table')}${isRaw ? ' (official standings)' : ''}`
+          : `${dl.middleHalfCount} of ${dl.count} draw leaders finished in the middle half; ${dl.championCount} won a title${isRaw ? ' (official standings)' : ''}`,
         detail: smallSample
-          ? m.seasonDrawLeaders.map((r) => `${r.team} (${ordinal(r.officialPos)}, ${r.drawn}D in ${r.season} T${r.tier})`).join('; ')
-          : `${dl.relegatedCount} draw ${plural(dl.relegatedCount, 'leader')} relegated and ${dl.championCount} won a title${dlChampNames ? ` (${dlChampNames})` : ''}; median ${fmtNum((dl.finishScore?.median ?? 0) * 100, 1)}% percentile (${ordinal(dl.pos?.median)} across mixed 20–24 club divisions).`,
+          ? `${m.seasonDrawLeaders.map((r) => `${r.team} (${ordinal(r.officialPos)} official finish, ${r.drawn} draws in ${r.season} Tier ${r.tier})`).join('; ')}.`
+          : `${dl.relegatedCount} draw ${plural(dl.relegatedCount, 'leader')} went down and ${dl.championCount} won the league${dlChampNames ? ` (${dlChampNames})` : ''}. Their median official finish was ${ordinal(dl.pos?.median)}, ahead of a median ${fmtNum((dl.finishScore?.median ?? 0) * 100, 1)}% of clubs in their division.`,
       },
       {
-        idx: '06 · Scorer Coverage',
+        idx: '06 · Top Scorers',
         stat: scorerCardStat,
-        claim: m.scorerAnalysis.status === 'unavailable' ? 'Pre-1992 & EFL T2–T4 scorer data unavailable' : 'Champions & Golden Boot winners loosely linked',
-        detail: m.scorerAnalysis.status === 'unavailable'
-          ? 'Verified season top-scorer tables exist for Tier 1 Premier League (1992–93..2024–25) only. Switch scope to inspect.'
-          : `Across ${m.scorerAnalysis.availableSlotsCount} verified PL ${plural(m.scorerAnalysis.availableSlotsCount, 'slot')}, ${m.scorerAnalysis.champWithGbCount} ${plural(m.scorerAnalysis.champWithGbCount, 'champion')} fielded the Golden Boot winner${m.scorerAnalysis.unavailableSlotsCount > 0 ? ` (${m.scorerAnalysis.unavailableSlotsCount} non-PL/pre-92 ${plural(m.scorerAnalysis.unavailableSlotsCount, 'slot')} omitted)` : ''}.`,
+        claim: scorerClaim,
+        detail: scorerDetail,
       },
     ];
 
-    cards.forEach((c) => {
+    return { isEmpty: false, note, cards };
+  }
+
+  function renderLedger() {
+    const m = state.model;
+    const grid = document.getElementById('ledger-grid');
+    const noteEl = document.getElementById('ledger-sample-note');
+    const view = buildLedgerView(m, state.scope);
+    if (noteEl) noteEl.textContent = view.note;
+    if (!grid) return;
+    clearEl(grid);
+    if (view.isEmpty) return;
+
+    view.cards.forEach((c) => {
       grid.appendChild(
         el('article', { className: 'ledger-card' },
           el('div', null,
@@ -546,10 +740,17 @@
           : `While Draws Rank ${ordinal(drawRankOverall)} Overall`;
         if (atkDef.diverges) {
           titleEl.textContent = `${atkDef.withinLeader === 'ga' ? 'Goals Against' : 'Goals For'} ${marginVerb} Within-Slot Rank While ${atkDef.pooledLeader === 'gf' ? 'Goals For' : 'Goals Against'} Leads Pooled R²(PPG)—${drawSuffix}`;
-        } else if (atkDef.withinLeader === 'tie') {
-          titleEl.textContent = `Attack and Defence Match Within-Slot While Draws Rank Last`;
+        } else if (atkDef.withinLeader === 'near-tie' || atkDef.withinLeader === 'tie') {
+          const rankDesc = atkDef.withinLeader === 'near-tie' ? 'Nearly Equal Within-Slot' : 'Equal Within-Slot';
+          const poolDesc = (atkDef.pooledLeader === 'gf' || atkDef.pooledLeader === 'ga')
+            ? `While ${atkDef.pooledLeader === 'gf' ? 'Goals For' : 'Goals Against'} Leads Pooled R²(PPG)`
+            : atkDef.pooledLeader === 'near-tie' ? 'And Match Closely on Pooled R²(PPG)' : 'And Match on Pooled R²(PPG)';
+          titleEl.textContent = `Attack and Defence ${rankDesc} ${poolDesc}—${drawSuffix}`;
         } else {
-          titleEl.textContent = `${atkDef.withinLeader === 'ga' ? 'Goals Against' : 'Goals For'} ${marginVerb} On Both Metrics—${drawSuffix}`;
+          const poolTail = (atkDef.pooledLeader === 'near-tie' || atkDef.pooledLeader === 'tie')
+            ? `While Pooled R²(PPG) Is ${atkDef.pooledLeader === 'near-tie' ? 'Nearly Equal' : 'Equal'}`
+            : 'On Both Metrics';
+          titleEl.textContent = `${atkDef.withinLeader === 'ga' ? 'Goals Against' : 'Goals For'} ${marginVerb} ${poolTail}—${drawSuffix}`;
         }
       }
     }
@@ -564,15 +765,22 @@
         );
       } else {
         const withinPhrase = atkDef.withinLeader === 'tie'
-          ? 'within-slot median |r| with finish score puts GF/G and GA/G virtually level'
-          : atkDef.withinLeader === 'ga'
-            ? 'within-slot median |r| with finish score slightly favours goals conceded (GA/G)'
-            : 'within-slot median |r| with finish score slightly favours goals scored (GF/G)';
+          ? 'within-slot median |r| with finish score puts GF/G and GA/G equal'
+          : atkDef.withinLeader === 'near-tie'
+            ? 'within-slot median |r| with finish score puts GF/G and GA/G nearly equal (within 0.0005)'
+            : atkDef.withinLeader === 'ga'
+              ? 'within-slot median |r| with finish score slightly favours goals conceded (GA/G)'
+              : 'within-slot median |r| with finish score slightly favours goals scored (GF/G)';
         const pooledPhrase = atkDef.pooledLeader === 'tie'
-          ? 'pooled R² with PPG is virtually equal'
-          : atkDef.pooledLeader === 'gf'
-            ? 'pooled R² with PPG favours goals scored (GF/G)'
-            : 'pooled R² with PPG favours goals conceded (GA/G)';
+          ? 'pooled R² with PPG is equal'
+          : atkDef.pooledLeader === 'near-tie'
+            ? 'pooled R² with PPG is nearly equal (within 0.05 percentage points)'
+            : atkDef.pooledLeader === 'gf'
+              ? 'pooled R² with PPG favours goals scored (GF/G)'
+              : 'pooled R² with PPG favours goals conceded (GA/G)';
+        const sec1Differs = atkDef.diverges
+          || (atkDef.withinNearTie && (atkDef.pooledLeader === 'gf' || atkDef.pooledLeader === 'ga'))
+          || (atkDef.pooledNearTie && (atkDef.withinLeader === 'gf' || atkDef.withinLeader === 'ga'));
         const tierDrawSummary = drawAlwaysLast
           ? `across ${m.byTierCorrelations.length === 1 ? `Tier ${m.byTierCorrelations[0].tier}` : `each selected tier (${m.byTierCorrelations.map((t) => `T${t.tier}`).join(', ')})`}`
           : `across tiers (${m.byTierCorrelations.map((t) => `T${t.tier}: ${ordinal(t.drawRankInTier)}`).join(', ')})`;
@@ -599,7 +807,7 @@
             el('strong', { textContent: withinPhrase }),
             ` (GA/G ${fmtNum(atkDef.gaWithin, 3)} vs GF/G ${fmtNum(atkDef.gfWithin, 3)}, gap ${fmtNum(atkDef.withinDiff, 3)}; defence stronger in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables vs ${m.withinSlot.gfBeatsGaCount} for attack${atkDef.ties > 0 ? `, ${atkDef.ties} tied` : ''}), whereas `,
             el('strong', { textContent: pooledPhrase }),
-            ` (GF/G ${fmtNum(atkDef.gfR2 * 100, 1)}% from r = ${fmtSigned(gfPool?.rPpg, 3)} vs GA/G ${fmtNum(atkDef.gaR2 * 100, 1)}% from r = ${fmtSigned(gaPool?.rPpg, 3)}).${atkDef.diverges ? ' The measures use different outcomes and aggregation methods, so their rankings can differ.' : ''} Both margins are modest descriptive associations rather than tactical prescriptions.`
+            ` (GF/G ${fmtNum(atkDef.gfR2 * 100, 1)}% from r = ${fmtSigned(gfPool?.rPpg, 3)} vs GA/G ${fmtNum(atkDef.gaR2 * 100, 1)}% from r = ${fmtSigned(gaPool?.rPpg, 3)}).${sec1Differs ? ' The measures use different outcomes and aggregation methods, so their rankings can differ.' : ''} Both margins are modest descriptive associations rather than tactical prescriptions.`
           ),
           el('p', null,
             `Meanwhile draw rate ranks ${ordinal(drawRankOverall)} of 5 predictors ${tierDrawSummary}: `,
@@ -2037,8 +2245,15 @@
     renderMastheadAndBanner();
 
     const emptyPanel = document.getElementById('empty-scope-panel');
+    const emptyMsgEl = document.getElementById('empty-scope-message');
     const sections = document.querySelectorAll('#main-content > section.analysis-section, #ledger');
     if (state.model.isEmpty) {
+      if (emptyMsgEl) {
+        emptyMsgEl.textContent = state.model.excludedCurtailedSlots?.length > 0
+          ? `All ${state.model.excludedCurtailedSlots.length} matching ${plural(state.model.excludedCurtailedSlots.length, 'table')} (${state.model.excludedCurtailedSlots.map((s) => `${s.season} ${s.historicalDivisionName}`).join(' and ')}) were curtailed and excluded by default. Enable "Include Curtailed" above or broaden your year/tier filter.`
+          : 'Select at least one league tier (1–4) or broaden your year range to inspect historical league tables.';
+      }
+      renderLedger();
       if (emptyPanel) emptyPanel.hidden = false;
       sections.forEach((sec) => { if (sec.id !== 'sec-methodology') sec.hidden = true; });
       return;
@@ -2191,6 +2406,10 @@
     } catch (err) {
       showFatalError(err?.message || 'Unable to load or validate league dataset.');
     }
+  }
+
+  if (typeof globalThis !== 'undefined') {
+    globalThis.ChampionshipLedger = { describeAtkVsDef, buildLedgerView };
   }
 
   if (typeof document !== 'undefined') {

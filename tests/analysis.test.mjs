@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import '../analysis.js';
+import '../app.js';
 
 const CA = globalThis.ChampionshipAnalysis;
+const CL = globalThis.ChampionshipLedger;
 const ROOT = path.resolve(import.meta.dirname, '..');
 const dataset = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'england-tiers-1-4-1981-2025.json'), 'utf8'));
 
@@ -182,4 +184,149 @@ test('Stage 2 A1-A4: Attack/defence dual metrics, raw-mode official-outcome isol
   badDs.tierSeasons = [structuredClone(badDs.tierSeasons[0])];
   badDs.tierSeasons[0].table[0].outcomeType = 'made_up';
   assert.equal(CA.validateDataset(badDs).ok, false);
+});
+
+test('Headline ledger semantics: Items 1-6 across real scopes, fixtures, and edge cases', () => {
+  const banBadNumbers = (view, label) => {
+    assert.ok(!/\bNaN\b|\bInfinity\b|\bundefined\b|\[object/i.test(view.note), `${label} note bad token`);
+    for (const c of view.cards) {
+      for (const field of [c.idx, c.stat, c.claim, c.detail]) {
+        assert.ok(!/\bNaN\b|\bInfinity\b|\bundefined\b|\[object/i.test(field), `${label} ${c.idx} bad token: ${field}`);
+      }
+    }
+  };
+
+  // Item 1, 2, 3, 4, 6 on default 174-table scope
+  const mDef = CA.buildAnalyticalModel(dataset, CA.PRESETS['all-4-tiers']);
+  const q1 = mDef.champStats.ppg.q1;
+  const q3 = mDef.champStats.ppg.q3;
+  const exactInQuartile = mDef.champs.filter((c) => c.officialPpg >= q1 && c.officialPpg <= q3).length;
+  const roundedInQuartile = mDef.champs.filter((c) => c.officialPpg >= Number(q1.toFixed(2)) && c.officialPpg <= Number(q3.toFixed(2))).length;
+  assert.equal(exactInQuartile, 86);
+  assert.equal(roundedInQuartile, 86);
+  assert.ok(exactInQuartile * 2 < mDef.champs.length, '86 of 174 (49.4%) is strictly below half');
+
+  const drawPred = mDef.correlations.find((c) => c.key === 'drawRate');
+  assert.equal(drawPred.slotValues.filter((s) => s.rFinish < 0).length, 111);
+  assert.equal(drawPred.slotValues.filter((s) => s.rFinish > 0).length, 63);
+
+  const vDef = CL.buildLedgerView(mDef, CA.PRESETS['all-4-tiers']);
+  banBadNumbers(vDef, 'default');
+  assert.ok(vDef.note.includes('174 league tables') && vDef.note.includes('4,000 team seasons') && vDef.note.includes('official standings'));
+  // Card 01: scale definition, selected-table summary, exact sign counts, no causal claim
+  assert.ok(vDef.cards[0].detail.includes('0–1 scale') && vDef.cards[0].detail.includes('174 selected tables'));
+  assert.ok(vDef.cards[0].detail.includes('negative in 111 of 174 tables and positive in 63'));
+  assert.ok(!/barely help/i.test(vDef.cards[0].claim + vDef.cards[0].detail));
+  // Card 02: variation not point share, non-additive, within-table median vs separate per-table count
+  assert.ok(vDef.cards[1].claim.includes('points variation'));
+  assert.ok(vDef.cards[1].detail.includes('median link') && vDef.cards[1].detail.includes('separately') && vDef.cards[1].detail.includes('92 of 174 tables'));
+  assert.ok(vDef.cards[1].detail.includes('65.5% of variation') && vDef.cards[1].detail.includes('61.0% with conceding') && vDef.cards[1].detail.includes('not additive shares or causes'));
+  // Card 03: median + middle-half quartiles, no majority claim
+  assert.ok(vDef.cards[2].detail.includes('median champion earned 2.04 official points') && vDef.cards[2].detail.includes('middle half roughly 1.94 to 2.16') && vDef.cards[2].detail.includes('1.90 median'));
+  assert.ok(!/\bmost\b|\bmajority\b/i.test(vDef.cards[2].detail));
+  // Card 04: 164 inside vs 10 outside with distinct reasons
+  assert.ok(vDef.cards[3].claim.includes('164 tables with relegation; 10 without it'));
+  assert.ok(vDef.cards[3].detail.includes('5 Fourth Division re-election seasons where automatic relegation was not in place') && vDef.cards[3].detail.includes('2 after club withdrawal') && vDef.cards[3].detail.includes('3 after ground-grading reprieve'));
+  // Card 06: 12 of 33 minority, 41 co-winner instances, 141 omitted, no causal need claim
+  assert.ok(vDef.cards[5].stat === '12 / 33' && vDef.cards[5].claim.includes('minority (12 of 33)'));
+  assert.ok(vDef.cards[5].detail.includes('41 Golden Boot') && vDef.cards[5].detail.includes('141 pre-1992 or lower-tier tables omitted'));
+  assert.ok(!/rarely|needed/i.test(vDef.cards[5].claim + vDef.cards[5].detail));
+
+  // Item 6: Tier 1 2011-2013 near-tie reproduction + synthetic exact tie & pooled near-tie
+  const scNear = { tiers: [1], startYear: 2011, endYear: 2013, includeCurtailed: false, pointsMode: 'official' };
+  const mNear = CA.buildAnalyticalModel(dataset, scNear);
+  const atkNear = CL.describeAtkVsDef(mNear);
+  assert.equal(atkNear.withinLeader, 'near-tie');
+  assert.equal(atkNear.withinNearTie, true);
+  assert.equal(atkNear.pooledLeader, 'gf');
+  const vNear = CL.buildLedgerView(mNear, scNear);
+  banBadNumbers(vNear, 'near-tie-2011-13');
+  assert.equal(vNear.cards[1].stat, '0.852 vs 0.851');
+  assert.ok(vNear.cards[1].claim.includes('nearly equal on table rank') && vNear.cards[1].claim.includes('scoring tracks more points variation'));
+  assert.ok(!/\b(tie|level)\b/i.test(vNear.cards[1].claim));
+  assert.ok(vNear.cards[1].detail.includes('nearly equal median link') && vNear.cards[1].detail.includes('0.0005 near-tie threshold'));
+  assert.ok(vNear.cards[1].detail.includes('81.5% of variation') && vNear.cards[1].detail.includes('65.4% with conceding'));
+  assert.ok(vNear.cards[0].detail.includes('negative in all 3 tables'));
+
+  const mockTrueTie = structuredClone(mNear);
+  mockTrueTie.correlations = mockTrueTie.correlations.map((c) => (
+    c.key === 'gaPerGame' || c.key === 'gfPerGame' ? { ...c, medianAbsRFinish: 0.8 } : c
+  ));
+  mockTrueTie.pooledCorrelations = mockTrueTie.pooledCorrelations.map((p) => (
+    p.key === 'gaPerGame' || p.key === 'gfPerGame' ? { ...p, r2Ppg: 0.65 } : p
+  ));
+  assert.equal(CL.describeAtkVsDef(mockTrueTie).withinLeader, 'tie');
+  assert.equal(CL.describeAtkVsDef(mockTrueTie).pooledLeader, 'tie');
+  const vTrueTie = CL.buildLedgerView(mockTrueTie, scNear);
+  assert.ok(vTrueTie.cards[1].claim.includes('equal on table rank and points variation') && !vTrueTie.cards[1].claim.includes('nearly equal'));
+
+  const mockPoolNear = structuredClone(mNear);
+  mockPoolNear.pooledCorrelations = mockPoolNear.pooledCorrelations.map((p) => (
+    p.key === 'gfPerGame' ? { ...p, r2Ppg: 0.6503 } : p.key === 'gaPerGame' ? { ...p, r2Ppg: 0.6500 } : p
+  ));
+  assert.equal(CL.describeAtkVsDef(mockPoolNear).pooledLeader, 'near-tie');
+  const vPoolNear = CL.buildLedgerView(mockPoolNear, scNear);
+  assert.ok(vPoolNear.cards[1].detail.includes('nearly equal shares of variation') && vPoolNear.cards[1].detail.includes('0.05 percentage-point'));
+
+  // Item 5: Tier 2 2021 raw mode disclosure (Reading 41 official vs 47 raw)
+  const scRaw21 = { tiers: [2], startYear: 2021, endYear: 2021, includeCurtailed: false, pointsMode: 'raw' };
+  const mRaw21 = CA.buildAnalyticalModel(dataset, scRaw21);
+  const readRow = mRaw21.allTeams.find((t) => t.team === 'Reading');
+  assert.equal(readRow.points, 41);
+  assert.equal(readRow.rawPoints, 47);
+  const vRaw21 = CL.buildLedgerView(mRaw21, scRaw21);
+  banBadNumbers(vRaw21, 'raw-2021-t2');
+  assert.ok(vRaw21.note.includes('Cards 01–02: raw 3W+D points; Cards 03–06: official standings'));
+  assert.ok(vRaw21.cards[3].stat.includes('0.891 official pts/g'));
+  assert.ok(vRaw21.cards[3].detail.includes('Reading stayed up on 41 official points (0.891 official per game; 47 raw points, 1.022 raw before a 6-point deduction)'));
+
+  // Item 4 & Item 3: Tier 4 1981-85 zero-relegation & draw positive-heavy signs
+  const scT4Early = { tiers: [4], startYear: 1981, endYear: 1985, includeCurtailed: false, pointsMode: 'official' };
+  const mT4Early = CA.buildAnalyticalModel(dataset, scT4Early);
+  const vT4Early = CL.buildLedgerView(mT4Early, scT4Early);
+  banBadNumbers(vT4Early, 't4-1981-85');
+  assert.ok(vT4Early.cards[0].detail.includes('negative in 1 of 5 tables and positive in 4'));
+  assert.ok(vT4Early.cards[3].stat === 'No relegation' && vT4Early.cards[3].claim.includes('5 tables without relegation (0 with relegation)'));
+  assert.ok(vT4Early.cards[3].detail.includes('automatic relegation was not in place') && !/suspended/i.test(vT4Early.cards[3].detail));
+
+  // Scorer proportions from real dataset slices: 0, <50%, ==50% (2002-05), >50% (2001-04), all (2022-24), and fixtures
+  const mPl0 = CA.buildAnalyticalModel(dataset, { tiers: [1], startYear: 1992, endYear: 1993, includeCurtailed: false, pointsMode: 'official' });
+  assert.ok(CL.buildLedgerView(mPl0).cards[5].claim.includes('0 of 2 champions'));
+  const mPlMinor = CA.buildAnalyticalModel(dataset, { tiers: [1], startYear: 1992, endYear: 1995, includeCurtailed: false, pointsMode: 'official' });
+  assert.ok(CL.buildLedgerView(mPlMinor).cards[5].claim.includes('minority (1 of 4)'));
+  const mPlHalf = CA.buildAnalyticalModel(dataset, { tiers: [1], startYear: 2002, endYear: 2005, includeCurtailed: false, pointsMode: 'official' });
+  assert.ok(CL.buildLedgerView(mPlHalf).cards[5].claim.includes('Half (2 of 4)'));
+  const mPlMaj = CA.buildAnalyticalModel(dataset, { tiers: [1], startYear: 2001, endYear: 2004, includeCurtailed: false, pointsMode: 'official' });
+  assert.ok(CL.buildLedgerView(mPlMaj).cards[5].claim.includes('majority (3 of 4)'));
+  const mPlAll = CA.buildAnalyticalModel(dataset, { tiers: [1], startYear: 2022, endYear: 2024, includeCurtailed: false, pointsMode: 'official' });
+  assert.ok(CL.buildLedgerView(mPlAll).cards[5].claim.includes('All 3 champions'));
+  const mZeroGb = CA.buildAnalyticalModel(dataset, { tiers: [1], startYear: 1992, endYear: 1992, includeCurtailed: false, pointsMode: 'official' });
+  assert.ok(CL.buildLedgerView(mZeroGb).cards[5].claim.includes('did not field'));
+  for (const [withGb, avail, pat] of [[0, 4, '0 of 4 champions'], [2, 4, 'Half (2 of 4)'], [2, 3, 'majority (2 of 3)'], [3, 3, 'All 3 champions']]) {
+    const fake = structuredClone(mNear);
+    fake.scorerAnalysis = { status: 'verified-full', availableSlotsCount: avail, unavailableSlotsCount: 0, champWithGbCount: withGb, gbInstances: Array(avail).fill({}) };
+    assert.ok(CL.buildLedgerView(fake).cards[5].claim.includes(pat), `Unexpected claim for ${withGb}/${avail}`);
+  }
+
+  // Draw all-positive synthetic fixture
+  const fakeAllPos = structuredClone(mNear);
+  fakeAllPos.correlations = fakeAllPos.correlations.map((c) => (
+    c.key === 'drawRate' ? { ...c, medianAbsRFinish: 0.25, medianRFinish: 0.25, slotValues: c.slotValues.map((sv) => ({ ...sv, rFinish: 0.25 })) } : c
+  ));
+  assert.ok(CL.buildLedgerView(fakeAllPos).cards[0].detail.includes('positive in all 3 tables'));
+
+  // Curtailed-only excluded, curtailed opt-in, 1-table, 2-table, empty, each individual tier
+  const mCurtExcl = CA.buildAnalyticalModel(dataset, { tiers: [3, 4], startYear: 2019, endYear: 2019, includeCurtailed: false, pointsMode: 'official' });
+  const vCurtExcl = CL.buildLedgerView(mCurtExcl);
+  assert.equal(vCurtExcl.isEmpty, true);
+  assert.ok(vCurtExcl.note.includes('2 curtailed tables excluded by default'));
+  const mEmpty = CA.buildAnalyticalModel(dataset, { tiers: [], startYear: 1981, endYear: 2024, includeCurtailed: false, pointsMode: 'official' });
+  assert.equal(CL.buildLedgerView(mEmpty).isEmpty, true);
+
+  for (const preset of [CA.PRESETS['pl-1992-2025'], { tiers: [1], startYear: 1981, endYear: 2024, includeCurtailed: false, pointsMode: 'official' }, { tiers: [2], startYear: 1981, endYear: 2024, includeCurtailed: false, pointsMode: 'official' }, { tiers: [3], startYear: 1981, endYear: 2024, includeCurtailed: false, pointsMode: 'official' }, { tiers: [4], startYear: 1981, endYear: 2024, includeCurtailed: false, pointsMode: 'official' }, { tiers: [1], startYear: 1992, endYear: 1993, includeCurtailed: false, pointsMode: 'official' }, { ...CA.PRESETS['all-4-tiers'], includeCurtailed: true }, { ...CA.PRESETS['all-4-tiers'], pointsMode: 'raw' }]) {
+    const mm = CA.buildAnalyticalModel(dataset, preset);
+    const vv = CL.buildLedgerView(mm, preset);
+    assert.equal(vv.isEmpty, false);
+    banBadNumbers(vv, JSON.stringify(preset));
+  }
 });
