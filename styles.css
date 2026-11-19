@@ -545,14 +545,14 @@ body.voice-sicko .takeaways-section {
 
 .section-header-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.25rem;
   margin-block-end: 1.75rem;
 }
 
 @container (inline-size > 820px) {
   .section-header-grid {
-    grid-template-columns: 1.15fr 0.85fr;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
     gap: 2.5rem;
     align-items: start;
   }
@@ -578,6 +578,7 @@ body.voice-sicko .takeaways-section {
 }
 
 .section-prose {
+  min-width: 0;
   font-size: 0.98rem;
   line-height: 1.65;
   color: var(--ink-secondary);
@@ -1699,4 +1700,48 @@ h3[id] {
     white-space: normal;
     overflow-wrap: break-word;
   }
+}
+
+/* Accessible math typesetting (Sicko Mode equations) */
+.math-display,
+.math-inline {
+  font-family: Georgia, 'Times New Roman', 'Nimbus Roman', serif;
+  font-size: 1.04em;
+  letter-spacing: 0.015em;
+  color: inherit;
+}
+.math-display {
+  display: block;
+  text-align: center;
+  margin: 0.85rem 0;
+  padding: 0.35rem 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+.math-inline { white-space: nowrap; }
+.mx-var { font-style: italic; }
+.mx-frac {
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: middle;
+  text-align: center;
+  margin: 0 0.18em;
+  line-height: 1.25;
+}
+.mx-num {
+  display: block;
+  padding: 0 0.32em 0.09em;
+  border-bottom: 1.5px solid currentColor;
+}
+.mx-den { display: block; padding: 0.09em 0.32em 0; }
+.mx-sqrt { display: inline-flex; align-items: stretch; }
+.mx-radical { font-size: 1.15em; line-height: 1; align-self: center; }
+.mx-sqrt-body { border-top: 1.5px solid currentColor; padding: 0.05em 0.1em 0; align-self: stretch; display: inline-flex; align-items: center; }
+.math-display sub,
+.math-display sup,
+.math-inline sub,
+.math-inline sup { font-size: 0.72em; }
+@media print {
+  .math-display { overflow: visible; white-space: normal; }
 }
