@@ -829,7 +829,9 @@ test('Voice mode switcher: Normal Person Mode vs Statistics Sicko Mode with cart
     assert.ok(sickoSnap.poTbodyH > 100, `Play-off seed table tbody must render full height in Sicko mode (got ${sickoSnap.poTbodyH})`);
     assert.ok(sickoSnap.title.includes('Within-Slot Pearsonian'));
     assert.equal(badTokenRe.exec(sickoSnap.bodyText), null, 'Sicko mode must have zero NaN/undefined/Infinity/[object tokens');
-    for (const token of ['Within-Slot', 'R²(PPG)', 'IQR', 'GA/G', 'GF/G', 'χ²', 'argmax(W)', 'OLS', 'PPG']) {
+    // Typeset math zones render scripts as real <sub>/<sup> nodes, so innerText
+    // carries base glyphs (R2(PPG), χ2) rather than the precomposed unicode forms.
+    for (const token of ['Within-Slot', 'R2(PPG)', 'IQR', 'GA/G', 'GF/G', 'χ2', 'argmax(W)', 'OLS', 'PPG']) {
       assert.ok(sickoSnap.bodyText.includes(token), `Sicko mode should surface quant jargon token "${token}"`);
     }
     assert.ok(sickoSnap.scrollW <= sickoSnap.clientW, 'Sicko desktop layout must not overflow horizontally');
