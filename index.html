@@ -20,6 +20,18 @@
 
   <div class="page-shell">
     <header class="masthead">
+      <div class="voice-mode-bar" role="region" aria-label="Reading mode switcher">
+        <span class="voice-mode-label" id="voice-mode-label" data-vk="voice-label">Reading Mode:</span>
+        <div class="voice-mode-group" role="group" aria-label="Select prose style">
+          <button type="button" class="btn-voice" data-voice-mode="normal" aria-pressed="true">Normal Person Mode</button>
+          <button type="button" class="btn-voice btn-voice-sicko" data-voice-mode="sicko" aria-pressed="false">
+            <img src="./assets/stats-sicko.jpg" alt="" class="voice-btn-thumb" width="22" height="22">
+            <span>Statistics Sicko Mode</span>
+          </button>
+        </div>
+        <span class="voice-mode-hint" id="voice-mode-hint" data-vk="voice-hint">Clear, flowing prose; flip the switch for full quant jargon</span>
+      </div>
+
       <div class="masthead-hero-grid" id="masthead-hero-grid">
         <div class="masthead-hero-copy">
           <h1 class="masthead-title" id="masthead-title" data-vk="masthead-title">The Championship Formula</h1>
@@ -94,18 +106,6 @@
         <span class="num" id="meta-coverage">Loading dataset…</span>
         <span class="num" id="meta-matches"></span>
         <span class="num" id="meta-goals"></span>
-      </div>
-
-      <div class="voice-mode-bar" role="region" aria-label="Reading mode switcher">
-        <span class="voice-mode-label" id="voice-mode-label" data-vk="voice-label">Reading Mode:</span>
-        <div class="voice-mode-group" role="group" aria-label="Select prose style">
-          <button type="button" class="btn-voice" data-voice-mode="normal" aria-pressed="true">Normal Person Mode</button>
-          <button type="button" class="btn-voice btn-voice-sicko" data-voice-mode="sicko" aria-pressed="false">
-            <img src="./assets/stats-sicko.jpg" alt="" class="voice-btn-thumb" width="22" height="22">
-            <span>Statistics Sicko Mode</span>
-          </button>
-        </div>
-        <span class="voice-mode-hint" id="voice-mode-hint" data-vk="voice-hint">Clear, flowing prose; flip the switch for full quant jargon</span>
       </div>
 
       <div class="normalisation-banner" id="normalisation-banner">
