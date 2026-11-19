@@ -163,12 +163,19 @@
             i = close + 1;
           }
         } else if (i < zone.length) {
-          script = zone[i];
-          i++;
+          // Unbraced script: consume the whole alphanumeric identifier run so
+          // multi-letter subscripts typeset as one script (N_slots, r_finish, Pts_18th).
+          let j = i;
+          while (j < zone.length && /[A-Za-z0-9]/.test(zone[j])) j++;
+          script = zone.slice(i, j);
+          i = j;
         }
         if (script) {
           flush();
           out.push(el(ch === '_' ? 'sub' : 'sup', { textContent: script }));
+        } else {
+          // No script body (e.g. '_' before punctuation): keep the marker literal.
+          buf += ch;
         }
         continue;
       }
