@@ -20,23 +20,6 @@
 
   <div class="page-shell">
     <header class="masthead">
-      <div class="voice-mode-bar" role="region" aria-label="Reading mode switcher">
-        <span class="voice-mode-label" id="voice-mode-label" data-vk="voice-label">Reading Mode:</span>
-        <div class="voice-mode-group" role="group" aria-label="Select prose style">
-          <button type="button" class="btn-voice" data-voice-mode="normal" aria-pressed="true">Normal Person Mode</button>
-          <button type="button" class="btn-voice btn-voice-sicko" data-voice-mode="sicko" aria-pressed="false">
-            <img src="./assets/stats-sicko.jpg" alt="" class="voice-btn-thumb" width="22" height="22">
-            <span>Statistics Sicko Mode</span>
-          </button>
-        </div>
-        <span class="voice-mode-hint" id="voice-mode-hint" data-vk="voice-hint">Clear, flowing prose; flip the switch for full quant jargon</span>
-      </div>
-      <div class="masthead-meta">
-        <span class="masthead-kicker" data-vk="masthead-kicker">English League Study · Three-Points Era</span>
-        <span class="num" id="meta-coverage">Loading dataset…</span>
-        <span class="num" id="meta-matches"></span>
-        <span class="num" id="meta-goals"></span>
-      </div>
       <div class="masthead-hero-grid" id="masthead-hero-grid">
         <div class="masthead-hero-copy">
           <h1 class="masthead-title" id="masthead-title" data-vk="masthead-title">The Championship Formula</h1>
@@ -51,83 +34,12 @@
           </figcaption>
         </figure>
       </div>
-      <div class="normalisation-banner" id="normalisation-banner">
-        <!-- Populated safely from dataset metadata and active scope -->
-      </div>
     </header>
 
     <section id="fatal-error-panel" class="fatal-error-panel" role="alert" hidden>
       <h2 class="fatal-error-title">Dataset Load Error</h2>
       <p id="fatal-error-message"></p>
     </section>
-
-    <section class="scope-bar" aria-label="Filter controls">
-      <div class="scope-bar-top">
-        <div class="scope-presets" role="group" aria-label="Quick filters">
-          <span class="control-group-label" data-vk="scope-presets-label">Presets:</span>
-          <button type="button" class="btn-toggle" data-preset="all-4-tiers" data-vk="preset-all" aria-pressed="true">All 4 Tiers (1981–2026)</button>
-          <button type="button" class="btn-toggle" data-preset="pl-1992-2026" data-vk="preset-pl" aria-pressed="false">Premier League (1992–2026)</button>
-          <button type="button" class="btn-toggle" data-preset="tier1-full" data-vk="preset-t1" aria-pressed="false">Top Flight (1981–2026)</button>
-          <button type="button" class="btn-toggle" data-preset="efl-tiers-2-4" data-vk="preset-efl" aria-pressed="false">Tiers 2–4 (1981–2026)</button>
-        </div>
-        <div class="scope-points-mode" role="group" aria-label="Points basis">
-          <span class="control-group-label" data-vk="scope-points-label">Points:</span>
-          <button type="button" class="btn-toggle" data-points-mode="official" data-vk="points-official" aria-pressed="true">Official Tables (with deductions)</button>
-          <button type="button" class="btn-toggle" data-points-mode="raw" data-vk="points-raw" aria-pressed="false" title="Recalculates points and table rank in Section 1 and deduction checks without points deductions; titles, promotions and relegations stay on official standings.">On-Pitch Points (before deductions)</button>
-        </div>
-      </div>
-
-      <div class="scope-bar-controls">
-        <fieldset class="scope-fieldset">
-          <legend class="scope-legend" data-vk="scope-tiers-legend">Divisions (tables use each era’s historical name)</legend>
-          <div class="tier-checkbox-row" id="scope-tier-checkboxes">
-            <label class="tier-check"><input type="checkbox" value="1" checked> <span data-vk="tier-check-1">Tier 1 · First Div / Premier League</span></label>
-            <label class="tier-check"><input type="checkbox" value="2" checked> <span data-vk="tier-check-2">Tier 2 · Second Div / Championship</span></label>
-            <label class="tier-check"><input type="checkbox" value="3" checked> <span data-vk="tier-check-3">Tier 3 · Third Div / League One</span></label>
-            <label class="tier-check"><input type="checkbox" value="4" checked> <span data-vk="tier-check-4">Tier 4 · Fourth Div / League Two</span></label>
-          </div>
-        </fieldset>
-
-        <fieldset class="scope-fieldset scope-years-fieldset">
-          <legend class="scope-legend" data-vk="scope-years-legend">Seasons (1981–82 to 2025–26)</legend>
-          <div class="year-select-row">
-            <label for="scope-start-year" class="year-label"><span data-vk="scope-from">From</span>
-              <select id="scope-start-year" class="select-control"></select>
-            </label>
-            <label for="scope-end-year" class="year-label"><span data-vk="scope-to">To</span>
-              <select id="scope-end-year" class="select-control"></select>
-            </label>
-          </div>
-        </fieldset>
-
-        <fieldset class="scope-fieldset scope-curtail-fieldset">
-          <legend class="scope-legend" data-vk="scope-curtail-legend">Curtailed 2019–20 Tables</legend>
-          <label class="tier-check">
-            <input type="checkbox" id="scope-include-curtailed">
-            <span data-vk="scope-curtail-label">Include shortened 2019–20 League One &amp; League Two (decided on points per game; Bury expelled)</span>
-          </label>
-        </fieldset>
-      </div>
-
-      <div class="active-scope-banner" id="active-scope-banner" aria-live="polite">
-        <!-- Populated safely with exact counts, exclusions, and deduction notes -->
-      </div>
-    </section>
-
-    <nav class="section-nav" aria-label="Article sections">
-      <ul class="section-nav-list">
-        <li><a href="#key-takeaways" data-vk="nav-takeaways">Key Findings</a></li>
-        <li><a href="#ledger" data-vk="nav-ledger">Scorecard</a></li>
-        <li><a href="#sec-predictors" data-vk="nav-sec1">01. What Tracks Rank</a></li>
-        <li><a href="#sec-champion" data-vk="nav-sec2">02. Champions</a></li>
-        <li><a href="#sec-survival" data-vk="nav-sec3">03. Survival &amp; Promotion</a></li>
-        <li><a href="#sec-draws" data-vk="nav-sec4">04. Draws</a></li>
-        <li><a href="#sec-golden-boot" data-vk="nav-sec5">05. Top Scorers</a></li>
-        <li><a href="#sec-leaders" data-vk="nav-sec5b">05b. Division Leaders</a></li>
-        <li><a href="#sec-archive" data-vk="nav-sec6">06. Archive</a></li>
-        <li><a href="#sec-methodology" data-vk="nav-sec7">07. Sources &amp; Methods</a></li>
-      </ul>
-    </nav>
 
     <main id="main-content">
       <section id="empty-scope-panel" class="empty-scope-panel" hidden>
@@ -145,6 +57,21 @@
         <ul class="takeaways-list" id="takeaways-list"></ul>
       </section>
 
+      <nav class="section-nav" aria-label="Article sections">
+        <ul class="section-nav-list">
+          <li><a href="#key-takeaways" data-vk="nav-takeaways">Key Findings</a></li>
+          <li><a href="#ledger" data-vk="nav-ledger">Scorecard</a></li>
+          <li><a href="#sec-predictors" data-vk="nav-sec1">01. What Tracks Rank</a></li>
+          <li><a href="#sec-champion" data-vk="nav-sec2">02. Champions</a></li>
+          <li><a href="#sec-survival" data-vk="nav-sec3">03. Survival &amp; Promotion</a></li>
+          <li><a href="#sec-draws" data-vk="nav-sec4">04. Draws</a></li>
+          <li><a href="#sec-golden-boot" data-vk="nav-sec5">05. Top Scorers</a></li>
+          <li><a href="#sec-leaders" data-vk="nav-sec5b">05b. Division Leaders</a></li>
+          <li><a href="#sec-archive" data-vk="nav-sec6">06. Archive</a></li>
+          <li><a href="#sec-methodology" data-vk="nav-sec7">07. Sources &amp; Methods</a></li>
+        </ul>
+      </nav>
+
       <!-- EXECUTIVE LEDGER -->
       <section id="ledger" class="ledger-section" aria-labelledby="ledger-heading">
         <div class="ledger-header">
@@ -153,6 +80,86 @@
         </div>
         <div class="ledger-grid" id="ledger-grid">
           <!-- Populated dynamically via safe DOM helpers -->
+        </div>
+      </section>
+
+      <div class="masthead-meta">
+        <span class="masthead-kicker" data-vk="masthead-kicker">English League Study · Three-Points Era</span>
+        <span class="num" id="meta-coverage">Loading dataset…</span>
+        <span class="num" id="meta-matches"></span>
+        <span class="num" id="meta-goals"></span>
+      </div>
+
+      <div class="voice-mode-bar" role="region" aria-label="Reading mode switcher">
+        <span class="voice-mode-label" id="voice-mode-label" data-vk="voice-label">Reading Mode:</span>
+        <div class="voice-mode-group" role="group" aria-label="Select prose style">
+          <button type="button" class="btn-voice" data-voice-mode="normal" aria-pressed="true">Normal Person Mode</button>
+          <button type="button" class="btn-voice btn-voice-sicko" data-voice-mode="sicko" aria-pressed="false">
+            <img src="./assets/stats-sicko.jpg" alt="" class="voice-btn-thumb" width="22" height="22">
+            <span>Statistics Sicko Mode</span>
+          </button>
+        </div>
+        <span class="voice-mode-hint" id="voice-mode-hint" data-vk="voice-hint">Clear, flowing prose; flip the switch for full quant jargon</span>
+      </div>
+
+      <div class="normalisation-banner" id="normalisation-banner">
+        <!-- Populated safely from dataset metadata and active scope -->
+      </div>
+
+      <section class="scope-bar" aria-label="Filter controls">
+        <details class="scope-details" id="scope-details" open>
+          <summary class="scope-details-summary"><span data-vk="scope-details-label">Filters and settings</span></summary>
+        <div class="scope-bar-top">
+          <div class="scope-presets" role="group" aria-label="Quick filters">
+            <span class="control-group-label" data-vk="scope-presets-label">Presets:</span>
+            <button type="button" class="btn-toggle" data-preset="all-4-tiers" data-vk="preset-all" aria-pressed="true">All 4 Tiers (1981–2026)</button>
+            <button type="button" class="btn-toggle" data-preset="pl-1992-2026" data-vk="preset-pl" aria-pressed="false">Premier League (1992–2026)</button>
+            <button type="button" class="btn-toggle" data-preset="tier1-full" data-vk="preset-t1" aria-pressed="false">Top Flight (1981–2026)</button>
+            <button type="button" class="btn-toggle" data-preset="efl-tiers-2-4" data-vk="preset-efl" aria-pressed="false">Tiers 2–4 (1981–2026)</button>
+          </div>
+          <div class="scope-points-mode" role="group" aria-label="Points basis">
+            <span class="control-group-label" data-vk="scope-points-label">Points:</span>
+            <button type="button" class="btn-toggle" data-points-mode="official" data-vk="points-official" aria-pressed="true">Official Tables (with deductions)</button>
+            <button type="button" class="btn-toggle" data-points-mode="raw" data-vk="points-raw" aria-pressed="false" title="Recalculates points and table rank in Section 1 and deduction checks without points deductions; titles, promotions and relegations stay on official standings.">On-Pitch Points (before deductions)</button>
+          </div>
+        </div>
+
+        <div class="scope-bar-controls">
+          <fieldset class="scope-fieldset">
+            <legend class="scope-legend" data-vk="scope-tiers-legend">Divisions (tables use each era’s historical name)</legend>
+            <div class="tier-checkbox-row" id="scope-tier-checkboxes">
+              <label class="tier-check"><input type="checkbox" value="1" checked> <span data-vk="tier-check-1">Tier 1 · First Div / Premier League</span></label>
+              <label class="tier-check"><input type="checkbox" value="2" checked> <span data-vk="tier-check-2">Tier 2 · Second Div / Championship</span></label>
+              <label class="tier-check"><input type="checkbox" value="3" checked> <span data-vk="tier-check-3">Tier 3 · Third Div / League One</span></label>
+              <label class="tier-check"><input type="checkbox" value="4" checked> <span data-vk="tier-check-4">Tier 4 · Fourth Div / League Two</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="scope-fieldset scope-years-fieldset">
+            <legend class="scope-legend" data-vk="scope-years-legend">Seasons (1981–82 to 2025–26)</legend>
+            <div class="year-select-row">
+              <label for="scope-start-year" class="year-label"><span data-vk="scope-from">From</span>
+                <select id="scope-start-year" class="select-control"></select>
+              </label>
+              <label for="scope-end-year" class="year-label"><span data-vk="scope-to">To</span>
+                <select id="scope-end-year" class="select-control"></select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="scope-fieldset scope-curtail-fieldset">
+            <legend class="scope-legend" data-vk="scope-curtail-legend">Curtailed 2019–20 Tables</legend>
+            <label class="tier-check">
+              <input type="checkbox" id="scope-include-curtailed">
+              <span data-vk="scope-curtail-label">Include shortened 2019–20 League One &amp; League Two (decided on points per game; Bury expelled)</span>
+            </label>
+          </fieldset>
+        </div>
+
+        </details>
+
+        <div class="active-scope-banner" id="active-scope-banner" aria-live="polite">
+          <!-- Populated safely with exact counts, exclusions, and deduction notes -->
         </div>
       </section>
 
@@ -165,7 +172,7 @@
             <div class="section-prose" id="sec1-prose"></div>
           </div>
           <aside class="finding-callout" aria-label="Rank correlation summary">
-            <h3 class="finding-callout-title" data-vk="sec1-callout-title">Within-Table vs. Pooled Summary</h3>
+            <h3 class="finding-callout-title" data-vk="sec1-callout-title">Within-Table v Pooled Summary</h3>
             <dl class="finding-kv-list" id="sec1-callout-list"></dl>
           </aside>
         </div>
@@ -227,7 +234,7 @@
             </div>
             <div tabindex="0" role="region" aria-labelledby="sec1-tier-caption" class="table-wrapper" style="margin-block-top: 1rem;">
               <table class="data-table" id="sec1-tier-table">
-                <caption id="sec1-tier-caption" data-vk="sec1-tier-cap">Attack vs. Defence by Tier</caption>
+                <caption id="sec1-tier-caption" data-vk="sec1-tier-cap">Attack v Defence by Tier</caption>
                 <thead>
                   <tr>
                     <th scope="col" class="text-col" data-vk="sec1-tth-tier">Tier</th>
@@ -249,11 +256,11 @@
       <section id="sec-champion" class="analysis-section" aria-labelledby="sec2-title">
         <div class="section-header-grid">
           <div>
-            <p class="section-kicker" data-vk="sec2-kicker">02 / Champions vs. Runners-Up</p>
+            <p class="section-kicker" data-vk="sec2-kicker">02 / Champions v Runners-Up</p>
             <h2 id="sec2-title" class="section-title">Loading title summary…</h2>
             <div class="section-prose" id="sec2-prose"></div>
           </div>
-          <aside class="finding-callout" aria-label="Champion vs runner-up summary">
+          <aside class="finding-callout" aria-label="Champion v runner-up summary">
             <h3 class="finding-callout-title" data-vk="sec2-callout-title">Official Title Profile (Per Game)</h3>
             <dl class="finding-kv-list" id="sec2-callout-list"></dl>
           </aside>
@@ -262,7 +269,7 @@
         <div class="chart-panel">
           <div class="chart-panel-header">
             <div>
-              <h3 class="chart-title" data-vk="sec2-time-title">Title Races Over Time: Champion vs. Runner-Up</h3>
+              <h3 class="chart-title" data-vk="sec2-time-title">Title Races Over Time: Champion v Runner-Up</h3>
               <p class="chart-subtitle" id="sec2-timeline-subtitle"></p>
             </div>
             <div class="chart-controls" role="group" aria-label="Select timeline stat">
@@ -287,7 +294,7 @@
           <div class="chart-panel">
             <div class="chart-panel-header">
               <div>
-                <h3 class="chart-title" data-vk="sec2-dist-title">Spread of 1st vs. 2nd Place (Per Game)</h3>
+                <h3 class="chart-title" data-vk="sec2-dist-title">Spread of 1st v 2nd Place (Per Game)</h3>
                 <p class="chart-subtitle" data-vk="sec2-dist-sub">Shaded box = middle half; dot = median; thin line = lowest to highest</p>
               </div>
             </div>
@@ -304,7 +311,7 @@
             </div>
             <div tabindex="0" role="region" aria-labelledby="sec2-table-caption" class="table-wrapper">
               <table class="data-table" id="sec2-dist-table">
-                <caption id="sec2-table-caption" data-vk="sec2-t1-cap">Champion vs. Runner-Up Spread (Per Game)</caption>
+                <caption id="sec2-table-caption" data-vk="sec2-t1-cap">Champion v Runner-Up Spread (Per Game)</caption>
                 <thead>
                   <tr>
                     <th scope="col" class="text-col" data-vk="sec2-th-stat">Stat (Per Game)</th>
@@ -355,7 +362,7 @@
         <div class="chart-panel">
           <div class="chart-panel-header">
             <div>
-              <h3 class="chart-title" data-vk="sec3-chart-title">Survival Line vs. Common Benchmarks</h3>
+              <h3 class="chart-title" data-vk="sec3-chart-title">Survival Line against Common Benchmarks</h3>
               <p class="chart-subtitle" id="sec3-chart-subtitle"></p>
             </div>
             <div class="chart-controls" role="group" aria-label="Select survival chart scale">
@@ -540,7 +547,7 @@
           <div class="chart-panel">
             <div class="chart-panel-header">
               <div>
-                <h3 class="chart-title" data-vk="sec5-c1-title">Top Scorer’s Share of Team Goals vs. Points Per Game</h3>
+                <h3 class="chart-title" data-vk="sec5-c1-title">Top Scorer’s Share of Team Goals against Points Per Game</h3>
                 <p class="chart-subtitle" id="sec5-share-subtitle" data-vk="sec5-c1-sub">Top-four clubs across verified Premier League seasons (1992–93 to 2025–26)</p>
               </div>
             </div>
@@ -564,7 +571,7 @@
             <div id="chart-sec5-gb-finishes"></div>
             <div tabindex="0" role="region" aria-labelledby="sec5-gb-caption" class="table-wrapper" style="margin-block-top: 1rem; max-block-size: 360px;">
               <table class="data-table" id="sec5-gb-table">
-                <caption id="sec5-gb-caption" data-vk="sec5-t-cap">Premier League Golden Boot Winners vs. Champions</caption>
+                <caption id="sec5-gb-caption" data-vk="sec5-t-cap">Premier League Golden Boot Winners v Champions</caption>
                 <thead>
                   <tr>
                     <th scope="col" class="text-col">Season</th>

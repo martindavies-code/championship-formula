@@ -1176,19 +1176,23 @@
         const champ = s.enrichedTable[0];
         if (champ?.hasGoldenBootWinner) champWithGbCount++;
         for (const gb of s.goldenBootWinners || []) {
-          const clubs = Array.isArray(gb.clubs) ? gb.clubs : [];
-          const primaryClub = clubs[clubs.length - 1];
-          const clubRow = s.enrichedTable.find(
-            (r) => r.team === primaryClub || (Array.isArray(r.sourceAliases) && r.sourceAliases.includes(primaryClub))
-          );
-          if (clubRow) {
+          // Credit goals per club: a mid-season transferred winner contributes one instance per
+          // credited (flagged) club with that club's own tally, never the combined figure.
+          const entries = Array.isArray(gb.clubBreakdown) && gb.clubBreakdown.length
+            ? gb.clubBreakdown
+            : (Array.isArray(gb.clubs) ? gb.clubs.map((c) => ({ club: c, goals: gb.goals })) : []);
+          for (const entry of entries) {
+            const clubRow = s.enrichedTable.find(
+              (r) => r.team === entry.club || (Array.isArray(r.sourceAliases) && r.sourceAliases.includes(entry.club))
+            );
+            if (!clubRow || !clubRow.hasGoldenBootWinner) continue;
             gbInstances.push({
               season: s.season,
               tier: s.tier,
               player: gb.player,
-              clubDisplay: gb.clubDisplay,
+              clubDisplay: entry.club,
               primaryClub: clubRow.team,
-              goals: gb.goals,
+              goals: entry.goals,
               pos: clubRow.pos,
               points: clubRow.pointsUsed,
               isChampion: clubRow.pos === 1,
