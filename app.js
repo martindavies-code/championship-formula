@@ -469,6 +469,7 @@
     'scope-to': '«t₁»',
     'scope-curtail-legend': 'COVID-Truncated 2019–20 Slots',
     'scope-curtail-label': 'Ingest 2019–20 T3/T4 unweighted-PPG curtailed slots («n = +2»; Bury FC expelled pre-kickoff)',
+    'nav-summary': 'Index of Analytical Sections',
     'nav-takeaways': '00. Priors & Anomalies',
     'nav-ledger': 'Summary Tensor',
     'nav-sec1': '01. Within-Slot «|r|» & «R²(PPG)»',
@@ -4501,6 +4502,30 @@
     });
   }
 
+  /* ========================================================================
+     SECTION NAV: small-screen contents disclosure
+     On phones the jump bar is a one-line labelled toggle that opens a full
+     vertical contents list (visible-menu guidance beats sideways scrolling);
+     on wider screens the list is always shown. Mirrors the filters' print
+     behaviour so the whole contents list prints.
+     ======================================================================== */
+  function setupSectionNav() {
+    const details = document.getElementById('section-nav-details');
+    if (!details || typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const wideMq = window.matchMedia('(min-width: 701px)');
+    const syncOpen = () => { details.open = wideMq.matches; };
+    if (wideMq.matches !== true) details.removeAttribute('open');
+    if (typeof wideMq.addEventListener === 'function') {
+      wideMq.addEventListener('change', syncOpen);
+    }
+    details.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', () => {
+        if (!wideMq.matches) details.open = false;
+      });
+    });
+    window.addEventListener('beforeprint', () => details.setAttribute('open', ''));
+  }
+
   async function initApp() {
     if (!CA) {
       showFatalError('Statistical analysis module (analysis.js) failed to initialize.');
@@ -4521,6 +4546,7 @@
       state.scope = CA.normalizeScope(state.dataset, CA.PRESETS['all-4-tiers']);
       state.model = CA.buildAnalyticalModel(state.dataset, state.scope);
       wireEvents();
+      setupSectionNav();
       renderAll();
     } catch (err) {
       showFatalError(err?.message || 'Unable to load or validate league dataset.');
