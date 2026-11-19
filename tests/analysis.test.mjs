@@ -214,15 +214,15 @@ test('Headline ledger semantics: Items 1-6 across real scopes, fixtures, and edg
   banBadNumbers(vDef, 'default');
   assert.ok(vDef.note.includes('174 league tables') && vDef.note.includes('4,000 team seasons') && vDef.note.includes('official standings'));
   // Card 01: scale definition, selected-table summary, exact sign counts, no causal claim
-  assert.ok(vDef.cards[0].detail.includes('0–1 scale') && vDef.cards[0].detail.includes('174 selected tables'));
+  assert.ok(vDef.cards[0].detail.includes('0–1 scale') && vDef.cards[0].detail.includes('Across 174 tables'));
   assert.ok(vDef.cards[0].detail.includes('negative in 111 of 174 tables and positive in 63'));
   assert.ok(!/barely help/i.test(vDef.cards[0].claim + vDef.cards[0].detail));
   // Card 02: variation not point share, non-additive, within-table median vs separate per-table count
   assert.ok(vDef.cards[1].claim.includes('points variation'));
-  assert.ok(vDef.cards[1].detail.includes('median link') && vDef.cards[1].detail.includes('separately') && vDef.cards[1].detail.includes('92 of 174 tables'));
-  assert.ok(vDef.cards[1].detail.includes('65.5% of variation') && vDef.cards[1].detail.includes('61.0% with conceding') && vDef.cards[1].detail.includes('not additive shares or causes'));
+  assert.ok(vDef.cards[1].detail.includes('median rank link') && vDef.cards[1].detail.includes('separately') && vDef.cards[1].detail.includes('92 of 174 tables'));
+  assert.ok(vDef.cards[1].detail.includes('65.5% of points-per-game variation to scoring') && vDef.cards[1].detail.includes('61.0% to conceding') && vDef.cards[1].detail.includes('not additive shares or causes'));
   // Card 03: median + middle-half quartiles, no majority claim
-  assert.ok(vDef.cards[2].detail.includes('median champion earned 2.04 official points') && vDef.cards[2].detail.includes('middle half roughly 1.94 to 2.16') && vDef.cards[2].detail.includes('1.90 median'));
+  assert.ok(vDef.cards[2].detail.includes('Median champion: 2.04 official points') && vDef.cards[2].detail.includes('middle half roughly 1.94 to 2.16') && vDef.cards[2].detail.includes('1.90 median'));
   assert.ok(!/\bmost\b|\bmajority\b/i.test(vDef.cards[2].detail));
   // Card 04: 164 inside vs 10 outside with distinct reasons
   assert.ok(vDef.cards[3].claim.includes('164 tables with relegation; 10 without it'));
@@ -242,10 +242,10 @@ test('Headline ledger semantics: Items 1-6 across real scopes, fixtures, and edg
   const vNear = CL.buildLedgerView(mNear, scNear);
   banBadNumbers(vNear, 'near-tie-2011-13');
   assert.equal(vNear.cards[1].stat, '0.852 vs 0.851');
-  assert.ok(vNear.cards[1].claim.includes('nearly equal on table rank') && vNear.cards[1].claim.includes('scoring tracks more points variation'));
+  assert.ok(vNear.cards[1].claim.includes('nearly equal on rank') && vNear.cards[1].claim.includes('scoring tracks more points variation'));
   assert.ok(!/\b(tie|level)\b/i.test(vNear.cards[1].claim));
-  assert.ok(vNear.cards[1].detail.includes('nearly equal median link') && vNear.cards[1].detail.includes('0.0005 near-tie threshold'));
-  assert.ok(vNear.cards[1].detail.includes('81.5% of variation') && vNear.cards[1].detail.includes('65.4% with conceding'));
+  assert.ok(vNear.cards[1].detail.includes('nearly equal as a median rank link') && vNear.cards[1].detail.includes('0.0005 near-tie margin'));
+  assert.ok(vNear.cards[1].detail.includes('81.5% of points-per-game variation to scoring') && vNear.cards[1].detail.includes('65.4% to conceding'));
   assert.ok(vNear.cards[0].detail.includes('negative in all 3 tables'));
 
   const mockTrueTie = structuredClone(mNear);
@@ -258,7 +258,7 @@ test('Headline ledger semantics: Items 1-6 across real scopes, fixtures, and edg
   assert.equal(CL.describeAtkVsDef(mockTrueTie).withinLeader, 'tie');
   assert.equal(CL.describeAtkVsDef(mockTrueTie).pooledLeader, 'tie');
   const vTrueTie = CL.buildLedgerView(mockTrueTie, scNear);
-  assert.ok(vTrueTie.cards[1].claim.includes('equal on table rank and points variation') && !vTrueTie.cards[1].claim.includes('nearly equal'));
+  assert.ok(vTrueTie.cards[1].claim.includes('equal on rank and points variation') && !vTrueTie.cards[1].claim.includes('nearly equal'));
 
   const mockPoolNear = structuredClone(mNear);
   mockPoolNear.pooledCorrelations = mockPoolNear.pooledCorrelations.map((p) => (
@@ -266,7 +266,7 @@ test('Headline ledger semantics: Items 1-6 across real scopes, fixtures, and edg
   ));
   assert.equal(CL.describeAtkVsDef(mockPoolNear).pooledLeader, 'near-tie');
   const vPoolNear = CL.buildLedgerView(mockPoolNear, scNear);
-  assert.ok(vPoolNear.cards[1].detail.includes('nearly equal shares of variation') && vPoolNear.cards[1].detail.includes('0.05 percentage-point'));
+  assert.ok(vPoolNear.cards[1].detail.includes('nearly equal shares of points-per-game variation') && vPoolNear.cards[1].detail.includes('0.05 percentage points'));
 
   // Item 5: Tier 2 2021 raw mode disclosure (Reading 41 official vs 47 raw)
   const scRaw21 = { tiers: [2], startYear: 2021, endYear: 2021, includeCurtailed: false, pointsMode: 'raw' };

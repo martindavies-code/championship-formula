@@ -186,8 +186,8 @@ test('Real browser offline file:// rendering loads bundled dataset cleanly with 
 
     assert.equal(cdp.pageErrors.length, 0, `Page errors on file://: ${cdp.pageErrors.join('; ')}`);
     assert.equal(snap.fatalHidden, true);
-    assert.ok(snap.coverage.includes('174 Tier-Seasons'));
-    assert.ok(snap.coverage.includes('4,000 Team-Seasons'));
+    assert.ok(snap.coverage.includes('174 League Tables'));
+    assert.ok(snap.coverage.includes('4,000 Team Seasons'));
     assert.equal(snap.ledgerCount, 6);
     assert.ok(snap.svgCount >= 5);
     assert.ok(snap.archiveRows >= 20);
@@ -213,7 +213,7 @@ test('Real browser HTTP interactions, responsive mobile layout, sorting, and scr
     })`);
     assert.equal(cdp.pageErrors.length, 0);
     assert.ok(desktopInit.scrollW <= desktopInit.clientW, `Desktop horizontal overflow: ${desktopInit.scrollW} > ${desktopInit.clientW}`);
-    assert.ok(desktopInit.coverage.includes('174 Tier-Seasons'));
+    assert.ok(desktopInit.coverage.includes('174 League Tables'));
     assert.equal(desktopInit.fewerWinsCount, 12);
     assert.equal(desktopInit.corrRows, 5);
     assert.equal(desktopInit.sec5ScopeBannerHidden, false); // mixed scope shows explicit warning banner
@@ -234,8 +234,8 @@ test('Real browser HTTP interactions, responsive mobile layout, sorting, and scr
       coverage: document.getElementById('meta-coverage').textContent,
       banner: document.getElementById('active-scope-banner').textContent,
     })`);
-    assert.ok(afterCurtail.coverage.includes('176 Tier-Seasons'));
-    assert.ok(afterCurtail.coverage.includes('4,047 Team-Seasons'));
+    assert.ok(afterCurtail.coverage.includes('176 League Tables'));
+    assert.ok(afterCurtail.coverage.includes('4,047 Team Seasons'));
     assert.ok(afterCurtail.banner.includes('Curtailed Included'));
 
     await cdp.evalJs(`() => {
@@ -300,8 +300,8 @@ test('Real browser HTTP interactions, responsive mobile layout, sorting, and scr
       verifiedHidden: document.getElementById('sec5-verified-panel').hidden,
       scopeBannerHidden: document.getElementById('sec5-scope-banner').hidden,
     })`);
-    assert.ok(plState.coverage.includes('33 Tier-Seasons'));
-    assert.ok(plState.coverage.includes('666 Team-Seasons'));
+    assert.ok(plState.coverage.includes('33 League Tables'));
+    assert.ok(plState.coverage.includes('666 Team Seasons'));
     assert.ok(plState.matches.includes('12,786'));
     assert.ok(plState.goals.includes('34,433'));
     assert.equal(plState.verifiedHidden, false);
@@ -313,7 +313,7 @@ test('Real browser HTTP interactions, responsive mobile layout, sorting, and scr
     assert.equal(await cdp.evalJs(`() => document.getElementById('empty-scope-panel').hidden`), false);
     await cdp.evalJs(`() => document.getElementById('btn-reset-scope').click()`);
     await new Promise((r) => setTimeout(r, 120));
-    assert.ok((await cdp.evalJs(`() => document.getElementById('meta-coverage').textContent`)).includes('174 Tier-Seasons'));
+    assert.ok((await cdp.evalJs(`() => document.getElementById('meta-coverage').textContent`)).includes('174 League Tables'));
 
     // 4. Mobile 360px & 390px overflow verification
     for (const [w, h] of [[360, 780], [390, 844]]) {
@@ -458,7 +458,7 @@ test('Stage 2 A1-A5 browser DOM invariants: dual GF/GA metrics, draw copy/quarti
     assert.ok(!allTiers.body.includes('Excludes 0'), 'Must omit zero-exclusion phrasing');
     assert.ok(!allTiers.body.includes('flipping the PL-only'), 'Must not contain removed false PL-flip claim');
     assert.ok(!allTiers.body.includes('22 from 11 draws'), 'Must not contain broken draw arithmetic');
-    assert.ok(allTiers.sec1.includes('Pooled R²(PPG)') && allTiers.sec1.includes('winning 11 and losing 11') && allTiers.sec1.includes('drawing all 22 yields 22 points'), 'Section 1 must include pooled R2 and fixed draw arithmetic');
+    assert.ok(allTiers.sec1.includes('Pooled points variation') && allTiers.sec1.includes('65.5%') && allTiers.sec1.includes('61.0%') && allTiers.sec1.includes('winning 11 and losing 11') && allTiers.sec1.includes('drawing all 22 yields 22 points'), 'Section 1 must include pooled points variation and fixed draw arithmetic');
     assert.ok(allTiers.sec4.includes('63.1%') && allTiers.sec4.includes('tied co-leaders'), 'Section 4 must include quartile share and co-leader caveat');
 
     // PL-only slice: must show zero Swindon mention in Section 4 and honest dual GF/GA wording in Section 1
@@ -641,15 +641,20 @@ test('Headline ledger semantic DOM invariants: plain English without statistical
     const defSnap = await checkLedger('default');
     assert.ok(defSnap.note.includes('174 league tables') && defSnap.note.includes('4,000 team seasons') && defSnap.note.includes('official standings'));
     assert.ok(defSnap.ledger.includes('negative in 111 of 174 tables and positive in 63'));
-    assert.ok(defSnap.ledger.includes('65.5% of variation') && defSnap.ledger.includes('61.0% with conceding'));
+    assert.ok(defSnap.ledger.includes('65.5% of points-per-game variation to scoring') && defSnap.ledger.includes('61.0% to conceding'));
     assert.ok(defSnap.ledger.includes('middle half roughly 1.94 to 2.16') && !/\bmost\b|\bmajority\b/i.test(defSnap.ledger));
     assert.ok(defSnap.ledger.includes('164 tables with relegation; 10 without it'));
     assert.ok(defSnap.ledger.includes('minority (12 of 33)') && defSnap.ledger.includes('41 Golden Boot') && !/rarely|needed/i.test(defSnap.ledger));
+    // Verify plain-English prose across Sections 01-07 (no statistical shorthand leaks)
+    const fullPageText = await cdp.evalJs(`() => document.body.innerText`);
+    const pageJargonRe = /within-slot|\|r\||R²\(PPG\)|\bIQR\b|% Pct|\b38g\b|\b46g\b|\bexcl\.|\bslots\b|\bGA\/G\b|\bGF\/G\b|\bGD\/G\b|\bW\/G\b|\bPPG\b|Tier-Seasons|Team-Seasons/i;
+    const mPageJargon = pageJargonRe.exec(fullPageText);
+    assert.equal(mPageJargon, null, `Full page must avoid shorthand jargon (found "${mPageJargon?.[0]}")`);
 
     // 2. PL preset
     await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2025"]').click()`);
     const plSnap = await checkLedger('pl-1992-2025');
-    assert.ok(plSnap.ledger.includes('33 league tables') && plSnap.ledger.includes('77.2% of variation'));
+    assert.ok(plSnap.ledger.includes('33 league tables') && plSnap.ledger.includes('77.2% of points-per-game variation'));
 
     // 3. Tier 1 2011-2013 near-tie reproduction
     await cdp.evalJs(`() => {
@@ -664,8 +669,8 @@ test('Headline ledger semantic DOM invariants: plain English without statistical
       sSel.value = '2011'; sSel.dispatchEvent(new Event('change'));
     }`);
     const nearSnap = await checkLedger('tier1-2011-2013');
-    assert.ok(nearSnap.ledger.includes('0.852 vs 0.851') && nearSnap.ledger.includes('nearly equal on table rank'));
-    assert.ok(nearSnap.ledger.includes('81.5% of variation') && nearSnap.ledger.includes('65.4% with conceding'));
+    assert.ok(nearSnap.ledger.includes('0.852 vs 0.851') && nearSnap.ledger.includes('nearly equal on rank'));
+    assert.ok(nearSnap.ledger.includes('81.5% of points-per-game variation to scoring') && nearSnap.ledger.includes('65.4% to conceding'));
 
     // 4. Tier 2 2021 raw mode (Reading 41 official vs 47 raw)
     await cdp.evalJs(`() => {
@@ -699,6 +704,8 @@ test('Headline ledger semantic DOM invariants: plain English without statistical
     const zeroRelSnap = await checkLedger('tier4-1981-85');
     assert.ok(zeroRelSnap.ledger.includes('5 tables without relegation (0 with relegation)'));
     assert.ok(zeroRelSnap.ledger.includes('automatic relegation was not in place'));
+    const sec3ZeroRel = await cdp.evalJs(`() => document.getElementById('sec-survival').innerText`);
+    assert.ok(sec3ZeroRel.includes('Automatic relegation was not in place') && !/suspended/i.test(sec3ZeroRel), 'Section 3 must not describe Fourth Division re-election seasons as suspended');
 
     // 6. Curtailed-only 2019-20 Tier 3-4 excluded by default -> empty state, then opt-in
     await cdp.evalJs(`() => {
