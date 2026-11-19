@@ -624,7 +624,7 @@
       } else {
         banner.append(
           el('strong', { textContent: 'How the numbers stay fair: ' }),
-          `This study covers all ${ds.metadata.totalTierSeasonSlots} completed and curtailed league tables (${fmtInt(ds.metadata.totalTeamSeasons)} team seasons, ${fmtInt(ds.metadata.totalMatchesPlayed)} matches) across Tiers 1–4 from 1981–82—when three points for a win arrived—through 2025–26. Completed seasons run anywhere from 38 to 46 matches and divisions hold 20 to 24 clubs; the two curtailed 2019–20 tables ended early after 34–37 games. We measure stats per game and place every finish on a clean 0-to-1 scale (1 = first, 0 = last). Unfinished seasons after 2025–26 are left out. The filters above narrow every figure on this page; the Showing line always lists the slice in use.`
+          `This study covers all ${ds.metadata.totalTierSeasonSlots} completed and curtailed league tables (${fmtInt(ds.metadata.totalTeamSeasons)} team seasons, ${fmtInt(ds.metadata.totalMatchesPlayed)} matches) across Tiers 1–4 from 1981–82—when three points for a win arrived—through 2025–26. Completed seasons run anywhere from 38 to 46 matches and divisions hold 20 to 24 clubs; the two curtailed 2019–20 tables ended early after 34–37 games. We measure stats per game and place every finish on a clean 0-to-1 scale (1 = first, 0 = last). Unfinished seasons after 2025–26 are left out. The filters below narrow every figure on this page; the Showing line always lists the slice in use.`
         );
       }
     }
