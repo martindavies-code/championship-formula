@@ -31,6 +31,9 @@ const MIME = {
   '.js': 'application/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.svg': 'image/svg+xml',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
 };
 
 function startStaticServer(overrideJsonFn = null) {
@@ -652,15 +655,37 @@ test('Headline ledger semantic DOM invariants: plain English without statistical
       text: document.getElementById('key-takeaways').innerText,
     })`);
     assert.equal(takeawaysSnap.count, 6);
-    assert.ok(takeawaysSnap.text.includes('Bromley') && takeawaysSnap.text.includes('43 times') && takeawaysSnap.text.includes('Sheffield Wednesday'));
+    assert.ok(takeawaysSnap.text.includes('Bromley') && takeawaysSnap.text.includes('112 four-team EFL play-offs') && takeawaysSnap.text.includes('Sheffield Wednesday'));
+    // Verify #sec3-playoff-panel renders grouped SVG bars, 4-row seed table, and zero jargon
+    const poSnap = await cdp.evalJs(`() => ({
+      panelText: document.getElementById('sec3-playoff-panel').innerText,
+      barCount: document.querySelectorAll('#chart-sec3-playoffs svg rect[data-tip-id]').length,
+      rowCount: document.querySelectorAll('#sec3-playoff-seed-tbody tr').length,
+      tableHidden: document.getElementById('sec3-playoff-table-wrap').hidden,
+    })`);
+    assert.equal(poSnap.tableHidden, false);
+    assert.equal(poSnap.barCount, 16, '4 seeds x 4 series (All EFL + Tiers 2, 3, 4) = 16 bars');
+    assert.equal(poSnap.rowCount, 4, 'All EFL Combined + Championship + League One + League Two');
+    assert.ok(poSnap.panelText.includes('35.7%') && poSnap.panelText.includes('24.1%') && poSnap.panelText.includes('19.6%') && poSnap.panelText.includes('20.5%'));
+    assert.ok(poSnap.panelText.includes('40.5%') && poSnap.panelText.includes('34.2%') && poSnap.panelText.includes('32.4%'));
+    assert.ok(poSnap.panelText.includes('1989–90') && poSnap.panelText.includes('2025–26') && poSnap.panelText.includes('transitional 1986–88'));
+
     const pageJargonRe = /within-slot|\|r\||R²\(PPG\)|\bIQR\b|% Pct|\b38g\b|\b46g\b|\bexcl\.|\bslots\b|\bGA\/G\b|\bGF\/G\b|\bGD\/G\b|\bW\/G\b|\bPPG\b|Tier-Seasons|Team-Seasons/i;
     const mPageJargon = pageJargonRe.exec(fullPageText);
     assert.equal(mPageJargon, null, `Full page must avoid shorthand jargon (found "${mPageJargon?.[0]}")`);
 
-    // 2. PL preset
+    // 2. PL preset (play-off breakdown hides table cleanly and shows clean prompt)
     await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2026"]').click()`);
     const plSnap = await checkLedger('pl-1992-2026');
     assert.ok(plSnap.ledger.includes('34 league tables') && plSnap.ledger.includes('77.2% of points-per-game variation'));
+    const plPoSnap = await cdp.evalJs(`() => ({
+      tableHidden: document.getElementById('sec3-playoff-table-wrap').hidden,
+      barCount: document.querySelectorAll('#chart-sec3-playoffs svg rect').length,
+      prose: document.getElementById('sec3-playoff-prose').innerText,
+    })`);
+    assert.equal(plPoSnap.tableHidden, true);
+    assert.equal(plPoSnap.barCount, 0);
+    assert.ok(plPoSnap.prose.includes('Select Tiers 2, 3, or 4 from 1988–89 onward'));
 
     // 3. Tier 1 2011-2013 near-tie reproduction
     await cdp.evalJs(`() => {
@@ -748,6 +773,96 @@ test('Headline ledger semantic DOM invariants: plain English without statistical
     }`);
     const singleSnap = await checkLedger('single-t2-raw');
     assert.ok(singleSnap.note.includes('1 league table · 24 team seasons'));
+    assert.equal(cdp.pageErrors.length, 0);
+  } finally {
+    await cdp.close();
+    server.close();
+  }
+});
+
+test('Voice mode switcher: Normal Person Mode vs Statistics Sicko Mode with cartoon asset & responsive layout', { timeout: 35000 }, async () => {
+  const { server, baseUrl } = await startStaticServer();
+  const cdp = await launchCdpSession();
+  const pageJargonRe = /within-slot|\|r\||R²\(PPG\)|\bIQR\b|% Pct|\b38g\b|\b46g\b|\bexcl\.|\bslots\b|\bGA\/G\b|\bGF\/G\b|\bGD\/G\b|\bW\/G\b|\bPPG\b|Tier-Seasons|Team-Seasons/i;
+  const badTokenRe = /\[object\b|\bundefined\b|\bNaN\b|\bInfinity\b/;
+  try {
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+    await cdp.navigateAndWait(`${baseUrl}/`);
+
+    // Default state: Normal Person Mode active, cartoon hidden, zero jargon
+    const init = await cdp.evalJs(`() => ({
+      normalPressed: document.querySelector('[data-voice-mode="normal"]').getAttribute('aria-pressed'),
+      sickoPressed: document.querySelector('[data-voice-mode="sicko"]').getAttribute('aria-pressed'),
+      sickoCardHidden: document.getElementById('sicko-hero-card').hidden,
+      bodyText: document.body.innerText,
+    })`);
+    assert.equal(init.normalPressed, 'true');
+    assert.equal(init.sickoPressed, 'false');
+    assert.equal(init.sickoCardHidden, true);
+    assert.equal(pageJargonRe.exec(init.bodyText), null, 'Normal Person Mode must stay jargon-free');
+
+    // Toggle into Statistics Sicko Mode
+    await cdp.evalJs(`() => document.querySelector('[data-voice-mode="sicko"]').click()`);
+    await new Promise((r) => setTimeout(r, 250));
+    const sickoSnap = await cdp.evalJs(`() => {
+      const img = document.querySelector('#sicko-hero-card img');
+      return {
+        hasBodyClass: document.body.classList.contains('voice-sicko'),
+        normalPressed: document.querySelector('[data-voice-mode="normal"]').getAttribute('aria-pressed'),
+        sickoPressed: document.querySelector('[data-voice-mode="sicko"]').getAttribute('aria-pressed'),
+        sickoCardHidden: document.getElementById('sicko-hero-card').hidden,
+        imgComplete: Boolean(img?.complete),
+        imgNaturalWidth: img?.naturalWidth || 0,
+        title: document.getElementById('masthead-title').textContent,
+        poTbodyH: document.querySelector('#sec3-playoff-seed-tbody')?.getBoundingClientRect().height || 0,
+        bodyText: document.body.innerText,
+        scrollW: document.documentElement.scrollWidth,
+        clientW: document.documentElement.clientWidth,
+      };
+    }`);
+    assert.equal(sickoSnap.hasBodyClass, true);
+    assert.equal(sickoSnap.normalPressed, 'false');
+    assert.equal(sickoSnap.sickoPressed, 'true');
+    assert.equal(sickoSnap.sickoCardHidden, false);
+    assert.equal(sickoSnap.imgComplete, true);
+    assert.ok(sickoSnap.imgNaturalWidth > 200, 'Stats Sicko cartoon image must load cleanly');
+    assert.ok(sickoSnap.poTbodyH > 100, `Play-off seed table tbody must render full height in Sicko mode (got ${sickoSnap.poTbodyH})`);
+    assert.ok(sickoSnap.title.includes('Within-Slot Pearsonian'));
+    assert.equal(badTokenRe.exec(sickoSnap.bodyText), null, 'Sicko mode must have zero NaN/undefined/Infinity/[object tokens');
+    for (const token of ['Within-Slot', 'R²(PPG)', 'IQR', 'GA/G', 'GF/G', 'χ²', 'argmax(W)', 'OLS', 'PPG']) {
+      assert.ok(sickoSnap.bodyText.includes(token), `Sicko mode should surface quant jargon token "${token}"`);
+    }
+    assert.ok(sickoSnap.scrollW <= sickoSnap.clientW, 'Sicko desktop layout must not overflow horizontally');
+
+    // Check Sicko mode across PL preset & 320px narrow mobile viewport
+    await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2026"]').click()`);
+    await new Promise((r) => setTimeout(r, 150));
+    const sickoPl = await cdp.evalJs(`() => document.body.innerText`);
+    assert.equal(badTokenRe.exec(sickoPl), null, 'Sicko mode on PL preset must have zero bad tokens');
+
+    await cdp.evalJs(`() => document.querySelector('[data-preset="all-4-tiers"]').click()`);
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 320, height: 780, deviceScaleFactor: 2, mobile: true });
+    await new Promise((r) => setTimeout(r, 160));
+    const sicko320 = await cdp.evalJs(`() => ({
+      scrollW: document.documentElement.scrollWidth,
+      clientW: document.documentElement.clientWidth,
+    })`);
+    assert.ok(sicko320.scrollW <= sicko320.clientW, `Sicko mode 320px overflow: ${sicko320.scrollW} > ${sicko320.clientW}`);
+
+    // Toggle back to Normal Person Mode and confirm pristine restoration
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+    await cdp.evalJs(`() => document.querySelector('[data-voice-mode="normal"]').click()`);
+    await new Promise((r) => setTimeout(r, 150));
+    const backNormal = await cdp.evalJs(`() => ({
+      hasBodyClass: document.body.classList.contains('voice-sicko'),
+      sickoCardHidden: document.getElementById('sicko-hero-card').hidden,
+      title: document.getElementById('masthead-title').textContent,
+      bodyText: document.body.innerText,
+    })`);
+    assert.equal(backNormal.hasBodyClass, false);
+    assert.equal(backNormal.sickoCardHidden, true);
+    assert.equal(backNormal.title, 'The Championship Formula');
+    assert.equal(pageJargonRe.exec(backNormal.bodyText), null, 'Returning to Normal Person Mode must restore jargon-free prose');
     assert.equal(cdp.pageErrors.length, 0);
   } finally {
     await cdp.close();
