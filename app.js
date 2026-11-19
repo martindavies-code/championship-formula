@@ -511,7 +511,6 @@
   const VOICE_CHROME = {
     'voice-label': 'Lexical Verbosity Vector:',
     'scope-details-label': 'Estimator Controls',
-    'voice-hint': 'UNSUPERVISED QUANT MODE ENGAGED: zero hand-holding, maximum pedantry',
     'masthead-aside': 'Unsupervised Empirical Audit · Tiers 1–4',
     'masthead-kicker': 'Panel-Data Econometric Spec v2.0.0 · Linear 3-1-0 Payoff Regime («t ∈ [1981, 2025]») · Zero-Imputation ETL',
     'masthead-title': 'The Championship Formula: Within-Slot Pearsonian & Stacked OLS Decomposition of English Pyramid Standings',
