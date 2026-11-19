@@ -748,10 +748,10 @@ body.voice-sicko .takeaways-section {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
   .split-grid.wide-left {
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
   .split-grid.wide-left.archive-split {
-    grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
   }
 }
 
@@ -862,7 +862,7 @@ body.voice-sicko .takeaways-section {
 
 table.data-table {
   inline-size: 100%;
-  min-inline-size: 580px;
+  min-inline-size: 0;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.83rem;
@@ -894,6 +894,21 @@ table.data-table td {
   border-block-end: 1px solid var(--rule-light);
   text-align: end;
   white-space: nowrap;
+}
+
+/* Long headers and cell contents wrap so tables fit their card instead of scrolling sideways */
+table.data-table thead th,
+table.data-table th.text-col,
+table.data-table td.text-col,
+table.data-table td {
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+/* Percent+count cells (e.g. play-off seed rates) may wrap at the space */
+#sec3-playoff-seed-table td {
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 table.data-table th:first-child,
@@ -942,6 +957,8 @@ table.data-table thead th > button {
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
+  row-gap: 0;
   gap: 0.3rem;
   cursor: pointer;
 }
@@ -1191,9 +1208,13 @@ h3[id] {
   #sec4-draws-table td,
   #sec5-gb-table th,
   #sec5-gb-table td {
-    padding: 0.35rem 0.25rem;
+    padding: 0.3rem 0.1rem;
     white-space: normal;
     overflow-wrap: break-word;
+  }
+
+  table.data-table thead th > button {
+    padding: 0.3rem 0.1rem;
   }
 
   #sec1-corr-table thead th,
@@ -1436,10 +1457,35 @@ h3[id] {
   #sec1-tier-table,
   #sec2-tier-table,
   #sec3-tier-table,
-  #sec3-promo-table {
+  #sec3-promo-table,
+  #sec3-playoff-seed-table,
+  #archive-league-table,
+  #sec4-draws-table,
+  #archive-scorers-table {
     min-inline-size: 0;
     font-size: 0.68rem;
   }
+
+  /* Header labels may break mid-word as a last resort on narrow screens */
+  table.data-table thead th {
+    overflow-wrap: anywhere;
+  }
+
+  /* Label columns keep a readable share: "Tier N" wraps between words, club/division names stay whole */
+  #sec1-tier-table th:first-child,
+  #sec1-tier-table td:first-child,
+  #sec2-tier-table th:first-child,
+  #sec2-tier-table td:first-child,
+  #sec3-tier-table th:first-child,
+  #sec3-tier-table td:first-child,
+  #sec3-promo-table th:first-child,
+  #sec3-promo-table td:first-child {
+    min-inline-size: 2.6em;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
+
 
   #sec1-tier-table th,
   #sec1-tier-table td,
@@ -1448,10 +1494,170 @@ h3[id] {
   #sec3-tier-table th,
   #sec3-tier-table td,
   #sec3-promo-table th,
-  #sec3-promo-table td {
-    padding: 0.35rem 0.25rem;
+  #sec3-promo-table td,
+  #sec3-playoff-seed-table th,
+  #sec3-playoff-seed-table td,
+  #archive-league-table th,
+  #archive-league-table td,
+  #sec4-draws-table th,
+  #sec4-draws-table td,
+  #archive-scorers-table th,
+  #archive-scorers-table td {
+    padding: 0.3rem 0.1rem;
     white-space: normal;
     overflow-wrap: break-word;
+  }
+
+  /* Long names (clubs, players) may break mid-word only if they cannot fit */
+  #sec1-tier-table th.text-col,
+  #sec1-tier-table td.text-col,
+  #sec2-tier-table th.text-col,
+  #sec2-tier-table td.text-col,
+  #sec3-tier-table th.text-col,
+  #sec3-tier-table td.text-col,
+  #sec3-promo-table th.text-col,
+  #sec3-promo-table td.text-col,
+  #sec1-tier-table thead th,
+  #sec2-tier-table thead th,
+  #sec3-tier-table thead th,
+  #sec3-promo-table thead th,
+  #sec4-draws-table thead th,
+  #archive-scorers-table thead th {
+    font-size: 0.6rem;
+  }
+
+  #sec3-playoff-seed-table th.text-col,
+  #sec3-playoff-seed-table td.text-col,
+  #archive-league-table th.text-col,
+  #archive-league-table td.text-col,
+  #sec4-draws-table th.text-col,
+  #sec4-draws-table td.text-col,
+  #archive-scorers-table th.text-col,
+  #archive-scorers-table td.text-col {
+    overflow-wrap: anywhere;
+  }
+
+  table.data-table thead th > button {
+    padding: 0.3rem 0.1rem;
+  }
+
+  /* Widest tables become stacked cards: each cell shows its column label */
+  #archive-league-table thead,
+  #sec3-playoff-seed-table thead {
+    display: none;
+  }
+
+  #archive-league-table caption,
+  #sec3-playoff-seed-table caption {
+    display: block;
+    inline-size: 100%;
+  }
+
+  #archive-league-table,
+  #archive-league-table tbody,
+  #archive-league-table tr,
+  #archive-league-table td,
+  #sec3-playoff-seed-table,
+  #sec3-playoff-seed-table tbody,
+  #sec3-playoff-seed-table tr,
+  #sec3-playoff-seed-table td {
+    display: block;
+  }
+
+  #archive-league-table tr,
+  #sec3-playoff-seed-table tr {
+    padding: 0.3rem 0.55rem;
+    border-block-end: 1px solid var(--rule-light);
+  }
+
+  #archive-league-table td,
+  #sec3-playoff-seed-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.9rem;
+    border-block-end: none;
+    text-align: end;
+    padding: 0.12rem 0;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
+  #archive-league-table td::before,
+  #sec3-playoff-seed-table td::before {
+    content: attr(data-label);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-secondary);
+    text-align: start;
+  }
+
+  /* Stacked cards use normal page scroll, not a fixed-height inner box */
+  .table-wrapper:has(#archive-league-table),
+  .table-wrapper:has(#sec3-playoff-seed-table) {
+    max-block-size: none;
+  }
+}
+
+/* Very narrow screens: remaining multi-column tables become labelled stacked cards */
+@media (max-width: 380px) {
+  #sec1-corr-table thead,
+  #sec2-dist-table thead,
+  #sec3-tier-table thead,
+  #sec3-promo-table thead,
+  #sec5-gb-table thead {
+    display: none;
+  }
+
+  #sec1-corr-table caption,
+  #sec2-dist-table caption,
+  #sec3-tier-table caption,
+  #sec3-promo-table caption,
+  #sec5-gb-table caption {
+    display: block;
+    inline-size: 100%;
+  }
+
+  #sec1-corr-table, #sec1-corr-table tbody, #sec1-corr-table tr, #sec1-corr-table td,
+  #sec2-dist-table, #sec2-dist-table tbody, #sec2-dist-table tr, #sec2-dist-table td,
+  #sec3-tier-table, #sec3-tier-table tbody, #sec3-tier-table tr, #sec3-tier-table td,
+  #sec3-promo-table, #sec3-promo-table tbody, #sec3-promo-table tr, #sec3-promo-table td,
+  #sec5-gb-table, #sec5-gb-table tbody, #sec5-gb-table tr, #sec5-gb-table td {
+    display: block;
+  }
+
+  #sec1-corr-table tr, #sec2-dist-table tr, #sec3-tier-table tr, #sec3-promo-table tr, #sec5-gb-table tr {
+    padding: 0.3rem 0.55rem;
+    border-block-end: 1px solid var(--rule-light);
+  }
+
+  #sec1-corr-table td, #sec2-dist-table td, #sec3-tier-table td, #sec3-promo-table td, #sec5-gb-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.9rem;
+    border-block-end: none;
+    text-align: end;
+    padding: 0.12rem 0;
+    white-space: normal;
+    overflow-wrap: break-word;
+    font-size: 0.72rem;
+  }
+
+  #sec1-corr-table td::before, #sec2-dist-table td::before, #sec3-tier-table td::before, #sec3-promo-table td::before, #sec5-gb-table td::before {
+    content: attr(data-label);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-secondary);
+    text-align: start;
+  }
+
+  .table-wrapper:has(#sec5-gb-table) {
+    max-block-size: none !important;
   }
 }
 
