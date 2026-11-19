@@ -243,7 +243,7 @@ test('Headline ledger semantics: Items 1-6 across real scopes, fixtures, and edg
   assert.equal(atkNear.pooledLeader, 'gf');
   const vNear = CL.buildLedgerView(mNear, scNear);
   banBadNumbers(vNear, 'near-tie-2011-13');
-  assert.equal(vNear.cards[1].stat, '0.852 vs 0.851');
+  assert.equal(vNear.cards[1].stat, '0.852 v 0.851');
   assert.ok(vNear.cards[1].claim.includes('nearly equal on rank') && vNear.cards[1].claim.includes('scoring tracks more points variation'));
   assert.ok(!/\b(tie|level)\b/i.test(vNear.cards[1].claim));
   assert.ok(vNear.cards[1].detail.includes('nearly equal as a median rank link') && vNear.cards[1].detail.includes('0.0005 near-tie margin'));

@@ -700,7 +700,7 @@ test('Headline ledger semantic DOM invariants: plain English without statistical
       sSel.value = '2011'; sSel.dispatchEvent(new Event('change'));
     }`);
     const nearSnap = await checkLedger('tier1-2011-2013');
-    assert.ok(nearSnap.ledger.includes('0.852 vs 0.851') && nearSnap.ledger.includes('nearly equal on rank'));
+    assert.ok(nearSnap.ledger.includes('0.852 v 0.851') && nearSnap.ledger.includes('nearly equal on rank'));
     assert.ok(nearSnap.ledger.includes('81.5% of points-per-game variation to scoring') && nearSnap.ledger.includes('65.4% to conceding'));
 
     // 4. Tier 2 2021 raw mode (Reading 41 official vs 47 raw)
