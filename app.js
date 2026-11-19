@@ -3673,6 +3673,15 @@
     }
   }
 
+  /* Keep data-labels in sync for every table that switches to stacked cards on
+     narrow screens; covers re-renders from filter and mode changes */
+  function watchStackedLabels(tbodyId) {
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+    labelStackedCells(tbody);
+    new MutationObserver(() => labelStackedCells(tbody)).observe(tbody, { childList: true });
+  }
+
   /* Copy column header text onto each cell as data-label so the narrow-screen
      stacked-card layout can label every value */
   function labelStackedCells(tbody) {
@@ -3981,6 +3990,8 @@
         renderArchive();
       });
     });
+
+    ['sec1-corr-tbody', 'sec2-dist-tbody', 'sec3-tier-tbody', 'sec3-promo-tbody', 'sec5-gb-tbody', 'archive-league-tbody', 'sec3-playoff-seed-tbody'].forEach(watchStackedLabels);
 
     document.querySelectorAll('#archive-league-table thead button[data-sort-col]').forEach((btn) => {
       btn.addEventListener('click', () => {
