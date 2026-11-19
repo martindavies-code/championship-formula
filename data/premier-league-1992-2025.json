@@ -60,7 +60,8 @@
         }
       ],
       "normalisationPolicy": "All cross-era comparisons normalise counting statistics (Points, Wins, Draws, Losses, GF, GA, GD, Top-Scorer Goals) by games played (per-game rate, and where shown on a 38-game scale, rate × 38)."
-    }
+    },
+    "goldenBootClubRule": "hasGoldenBootWinner credits a transferred winner's goals per club: a club is flagged only when the player's club-specific league tally is itself the season's highest club-specific tally (not on final-club status alone). 1992-93: Teddy Sheringham won the award with 22 league goals combined across Nottingham Forest (1) and Tottenham Hotspur (21); his 21 for Tottenham was the season's highest club-specific tally (next best: Les Ferdinand's 20), so Tottenham is flagged, while his 1 for Forest was not, so Forest is not. Division-wide Golden Boot totals remain the combined league figure (22)."
   },
   "seasons": [
     {
@@ -80,7 +81,17 @@
             "Tottenham Hotspur"
           ],
           "clubDisplay": "Nottingham Forest / Tottenham Hotspur",
-          "goals": 22
+          "goals": 22,
+          "clubBreakdown": [
+            {
+              "club": "Nottingham Forest",
+              "goals": 1
+            },
+            {
+              "club": "Tottenham Hotspur",
+              "goals": 21
+            }
+          ]
         }
       ],
       "topScorers": [
@@ -680,7 +691,7 @@
             "goals": 1,
             "inLeagueTop10": true
           },
-          "hasGoldenBootWinner": true
+          "hasGoldenBootWinner": false
         }
       ]
     },

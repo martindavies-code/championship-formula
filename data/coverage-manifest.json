@@ -2,7 +2,7 @@
   "schemaVersion": "2.0.0",
   "generatedForEndpoint": "2025-26",
   "canonicalDatasetFile": "data/england-tiers-1-4-1981-2026.json",
-  "canonicalJsonSha256": "8dc01fc87b8c7afa8ff5d5c1bd92ffc01fe39194680b7b78ac73fbfa47bcb64b",
+  "canonicalJsonSha256": "c7ff87df455872cf59d4cad22dc7066a1efa78d2c62b260c83649029e889baf2",
   "totals": {
     "slotsExpected": 180,
     "slotsPresent": 180,

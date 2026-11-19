@@ -1284,6 +1284,41 @@ h3[id] {
   border-top: 3px solid var(--rule-heavy);
 }
 
+.scope-details > summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  padding-block-end: 0.7rem;
+}
+
+.scope-details > summary::before {
+  content: '\25B8';
+  font-size: 0.85em;
+}
+
+.scope-details[open] > summary::before {
+  content: '\25BE';
+}
+
+.scope-details > summary:hover {
+  color: var(--ink-primary);
+}
+
+.scope-details:not([open]) > summary {
+  padding-block-end: 0;
+}
+
+.scope-details:not([open]) {
+  padding-block-end: 0.85rem;
+}
+
 .scope-bar-top {
   display: flex;
   flex-wrap: wrap;
@@ -1816,12 +1851,12 @@ h3[id] {
 .masthead .masthead-kicker,
 .masthead .num { color: var(--bg-paper); }
 .masthead .masthead-meta { border-block-end-color: rgba(244, 239, 227, 0.35); }
-.masthead .voice-mode-hint {
+.voice-mode-hint {
   font-family: var(--font-hand);
   font-style: normal;
   font-size: 1.2rem;
   line-height: 1.1;
-  color: var(--bg-paper);
+  color: var(--ink-secondary);
 }
 .masthead .btn-voice {
   background-color: transparent;

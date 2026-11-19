@@ -222,8 +222,8 @@
   }
 
   function mathZoneAria(zone) {
-    let s = zone.replace(/_(\{[^}]*\}|.)/g, (mm, g) => ` sub ${g.replace(/[{}]/g, '')}`);
-    s = s.replace(/\^(\{[^}]*\}|.)/g, (mm, g) => ` sup ${g.replace(/[{}]/g, '')}`);
+    let s = zone.replace(/_(\{[^}]*\}|[A-Za-z0-9]+)/g, (mm, g) => ` sub ${g.replace(/[{}]/g, '')}`);
+    s = s.replace(/\^(\{[^}]*\}|[A-Za-z0-9]+)/g, (mm, g) => ` sup ${g.replace(/[{}]/g, '')}`);
     for (const [glyph, ascii] of Object.entries(SUB_GLYPHS)) s = s.split(glyph).join(` sub ${ascii}`);
     for (const [glyph, ascii] of Object.entries(SUP_GLYPHS)) s = s.split(glyph).join(` sup ${ascii}`);
     return s.replace(/\s+/g, ' ').trim();
@@ -446,6 +446,7 @@
 
   const VOICE_CHROME = {
     'voice-label': 'Lexical Verbosity Vector:',
+    'scope-details-label': 'Estimator Controls',
     'voice-hint': 'UNSUPERVISED QUANT MODE ENGAGED: zero hand-holding, maximum pedantry',
     'masthead-kicker': 'Panel-Data Econometric Spec v2.0.0 · Linear 3-1-0 Payoff Regime («t ∈ [1981, 2025]») · Zero-Imputation ETL',
     'masthead-title': 'The Championship Formula: Within-Slot Pearsonian & Stacked OLS Decomposition of English Pyramid Standings',
@@ -1042,7 +1043,7 @@
     // Card 02: Attack vs Defence (within-table rank medians, separate table wins count, pooled PPG variation)
     const atkDefStat = smallSample
       ? `${m.numSlots} ${plural(m.numSlots, 'table')}`
-      : `${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)}`;
+      : `${fmtNum(atkDef.gaWithin, 3)} v ${fmtNum(atkDef.gfWithin, 3)}`;
 
     const rankHead = atkDef.withinLeader === 'ga'
       ? 'Defence edges within-table rank'
@@ -1227,7 +1228,7 @@
           : `Across ${m.numSlots} tables${isRaw ? ' (raw 3W+D points)' : ''} on a 0–1 scale (0 = no linear link, 1 = perfect link with final rank), median strength is ${fmtNum(winPred?.medianAbsRFinish, 3)} for wins, ${fmtNum(gdPred?.medianAbsRFinish, 3)} for goal difference, and ${fmtNum(drawPred?.medianAbsRFinish, 3)} for draws.${drawSignSentence}`,
       },
       {
-        idx: '02 · Attack vs. Defence',
+        idx: '02 · Attack v Defence',
         stat: atkDefStat,
         claim: atkDefClaim,
         detail: smallSample
@@ -1563,11 +1564,11 @@
     const dl25T2 = m.seasonDrawLeaders.find((r) => r.slotId === '2025-26-T2');
     let dl25Example = '';
     if (dl25T1 && dl25T3) {
-      dl25Example = ` The 2025–26 season showed both extremes: Premier League the most frequent drawers ${dl25T1.team} (${dl25T1.drawn} draws) still finished ${ordinal(dl25T1.officialPos)}, while League One the most frequent drawers ${dl25T3.team} (${dl25T3.drawn} draws) won promotion.`;
+      dl25Example = ` The 2025–26 season showed both extremes: the Premier League’s most frequent drawers, ${dl25T1.team} (${dl25T1.drawn} draws), still finished ${ordinal(dl25T1.officialPos)}, while League One’s most frequent drawers, ${dl25T3.team} (${dl25T3.drawn} draws), won promotion.`;
     } else if (dl25T1) {
       dl25Example = ` Yet in 2025–26, ${dl25T1.team} led the Premier League with ${dl25T1.drawn} draws and still finished ${ordinal(dl25T1.officialPos)}.`;
     } else if (dl25T2 && dl25T3) {
-      dl25Example = ` In 2025–26, the Championship’s most frequent drawers ${dl25T2.team} went down while League One the most frequent drawers ${dl25T3.team} won promotion.`;
+      dl25Example = ` In 2025–26, the Championship’s most frequent drawers, ${dl25T2.team}, went down while League One’s most frequent drawers, ${dl25T3.team}, won promotion.`;
     }
     bullets.push({
       lead: 'Clubs that draw most often usually finish mid-table, with striking exceptions.',
@@ -1882,9 +1883,9 @@
           el('p', null,
             'Between attack and defence, two common ways of measuring strength can point differently: ',
             el('strong', { textContent: withinPhrase }),
-            ` (goals conceded ${fmtNum(atkDef.gaWithin, 3)} vs goals scored ${fmtNum(atkDef.gfWithin, 3)}, gap ${fmtNum(atkDef.withinDiff, 3)} before rounding; defence stronger in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables vs ${m.withinSlot.gfBeatsGaCount} for scoring${atkDef.ties > 0 ? `, ${atkDef.ties} tied` : ''}), whereas `,
+            ` (goals conceded ${fmtNum(atkDef.gaWithin, 3)} against goals scored ${fmtNum(atkDef.gfWithin, 3)}, gap ${fmtNum(atkDef.withinDiff, 3)} before rounding; defence stronger in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables vs ${m.withinSlot.gfBeatsGaCount} for scoring${atkDef.ties > 0 ? `, ${atkDef.ties} tied` : ''}), whereas `,
             el('strong', { textContent: pooledPhrase }),
-            ` (goals scored ${fmtNum(atkDef.gfR2 * 100, 1)}% vs goals conceded ${fmtNum(atkDef.gaR2 * 100, 1)}%, overlapping descriptive links rather than additive shares).${sec1Differs ? ' The measures use different outcomes and aggregation methods, so their rankings can differ.' : ''} Both margins are modest descriptive associations rather than tactical prescriptions.`
+            ` (goals scored ${fmtNum(atkDef.gfR2 * 100, 1)}% against goals conceded ${fmtNum(atkDef.gaR2 * 100, 1)}%, overlapping descriptive links rather than additive shares).${sec1Differs ? ' The measures use different outcomes and aggregation methods, so their rankings can differ.' : ''} Both margins are modest descriptive associations rather than tactical prescriptions.`
           ),
           el('p', null,
             `Draws per game rank ${ordinal(drawRankOverall)} of 5 ${tierDrawSummary}. Their direction flips from season to season, negative in ${drawNegSlots} of ${drawPred?.slotCount ?? 0} tables and positive in ${drawPosSlots}, leaving a `,
@@ -1985,7 +1986,7 @@
       const basisTag = isRawMode() ? (sicko ? ' · counterfactual raw «3W+D»' : ' · On-pitch points (before deductions)') : '';
       setRich(subEl, sicko
         ? `«N_obs = ${fmtInt(valid.length)}» Team-${plural(valid.length, 'Season')} · «x = ${pp.short}» vs ${targetIsPpg ? '«y = PPG»' : '«y = y_finish ∈ [0,1]»'}${basisTag}`
-        : `${fmtInt(valid.length)} team ${plural(valid.length, 'season')} · ${pp.label} vs ${targetIsPpg ? 'Points per game' : 'Table rank (1 = 1st, 0 = last)'}${basisTag}`);
+        : `${fmtInt(valid.length)} team ${plural(valid.length, 'season')} · ${pp.label} against ${targetIsPpg ? 'Points per game' : 'Table rank (1 = 1st, 0 = last)'}${basisTag}`);
     }
     if (noteEl) {
       const sicko = isSicko();
@@ -2559,7 +2560,7 @@
           : `None of the ${noRel.length} selected ${plural(noRel.length, sicko ? 'slot' : 'table')} had relegation (${noRel.map((x) => `${x.season} Tier ${x.tier}`).join(', ')}).`;
         proseEl.append(el('p', { textContent: `${reasonText} Widen the filter to examine survival cutoffs.` }));
       } else if (smallSample) {
-        const slotDesc = m.survivalSeries.map((s) => `${s.season} Tier ${s.tier}: lowest survivor ${s.survivingTeam} (${s.survivingPts} pts, ${fmtNum(s.survivingPpg, 3)}${sicko ? ' PPG' : '/game'}) vs highest relegated ${s.relegatedTeam} (${s.relegatedHighPts} pts, ${fmtNum(s.relegatedHighPpg, 3)}${sicko ? ' PPG' : '/game'})`).join('; ');
+        const slotDesc = m.survivalSeries.map((s) => `${s.season} Tier ${s.tier}: lowest survivor ${s.survivingTeam} (${s.survivingPts} pts, ${fmtNum(s.survivingPpg, 3)}${sicko ? ' PPG' : '/game'}) against highest relegated ${s.relegatedTeam} (${s.relegatedHighPts} pts, ${fmtNum(s.relegatedHighPpg, 3)}${sicko ? ' PPG' : '/game'})`).join('; ');
         const reprieveDesc = boundaryReprieves.length > 0
           ? ` Boundary reprieves excluded from lowest merit survivor: ${boundaryReprieves.map((r) => `${r.team} (${r.season} Tier ${r.tier}, ${ordinal(r.pos)}, ${r.outcomeType})`).join(', ')}.`
           : '';
@@ -2794,7 +2795,7 @@
           ? `Observed lowest merit survivor vs. highest relegated ceiling in official PPG (invariant across ${rangeTag})${basisTag}`
           : `${mult}g linear point-equivalent projection across «N_rel = ${m.survivalSeries.length}» relegation-active ${plural(m.survivalSeries.length, 'slot')}${basisTag}`)
         : (mode === 'ppg'
-          ? `Lowest safe vs. highest relegated club in official points per game (comparable across ${rangeTagPlain})${basisTag}`
+          ? `Lowest safe against highest relegated club in official points per game (comparable across ${rangeTagPlain})${basisTag}`
           : `${mult}-game official point equivalent across ${m.survivalSeries.length} ${plural(m.survivalSeries.length, 'table')} with relegation${basisTag}`));
     }
     if (noteEl) {
@@ -3580,7 +3581,7 @@
     const rows = res.rows;
 
     setRich(titleEl, sicko
-      ? `Leader maxima verified in «${c.verified}» of «${c.inScope}» ${plural(c.inScope, 'division-season')}; «${c.inScope - c.verified}» left missing, not imputed`
+      ? `Leader maxima verified in ${c.verified} of ${c.inScope} ${plural(c.inScope, 'division-season')}; ${c.inScope - c.verified} left missing, not imputed`
       : allVerified
         ? `Every division’s leading scorer is verified for ${c.inScope === 1 ? 'the 1 season' : `all ${c.inScope} seasons`} in view`
         : `Leading league scorers are verified for ${c.verified} of ${c.inScope} ${plural(c.inScope, 'division-season')} in view`);
@@ -3871,11 +3872,11 @@
       appendKV(calloutEl, sicko ? '«pos=1» w/ Golden Boot' : 'Champions with Golden Boot', `${sa.champWithGbCount} / ${sa.availableSlotsCount} (${pctWithGb}%)`, 'highlight');
       appendKV(calloutEl, sicko ? '«pos=1» Med. Goal Share' : 'Champion top-scorer share', `${fmtNum(ss.champ?.median, 1)}% median`);
       appendKV(calloutEl, sicko ? '«pos ∈ {3,4}» Med. Share' : '3rd–4th top-scorer share', `${fmtNum(ss.thirdFourth?.median, 1)}% median`);
-      appendKV(calloutEl, sicko ? 'Top-4 «r(share, PPG)»' : 'Share vs. points link (Top 4)', fmtSigned(ss.rSharePpgTop4, 3));
+      appendKV(calloutEl, sicko ? 'Top-4 «r(share, PPG)»' : 'Share–points link (Top 4)', fmtSigned(ss.rSharePpgTop4, 3));
     }
 
     const gbSubEl = document.getElementById('sec5-gb-subtitle');
-    if (gbSubEl) gbSubEl.textContent = `${sa.availableSlotsCount} verified Premier League ${plural(sa.availableSlotsCount, 'season')} (${sa.gbInstances.length} Golden Boot winner-seasons, including ties)`;
+    if (gbSubEl) gbSubEl.textContent = `${sa.availableSlotsCount} verified Premier League ${plural(sa.availableSlotsCount, 'season')} (${sa.gbInstances.length} Golden Boot winner-seasons, including ties; club flags credit a winner’s goals to a club only when his club-specific tally is itself the season’s highest)`;
 
     renderSec5Charts(sa);
   }
@@ -4512,6 +4513,11 @@
       const cl = await loadOptionalFile('./data/tier1-club-leaders-1981-92.json', '__T1_CLUB_LEADERS__', validateClubLeaders);
       state.clubLeaders = cl.data; state.clubLeadersError = cl.error;
       populateYearDropdowns();
+      const scopeDetails = document.getElementById('scope-details');
+      if (scopeDetails) {
+        if (window.matchMedia('(max-width: 700px)').matches) scopeDetails.removeAttribute('open');
+        window.addEventListener('beforeprint', () => scopeDetails.setAttribute('open', ''));
+      }
       state.scope = CA.normalizeScope(state.dataset, CA.PRESETS['all-4-tiers']);
       state.model = CA.buildAnalyticalModel(state.dataset, state.scope);
       wireEvents();
