@@ -72,7 +72,7 @@
       "divisionSizes": "Varying division sizes: 20, 21 (1987-88 T1), 22 (1981-87 T1/T2, 1991-95 T1/T4), 23 (1987-88 T2, 2019-20 T3 active clubs after Bury expulsion), and 24 teams (most T2–T4 seasons). Per-game normalisation uses actual matches played.",
       "exclusionPolicy": "2019-20 League One & League Two (status: curtailed) are excluded from default completed-season aggregates and toggleable explicitly in UI controls."
     },
-    "canonicalJsonSha256": "2d0d3073e478cbd6349dd2b723e60961cf70eda0c55cf7a55132b257232d7549"
+    "canonicalJsonSha256": "07dd8708be910ed8451e1c25ad27fec6dc9afdd26479db3b90a0c1285fea921f"
   },
   "tierSeasons": [
     {
@@ -26527,7 +26527,7 @@
         "https://www.rsssf.org/engpaul/FLA/1990-91.html"
       ],
       "exceptions": [
-        "1990-91 League Division 4: Four automatic promotion places plus 7th-placed play-off winner Torquay United (five promotions); zero clubs relegated (23rd-placed Aldershot and 24th-placed Wrexham retained ahead of Aldershot's mid-1991-92 withdrawal)."
+        "1990-91 League Division 4: Four automatic promotion places plus 7th-placed play-off winner Torquay United (five promotions); zero clubs relegated due to Football League expansion (a 93rd club admitted for 1991-92 as the First Division grew to 22 clubs); bottom-placed Wrexham retained."
       ],
       "table": [
         {
@@ -27158,8 +27158,8 @@
           "promoted": false,
           "promotionMethod": null,
           "relegated": false,
-          "outcomeType": "withdrew",
-          "administrativeOutcome": "Finished 23rd (not relegated during League restructuring); remained in 1991-92 Fourth Division before withdrawing/folding in March 1992 with all 1991-92 results expunged.",
+          "outcomeType": "none",
+          "administrativeOutcome": "Finished 23rd (no Fourth Division relegation this season due to League expansion); the club later folded during 1991-92 with all its 1991-92 results expunged.",
           "topScorer": null,
           "hasGoldenBootWinner": null
         },
@@ -27190,7 +27190,8 @@
           "topScorer": null,
           "hasGoldenBootWinner": null
         }
-      ]
+      ],
+      "expansionRestructure": true
     },
     {
       "slotId": "1991-92-T1",
