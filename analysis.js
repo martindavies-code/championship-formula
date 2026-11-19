@@ -15,37 +15,37 @@
   const PRESETS = {
     'all-4-tiers': {
       id: 'all-4-tiers',
-      label: 'All 4 Tiers (1981–82 to 2024–25)',
+      label: 'All 4 Tiers (1981–82 to 2025–26)',
       tiers: [1, 2, 3, 4],
       startYear: 1981,
-      endYear: 2024,
+      endYear: 2025,
       includeCurtailed: false,
       pointsMode: 'official',
     },
-    'pl-1992-2025': {
-      id: 'pl-1992-2025',
-      label: 'Original PL Scope (1992–93 to 2024–25)',
+    'pl-1992-2026': {
+      id: 'pl-1992-2026',
+      label: 'Premier League (1992–93 to 2025–26)',
       tiers: [1],
       startYear: 1992,
-      endYear: 2024,
+      endYear: 2025,
       includeCurtailed: false,
       pointsMode: 'official',
     },
     'tier1-full': {
       id: 'tier1-full',
-      label: 'Tier 1 Full 3-Point Era (1981–82 to 2024–25)',
+      label: 'Tier 1 Full 3-Point Era (1981–82 to 2025–26)',
       tiers: [1],
       startYear: 1981,
-      endYear: 2024,
+      endYear: 2025,
       includeCurtailed: false,
       pointsMode: 'official',
     },
     'efl-tiers-2-4': {
       id: 'efl-tiers-2-4',
-      label: 'EFL Tiers 2–4 (1981–82 to 2024–25)',
+      label: 'EFL Tiers 2–4 (1981–82 to 2025–26)',
       tiers: [2, 3, 4],
       startYear: 1981,
-      endYear: 2024,
+      endYear: 2025,
       includeCurtailed: false,
       pointsMode: 'official',
     },
@@ -129,9 +129,9 @@
     {
       id: 'era-modern',
       name: 'Modern Super-Club / EFL',
-      years: '2014–15 to 2024–25',
+      years: '2014–15 to 2025–26',
       startMin: 2014,
-      startMax: 2024,
+      startMax: 2025,
     },
   ];
 
@@ -319,7 +319,7 @@
 
   function normalizeScope(dataset, rawScope) {
     const minAvail = dataset?.metadata?.startYear ?? 1981;
-    const maxAvail = dataset?.metadata?.endYear ?? 2024;
+    const maxAvail = dataset?.metadata?.endYear ?? 2025;
     const s = rawScope && typeof rawScope === 'object' ? rawScope : {};
 
     let tiers = Array.isArray(s.tiers) ? s.tiers.map(Number).filter((t) => t >= 1 && t <= 4) : [1, 2, 3, 4];
@@ -957,6 +957,7 @@
           tier: s.tier,
           team: poWin.team,
           pos: poWin.pos,
+          topSeedPos: autoRows.length + 1,
           ppg: poWin.officialPpg,
         });
       }
@@ -976,6 +977,7 @@
           poWinnerCount: poSub.length,
           poWinnerMedianPos: median(poSub.map((x) => x.pos)),
           poWinnerThirdCount: poSub.filter((x) => x.pos === 3).length,
+          poWinnerTopSeedCount: poSub.filter((x) => x.pos === x.topSeedPos).length,
           poWinnerLowestPosCount: poSub.filter((x) => (tierNum === 4 ? x.pos === 7 : x.pos === 6)).length,
         };
       });
@@ -1060,7 +1062,7 @@
         availableSlotsCount: 0,
         unavailableSlotsCount: unavailableScorerSlots.length,
         availableRangeLabel: null,
-        note: 'Verified season top-scorer and club leading-scorer records cover Tier 1 Premier League (1992–93 to 2024–25) only. Historical First Division (pre-1992) and Football League/EFL Tiers 2–4 lack uniform season-long club top-scorer coverage in our verified sources, so no figures are guessed or zero-filled.',
+        note: 'Verified season top-scorer and club leading-scorer records cover Tier 1 Premier League (1992–93 to 2025–26) only. Historical First Division (pre-1992) and Football League/EFL Tiers 2–4 lack uniform season-long club top-scorer coverage in our verified sources, so no figures are guessed or zero-filled.',
       };
     } else {
       const availTeams = [];
@@ -1112,7 +1114,7 @@
         status: unavailableScorerSlots.length === 0 ? 'verified-full' : 'verified-partial',
         availableSlotsCount: availableScorerSlots.length,
         unavailableSlotsCount: unavailableScorerSlots.length,
-        availableRangeLabel: 'Premier League (Tier 1, 1992–93 to 2024–25)',
+        availableRangeLabel: 'Premier League (Tier 1, 1992–93 to 2025–26)',
         champWithGbCount,
         gbInstances,
         top4Teams,
@@ -1130,7 +1132,7 @@
           rGbChampAll: pearson(availTeams.map((x) => (x.hasGoldenBootWinner ? 1 : 0)), availTeams.map((x) => (x.pos === 1 ? 1 : 0))),
         },
         note: unavailableScorerSlots.length > 0
-          ? `Scoped strictly to ${availableScorerSlots.length} verified Tier 1 Premier League slots (1992–93 to 2024–25); ${unavailableScorerSlots.length} historical/EFL slots in your current filter have unavailable uniform scorer data and are omitted here.`
+          ? `Scoped strictly to ${availableScorerSlots.length} verified Tier 1 Premier League slots (1992–93 to 2025–26); ${unavailableScorerSlots.length} historical/EFL slots in your current filter have unavailable uniform scorer data and are omitted here.`
           : 'All slots in the current filter have verified official top-scorer records.',
       };
     }

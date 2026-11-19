@@ -8,7 +8,7 @@ import { pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const DATASET_PATH = path.join(ROOT, 'data', 'england-tiers-1-4-1981-2025.json');
+const DATASET_PATH = path.join(ROOT, 'data', 'england-tiers-1-4-1981-2026.json');
 const SCREENSHOT_DIR = process.env.SCREENSHOT_DIR || null;
 
 function findBrowser() {
@@ -37,7 +37,7 @@ function startStaticServer(overrideJsonFn = null) {
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
       const reqUrl = new URL(req.url, 'http://127.0.0.1');
-      if (reqUrl.pathname === '/data/england-tiers-1-4-1981-2025.json' && overrideJsonFn) {
+      if (reqUrl.pathname === '/data/england-tiers-1-4-1981-2026.json' && overrideJsonFn) {
         return overrideJsonFn(req, res);
       }
       const rel = reqUrl.pathname === '/' ? 'index.html' : reqUrl.pathname.replace(/^\/+/, '');
@@ -163,7 +163,7 @@ test('Static HTML & script architecture preserves offline file:// contract and z
   const appSrc = fs.readFileSync(path.join(ROOT, 'app.js'), 'utf8');
 
   assert.equal(html.includes('type="module"'), false, 'index.html must not use type="module" so file:// works');
-  assert.ok(html.includes('<script src="./data/england-tiers-1-4-1981-2025-bundle.js"></script>'));
+  assert.ok(html.includes('<script src="./data/england-tiers-1-4-1981-2026-bundle.js"></script>'));
   assert.ok(html.includes('<script defer src="./analysis.js"></script>'));
   assert.ok(html.includes('<script defer src="./app.js"></script>'));
   assert.equal(/\.\s*innerHTML\b/.test(appSrc), false, 'app.js must never assign innerHTML');
@@ -186,8 +186,8 @@ test('Real browser offline file:// rendering loads bundled dataset cleanly with 
 
     assert.equal(cdp.pageErrors.length, 0, `Page errors on file://: ${cdp.pageErrors.join('; ')}`);
     assert.equal(snap.fatalHidden, true);
-    assert.ok(snap.coverage.includes('174 League Tables'));
-    assert.ok(snap.coverage.includes('4,000 Team Seasons'));
+    assert.ok(snap.coverage.includes('178 League Tables'));
+    assert.ok(snap.coverage.includes('4,092 Team Seasons'));
     assert.equal(snap.ledgerCount, 6);
     assert.ok(snap.svgCount >= 5);
     assert.ok(snap.archiveRows >= 20);
@@ -213,8 +213,8 @@ test('Real browser HTTP interactions, responsive mobile layout, sorting, and scr
     })`);
     assert.equal(cdp.pageErrors.length, 0);
     assert.ok(desktopInit.scrollW <= desktopInit.clientW, `Desktop horizontal overflow: ${desktopInit.scrollW} > ${desktopInit.clientW}`);
-    assert.ok(desktopInit.coverage.includes('174 League Tables'));
-    assert.equal(desktopInit.fewerWinsCount, 12);
+    assert.ok(desktopInit.coverage.includes('178 League Tables'));
+    assert.equal(desktopInit.fewerWinsCount, 13);
     assert.equal(desktopInit.corrRows, 5);
     assert.equal(desktopInit.sec5ScopeBannerHidden, false); // mixed scope shows explicit warning banner
 
@@ -234,8 +234,8 @@ test('Real browser HTTP interactions, responsive mobile layout, sorting, and scr
       coverage: document.getElementById('meta-coverage').textContent,
       banner: document.getElementById('active-scope-banner').textContent,
     })`);
-    assert.ok(afterCurtail.coverage.includes('176 League Tables'));
-    assert.ok(afterCurtail.coverage.includes('4,047 Team Seasons'));
+    assert.ok(afterCurtail.coverage.includes('180 League Tables'));
+    assert.ok(afterCurtail.coverage.includes('4,139 Team Seasons'));
     assert.ok(afterCurtail.banner.includes('Curtailed Included'));
 
     await cdp.evalJs(`() => {
@@ -300,10 +300,10 @@ test('Real browser HTTP interactions, responsive mobile layout, sorting, and scr
       verifiedHidden: document.getElementById('sec5-verified-panel').hidden,
       scopeBannerHidden: document.getElementById('sec5-scope-banner').hidden,
     })`);
-    assert.ok(plState.coverage.includes('33 League Tables'));
-    assert.ok(plState.coverage.includes('666 Team Seasons'));
-    assert.ok(plState.matches.includes('12,786'));
-    assert.ok(plState.goals.includes('34,433'));
+    assert.ok(plState.coverage.includes('34 League Tables'));
+    assert.ok(plState.coverage.includes('686 Team Seasons'));
+    assert.ok(plState.matches.includes('13,166'));
+    assert.ok(plState.goals.includes('35,478'));
     assert.equal(plState.verifiedHidden, false);
     assert.equal(plState.scopeBannerHidden, true);
 
@@ -313,7 +313,7 @@ test('Real browser HTTP interactions, responsive mobile layout, sorting, and scr
     assert.equal(await cdp.evalJs(`() => document.getElementById('empty-scope-panel').hidden`), false);
     await cdp.evalJs(`() => document.getElementById('btn-reset-scope').click()`);
     await new Promise((r) => setTimeout(r, 120));
-    assert.ok((await cdp.evalJs(`() => document.getElementById('meta-coverage').textContent`)).includes('174 League Tables'));
+    assert.ok((await cdp.evalJs(`() => document.getElementById('meta-coverage').textContent`)).includes('178 League Tables'));
 
     // 4. Mobile 360px & 390px overflow verification
     for (const [w, h] of [[360, 780], [390, 844]]) {
@@ -404,7 +404,7 @@ test('D4: Zero [object, undefined, NaN, or Infinity strings appear in rendered U
   try {
     await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
     await cdp.navigateAndWait(`${baseUrl}/`);
-    for (const preset of ['all-4-tiers', 'pl-1992-2025', 'tier1-full', 'efl-tiers-2-4']) {
+    for (const preset of ['all-4-tiers', 'pl-1992-2026', 'tier1-full', 'efl-tiers-2-4']) {
       await cdp.evalJs(`() => document.querySelector('[data-preset="${preset}"]').click()`);
       await assertCleanRender(`preset:${preset}`);
     }
@@ -454,15 +454,15 @@ test('Stage 2 A1-A5 browser DOM invariants: dual GF/GA metrics, draw copy/quarti
       sec1: document.getElementById('sec-predictors').textContent,
       sec4: document.getElementById('sec-draws').textContent,
     })`);
-    assert.ok(!allTiers.body.includes('1 clubs'), 'Must never render "1 clubs"');
+    assert.ok(!/\b1 clubs\b/.test(allTiers.body), 'Must never render "1 clubs"');
     assert.ok(!allTiers.body.includes('Excludes 0'), 'Must omit zero-exclusion phrasing');
     assert.ok(!allTiers.body.includes('flipping the PL-only'), 'Must not contain removed false PL-flip claim');
     assert.ok(!allTiers.body.includes('22 from 11 draws'), 'Must not contain broken draw arithmetic');
-    assert.ok(allTiers.sec1.includes('Pooled points variation') && allTiers.sec1.includes('65.5%') && allTiers.sec1.includes('61.0%') && allTiers.sec1.includes('winning 11 and losing 11') && allTiers.sec1.includes('drawing all 22 yields 22 points'), 'Section 1 must include pooled points variation and fixed draw arithmetic');
-    assert.ok(allTiers.sec4.includes('63.1%') && allTiers.sec4.includes('tied co-leaders'), 'Section 4 must include quartile share and co-leader caveat');
+    assert.ok(allTiers.sec1.includes('Pooled points variation') && allTiers.sec1.includes('65.8%') && allTiers.sec1.includes('61.0%') && allTiers.sec1.includes('winning 11 and losing 11') && allTiers.sec1.includes('drawing all 22 yields 22 points'), 'Section 1 must include pooled points variation and fixed draw arithmetic');
+    assert.ok(allTiers.sec4.includes('62.1%') && allTiers.sec4.includes('tied co-leaders'), 'Section 4 must include quartile share and co-leader caveat');
 
     // PL-only slice: must show zero Swindon mention in Section 4 and honest dual GF/GA wording in Section 1
-    await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2025"]').click()`);
+    await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2026"]').click()`);
     await new Promise((r) => setTimeout(r, 150));
     const plText = await cdp.evalJs(`() => ({
       body: document.body.innerText,
@@ -515,7 +515,7 @@ test('Final polish: neutral divergence prose without causal claim and PL 38-game
   const removedB = ['treats', 'every', 'division-year', 'identically'].join(' ');
   assert.ok(!readmeText.toLowerCase().includes(removedA) && !readmeText.toLowerCase().includes(removedB), 'README must not contain removed causal phrases');
   assert.ok(readmeText.includes('The measures use different outcomes and aggregation methods, so their rankings can differ.'), 'README must use neutral divergence wording');
-  assert.ok(readmeText.includes('33') && readmeText.includes('1992–95') && readmeText.includes('30') && readmeText.includes('intentional scope definition'), 'README must disclose PL preset 33 vs 30 38-game baseline');
+  assert.ok(readmeText.includes('34') && readmeText.includes('1992–95') && readmeText.includes('31') && readmeText.includes('intentional scope definition'), 'README must disclose PL preset 34 vs 31 38-game baseline');
 
   const { server, baseUrl } = await startStaticServer();
   const cdp = await launchCdpSession();
@@ -543,21 +543,21 @@ test('Final polish: neutral divergence prose without causal claim and PL 38-game
     assert.ok(defText.sec1.includes('Both margins are modest descriptive associations rather than tactical prescriptions.'));
     assert.ok(!defText.sec3.includes('38-game Premier League baseline'), 'Non-PL all-4-tiers scope must stay unchanged without PL baseline line');
 
-    // 2. PL preset (pl-1992-2025): neutral divergence wording AND computed 38-game PL baseline line with all 5 reference values
-    await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2025"]').click()`);
+    // 2. PL preset (pl-1992-2026): neutral divergence wording AND computed 38-game PL baseline line with all 5 reference values
+    await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2026"]').click()`);
     await new Promise((r) => setTimeout(r, 150));
     const plText = await cdp.evalJs(`() => ({
       body: document.body.innerText,
       sec1: document.getElementById('sec-predictors').textContent,
       sec3: document.getElementById('sec3-prose').textContent,
     })`);
-    assertNoBanned('pl-1992-2025', plText.body);
+    assertNoBanned('pl-1992-2026', plText.body);
     assert.ok(plText.sec1.includes('The measures use different outcomes and aggregation methods, so their rankings can differ.'));
     assert.ok(plText.sec3.includes('38-game Premier League baseline'), 'PL preset must render computed 38-game PL baseline line');
-    assert.ok(plText.sec3.includes('34.5 points') && plText.sec3.includes('median 34'), 'PL baseline must show mean 34.5 and median 34');
-    assert.ok(plText.sec3.includes('14 of 30 seasons'), 'PL baseline must show 14 of 30 at 35 points');
-    assert.ok(plText.sec3.includes('3 of 30') && plText.sec3.includes('40+ points'), 'PL baseline must show 3 of 30 on 40+ points');
-    assert.ok(plText.sec3.includes('22 of 30 seasons'), 'PL baseline must show 22 of 30 below 40 points');
+    assert.ok(plText.sec3.includes('34.7 points') && plText.sec3.includes('median 34'), 'PL baseline must show mean 34.7 and median 34');
+    assert.ok(plText.sec3.includes('15 of 31 seasons'), 'PL baseline must show 15 of 31 at 35 points');
+    assert.ok(plText.sec3.includes('3 of 31') && plText.sec3.includes('40+ points'), 'PL baseline must show 3 of 31 on 40+ points');
+    assert.ok(plText.sec3.includes('22 of 31 seasons'), 'PL baseline must show 22 of 31 below 40 points');
 
     // 3. PL small-sample guard (1992-93 to 1993-94, 2 slots): baseline line must not fire
     await cdp.evalJs(`() => {
@@ -637,24 +637,30 @@ test('Headline ledger semantic DOM invariants: plain English without statistical
       return snap;
     };
 
-    // 1. Default 174-table scope
+    // 1. Default 178-table scope
     const defSnap = await checkLedger('default');
-    assert.ok(defSnap.note.includes('174 league tables') && defSnap.note.includes('4,000 team seasons') && defSnap.note.includes('official standings'));
-    assert.ok(defSnap.ledger.includes('negative in 111 of 174 tables and positive in 63'));
-    assert.ok(defSnap.ledger.includes('65.5% of points-per-game variation to scoring') && defSnap.ledger.includes('61.0% to conceding'));
-    assert.ok(defSnap.ledger.includes('middle half roughly 1.94 to 2.16') && !/\bmost\b|\bmajority\b/i.test(defSnap.ledger));
-    assert.ok(defSnap.ledger.includes('164 tables with relegation; 10 without it'));
-    assert.ok(defSnap.ledger.includes('minority (12 of 33)') && defSnap.ledger.includes('41 Golden Boot') && !/rarely|needed/i.test(defSnap.ledger));
-    // Verify plain-English prose across Sections 01-07 (no statistical shorthand leaks)
+    assert.ok(defSnap.note.includes('178 league tables') && defSnap.note.includes('4,092 team seasons') && defSnap.note.includes('official standings'));
+    assert.ok(defSnap.ledger.includes('negative in 113 of 178 tables and positive in 65'));
+    assert.ok(defSnap.ledger.includes('65.8% of points-per-game variation to scoring') && defSnap.ledger.includes('61.0% to conceding'));
+    assert.ok(defSnap.ledger.includes('middle half roughly 1.94 to 2.17') && !/\bmost\b|\bmajority\b/i.test(defSnap.ledger));
+    assert.ok(defSnap.ledger.includes('168 tables with relegation; 10 without it'));
+    assert.ok(defSnap.ledger.includes('minority (12 of 34)') && defSnap.ledger.includes('42 Golden Boot') && !/rarely|needed/i.test(defSnap.ledger));
+    // Verify plain-English prose & Key Findings bullets across the full page (no statistical shorthand leaks)
     const fullPageText = await cdp.evalJs(`() => document.body.innerText`);
+    const takeawaysSnap = await cdp.evalJs(`() => ({
+      count: document.querySelectorAll('#takeaways-list li').length,
+      text: document.getElementById('key-takeaways').innerText,
+    })`);
+    assert.equal(takeawaysSnap.count, 6);
+    assert.ok(takeawaysSnap.text.includes('Bromley') && takeawaysSnap.text.includes('43 times') && takeawaysSnap.text.includes('Sheffield Wednesday'));
     const pageJargonRe = /within-slot|\|r\||R²\(PPG\)|\bIQR\b|% Pct|\b38g\b|\b46g\b|\bexcl\.|\bslots\b|\bGA\/G\b|\bGF\/G\b|\bGD\/G\b|\bW\/G\b|\bPPG\b|Tier-Seasons|Team-Seasons/i;
     const mPageJargon = pageJargonRe.exec(fullPageText);
     assert.equal(mPageJargon, null, `Full page must avoid shorthand jargon (found "${mPageJargon?.[0]}")`);
 
     // 2. PL preset
-    await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2025"]').click()`);
-    const plSnap = await checkLedger('pl-1992-2025');
-    assert.ok(plSnap.ledger.includes('33 league tables') && plSnap.ledger.includes('77.2% of points-per-game variation'));
+    await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2026"]').click()`);
+    const plSnap = await checkLedger('pl-1992-2026');
+    assert.ok(plSnap.ledger.includes('34 league tables') && plSnap.ledger.includes('77.2% of points-per-game variation'));
 
     // 3. Tier 1 2011-2013 near-tie reproduction
     await cdp.evalJs(`() => {

@@ -220,7 +220,79 @@ table th,
   border-block-end-color: var(--accent-champ);
 }
 
-/* Executive Findings Ledger (5 Headline Answers) */
+/* Key Findings Bullet Brief */
+.takeaways-section {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--rule-light);
+  border-inline-start: 4px solid var(--accent-champ);
+  padding: 1.25rem 1.4rem 1.35rem;
+  margin-block-end: 2.25rem;
+}
+
+.takeaways-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.35rem 1rem;
+  border-block-end: 1px solid var(--rule-light);
+  padding-block-end: 0.5rem;
+  margin-block-end: 1rem;
+}
+
+.takeaways-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.18rem, 1.05rem + 0.5vw, 1.42rem);
+  font-weight: 700;
+  margin: 0;
+  color: var(--ink-primary);
+}
+
+.takeaways-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--ink-muted);
+}
+
+.takeaways-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem 2rem;
+}
+
+@media (min-width: 780px) {
+  .takeaways-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.takeaways-list li {
+  position: relative;
+  padding-inline-start: 1.1rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+}
+
+.takeaways-list li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 0.52rem;
+  inline-size: 0.42rem;
+  block-size: 0.42rem;
+  background-color: var(--accent-champ);
+}
+
+.takeaways-lead {
+  color: var(--ink-primary);
+  font-weight: 600;
+}
+
+/* Executive Findings Ledger (6 Headline Answers) */
 .ledger-section {
   margin-block-end: 3.25rem;
 }

@@ -6,8 +6,8 @@ import path from 'node:path';
 import vm from 'node:vm';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const DATASET_PATH = path.join(ROOT, 'data', 'england-tiers-1-4-1981-2025.json');
-const BUNDLE_PATH = path.join(ROOT, 'data', 'england-tiers-1-4-1981-2025-bundle.js');
+const DATASET_PATH = path.join(ROOT, 'data', 'england-tiers-1-4-1981-2026.json');
+const BUNDLE_PATH = path.join(ROOT, 'data', 'england-tiers-1-4-1981-2026-bundle.js');
 const MANIFEST_PATH = path.join(ROOT, 'data', 'coverage-manifest.json');
 const PL_OLD_PATH = path.join(ROOT, 'data', 'premier-league-1992-2025.json');
 
@@ -15,20 +15,20 @@ const rawJson = fs.readFileSync(DATASET_PATH, 'utf8');
 const dataset = JSON.parse(rawJson);
 const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
 
-test('Schema 2.0.0 metadata, slot totals, and exclusion of post-2024-25 seasons', () => {
+test('Schema 2.0.0 metadata, slot totals, and exclusion of post-2025-26 seasons', () => {
   assert.equal(dataset.schemaVersion, '2.0.0');
-  assert.equal(dataset.tierSeasons.length, 176);
-  assert.equal(manifest.slots.length, 176);
+  assert.equal(dataset.tierSeasons.length, 180);
+  assert.equal(manifest.slots.length, 180);
   assert.equal(dataset.metadata.startYear, 1981);
-  assert.equal(dataset.metadata.endYear, 2024);
-  assert.equal(dataset.metadata.totalTierSeasonSlots, 176);
-  assert.equal(dataset.metadata.completedSlots, 174);
+  assert.equal(dataset.metadata.endYear, 2025);
+  assert.equal(dataset.metadata.totalTierSeasonSlots, 180);
+  assert.equal(dataset.metadata.completedSlots, 178);
   assert.equal(dataset.metadata.curtailedSlots, 2);
-  assert.equal(dataset.metadata.totalTeamSeasons, 4047);
-  assert.equal(dataset.metadata.totalMatchesPlayed, 89234);
-  assert.equal(dataset.metadata.totalGoalsScored, 233356);
+  assert.equal(dataset.metadata.totalTeamSeasons, 4139);
+  assert.equal(dataset.metadata.totalMatchesPlayed, 91270);
+  assert.equal(dataset.metadata.totalGoalsScored, 238714);
 
-  const forbidden = dataset.tierSeasons.filter((s) => s.startYear >= 2025 || s.startYear < 1981);
+  const forbidden = dataset.tierSeasons.filter((s) => s.startYear >= 2026 || s.startYear < 1981);
   assert.equal(forbidden.length, 0);
   assert.equal(JSON.stringify(dataset.metadata).toLowerCase().includes('latest completed season'), false);
 });
@@ -66,9 +66,13 @@ test('Historical division names respect era boundaries by tier', () => {
   assert.equal(get('2016-17-T2').historicalDivisionName, 'EFL Championship');
   assert.equal(get('2024-25-T3').historicalDivisionName, 'EFL League One');
   assert.equal(get('2024-25-T4').historicalDivisionName, 'EFL League Two');
+  assert.equal(get('2025-26-T1').historicalDivisionName, 'Premier League');
+  assert.equal(get('2025-26-T2').historicalDivisionName, 'EFL Championship');
+  assert.equal(get('2025-26-T3').historicalDivisionName, 'EFL League One');
+  assert.equal(get('2025-26-T4').historicalDivisionName, 'EFL League Two');
 });
 
-test('Mathematical conservation laws hold on all 176 slots and 4,047 team rows', () => {
+test('Mathematical conservation laws hold on all 180 slots and 4,139 team rows', () => {
   let totalRows = 0;
   let totalMatches = 0;
   let totalGoals = 0;
@@ -120,9 +124,9 @@ test('Mathematical conservation laws hold on all 176 slots and 4,047 team rows',
     totalGoals += s.totalGoals;
   }
 
-  assert.equal(totalRows, 4047);
-  assert.equal(totalMatches, 89234);
-  assert.equal(totalGoals, 233356);
+  assert.equal(totalRows, 4139);
+  assert.equal(totalMatches, 91270);
+  assert.equal(totalGoals, 238714);
 });
 
 test('Premier League 1992-93..2024-25 cell-level parity with verified PL dataset', () => {
@@ -200,6 +204,39 @@ test('Spot checks: historical anomalies, deductions, tie-breaks, and 2024-25 pla
   assert.equal(get('2024-25-T2').table.find((r) => r.promotionMethod === 'playoff').team, 'Sunderland');
   assert.equal(get('2024-25-T3').table.find((r) => r.promotionMethod === 'playoff').team, 'Charlton Athletic');
   assert.equal(get('2024-25-T4').table.find((r) => r.promotionMethod === 'playoff').team, 'AFC Wimbledon');
+
+  // 2025-26 champions, deductions, play-offs & verified Premier League scorers
+  const s25t1 = get('2025-26-T1');
+  assert.equal(s25t1.table[0].team, 'Arsenal');
+  assert.equal(s25t1.table[0].points, 85);
+  assert.equal(s25t1.table[0].topScorer.player, 'Viktor Gyökeres');
+  assert.equal(s25t1.table[0].topScorer.goals, 14);
+  assert.equal(s25t1.table[0].hasGoldenBootWinner, false);
+  assert.equal(s25t1.scorerCoverage, 'verified_pl_complete');
+  assert.equal(s25t1.goldenBootGoals, 27);
+  assert.equal(s25t1.goldenBootWinners[0].player, 'Erling Haaland');
+  assert.equal(s25t1.table.find((r) => r.team === 'Manchester City').hasGoldenBootWinner, true);
+
+  const s25t2 = get('2025-26-T2');
+  assert.equal(s25t2.table[0].team, 'Coventry City');
+  assert.equal(s25t2.table[0].points, 95);
+  assert.equal(s25t2.table.find((r) => r.promotionMethod === 'playoff').team, 'Hull City');
+  assert.equal(s25t2.table.find((r) => r.team === 'Sheffield Wednesday').signedAdjustment, -18);
+  assert.equal(s25t2.table.find((r) => r.team === 'Sheffield Wednesday').points, 0);
+  assert.equal(s25t2.table.find((r) => r.team === 'Leicester City').signedAdjustment, -6);
+  assert.equal(s25t2.table.find((r) => r.team === 'Leicester City').points, 46);
+  assert.equal(s25t2.table.find((r) => r.team === 'West Bromwich Albion').signedAdjustment, -2);
+
+  const s25t3 = get('2025-26-T3');
+  assert.equal(s25t3.table[0].team, 'Lincoln City');
+  assert.equal(s25t3.table[0].points, 103);
+  assert.equal(s25t3.table.find((r) => r.promotionMethod === 'playoff').team, 'Bolton Wanderers');
+
+  const s25t4 = get('2025-26-T4');
+  assert.equal(s25t4.table[0].team, 'Bromley');
+  assert.equal(s25t4.table[0].points, 87);
+  assert.equal(s25t4.table[0].won, 24);
+  assert.equal(s25t4.table.find((r) => r.promotionMethod === 'playoff').team, 'Notts County');
 });
 
 // C1 & C2: Sourced independent relegation + promotion boundary fixture across all 44 seasons (Tiers 1-4).
@@ -416,6 +453,16 @@ const INDEPENDENT_SEASON_OUTCOMES = {
       4: ['Carlisle United', 'Morecambe'],
     },
   },
+  2025: {
+    rel: [3, 3, 4, 2], prom: [3, 3, 4],
+    source: 'https://www.rsssf.org/tablese/eng2026.html',
+    relegatedNames: {
+      1: ['West Ham United', 'Burnley', 'Wolverhampton Wanderers'],
+      2: ['Oxford United', 'Leicester City', 'Sheffield Wednesday'],
+      3: ['Exeter City', 'Port Vale', 'Rotherham United', 'Northampton Town'],
+      4: ['Harrogate Town', 'Barrow'],
+    },
+  },
 };
 
 // Sourced Tier 4 exit & non-exit fixture covering every non-standard exit/reprieve plus re-election/modern rules
@@ -436,6 +483,7 @@ const EXPECTED_T4_EXIT_SOURCES = [
   { slotId: '2018-19-T4', relCount: 2, relegatedTeams: ['Notts County', 'Yeovil Town'], promotedNonRel: 'Bury' },
   { slotId: '2019-20-T4', relCount: 1, relegatedTeams: ['Macclesfield Town'], safeAtBottom: 'Stevenage' },
   { slotId: '2024-25-T4', relCount: 2, relegatedTeams: ['Carlisle United', 'Morecambe'] },
+  { slotId: '2025-26-T4', relCount: 2, relegatedTeams: ['Harrogate Town', 'Barrow'] },
 ];
 
 // Genuine source-verified boundary mismatches between rel(T_k) and prom(T_{k+1}) across 132 boundaries
@@ -496,11 +544,11 @@ const DOCUMENTED_BOUNDARY_EXCEPTIONS = new Map([
   }],
 ]);
 
-test('D1-D3 & C1-C4: Boundary conservation, per-slot relegation counts & 2007-2025 club names, and Wimbledon C4 separation hold', () => {
+test('D1-D3 & C1-C4: Boundary conservation, per-slot relegation counts & 2007-2026 club names, and Wimbledon C4 separation hold', () => {
   const bySlot = new Map(dataset.tierSeasons.map((s) => [s.slotId, s]));
 
-  // 1. Assert each slot's relegationSlots + promotionSlots equal independent source counts (and full names for 2007-2025)
-  for (let sy = 1981; sy <= 2024; sy++) {
+  // 1. Assert each slot's relegationSlots + promotionSlots equal independent source counts (and full names for 2007-2026)
+  for (let sy = 1981; sy <= 2025; sy++) {
     const season = `${sy}-${String((sy + 1) % 100).padStart(2, '0')}`;
     const fx = INDEPENDENT_SEASON_OUTCOMES[sy];
     assert.ok(fx, `Missing independent fixture for ${season}`);

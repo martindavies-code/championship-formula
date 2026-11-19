@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Championship Formula — English League Tiers 1–4 (1981–82 to 2024–25)</title>
-  <meta name="description" content="A descriptive empirical study of 176 league tables across the top four English divisions in the three-points-for-a-win era (1981–82 through 2024–25): what separates first place from everyone else.">
+  <title>The Championship Formula — English League Tiers 1–4 (1981–82 to 2025–26)</title>
+  <meta name="description" content="A descriptive empirical study of 180 league tables across the top four English divisions in the three-points-for-a-win era (1981–82 through 2025–26): what separates first place from everyone else.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
       </div>
       <h1 class="masthead-title">The Championship Formula</h1>
       <p class="masthead-deck" id="masthead-deck">
-        Every final table from England’s top four divisions since three points for a win began in 1981–82 through 2024–25—measured per game to see what sets champions, contenders and survivors apart.
+        Every final table from England’s top four divisions since three points for a win began in 1981–82 through 2025–26—measured per game to see what sets champions, contenders and survivors apart.
       </p>
       <div class="normalisation-banner" id="normalisation-banner">
         <!-- Populated safely from dataset metadata and active scope -->
@@ -43,10 +43,10 @@
       <div class="scope-bar-top">
         <div class="scope-presets" role="group" aria-label="Quick filters">
           <span class="control-group-label">Presets:</span>
-          <button type="button" class="btn-toggle" data-preset="all-4-tiers" aria-pressed="true">All 4 Tiers (1981–2025)</button>
-          <button type="button" class="btn-toggle" data-preset="pl-1992-2025" aria-pressed="false">Premier League (1992–2025)</button>
-          <button type="button" class="btn-toggle" data-preset="tier1-full" aria-pressed="false">Top Flight (1981–2025)</button>
-          <button type="button" class="btn-toggle" data-preset="efl-tiers-2-4" aria-pressed="false">EFL Tiers 2–4 (1981–2025)</button>
+          <button type="button" class="btn-toggle" data-preset="all-4-tiers" aria-pressed="true">All 4 Tiers (1981–2026)</button>
+          <button type="button" class="btn-toggle" data-preset="pl-1992-2026" aria-pressed="false">Premier League (1992–2026)</button>
+          <button type="button" class="btn-toggle" data-preset="tier1-full" aria-pressed="false">Top Flight (1981–2026)</button>
+          <button type="button" class="btn-toggle" data-preset="efl-tiers-2-4" aria-pressed="false">EFL Tiers 2–4 (1981–2026)</button>
         </div>
         <div class="scope-points-mode" role="group" aria-label="Points basis">
           <span class="control-group-label">Points:</span>
@@ -67,7 +67,7 @@
         </fieldset>
 
         <fieldset class="scope-fieldset scope-years-fieldset">
-          <legend class="scope-legend">Seasons (1981–82 to 2024–25)</legend>
+          <legend class="scope-legend">Seasons (1981–82 to 2025–26)</legend>
           <div class="year-select-row">
             <label for="scope-start-year" class="year-label">From
               <select id="scope-start-year" class="select-control"></select>
@@ -94,7 +94,8 @@
 
     <nav class="section-nav" aria-label="Article sections">
       <ul class="section-nav-list">
-        <li><a href="#ledger">Summary</a></li>
+        <li><a href="#key-takeaways">Key Findings</a></li>
+        <li><a href="#ledger">Scorecard</a></li>
         <li><a href="#sec-predictors">01. What Tracks Rank</a></li>
         <li><a href="#sec-champion">02. Champions</a></li>
         <li><a href="#sec-survival">03. Survival &amp; Promotion</a></li>
@@ -109,7 +110,16 @@
       <section id="empty-scope-panel" class="empty-scope-panel" hidden>
         <h2>No League Tables Match This Filter</h2>
         <p id="empty-scope-message">Select at least one tier (1–4) or widen the season range to view historical tables.</p>
-        <button type="button" class="btn-toggle" id="btn-reset-scope">Reset to All 4 Tiers (1981–82 to 2024–25)</button>
+        <button type="button" class="btn-toggle" id="btn-reset-scope">Reset to All 4 Tiers (1981–82 to 2025–26)</button>
+      </section>
+
+      <!-- KEY FINDINGS IN PLAIN BULLETS -->
+      <section id="key-takeaways" class="takeaways-section" aria-labelledby="takeaways-heading">
+        <div class="takeaways-header">
+          <h2 id="takeaways-heading" class="takeaways-title">Key Findings — The Surprising Bits First</h2>
+          <span class="takeaways-subtitle num" id="takeaways-scope-note"></span>
+        </div>
+        <ul class="takeaways-list" id="takeaways-list"></ul>
       </section>
 
       <!-- EXECUTIVE LEDGER -->
@@ -469,7 +479,7 @@
         <div id="sec5-unavailable-panel" class="chart-panel unavailable-panel" hidden>
           <h3>Top-Scorer Records Are Unavailable in This Filter</h3>
           <p id="sec5-unavailable-copy"></p>
-          <button type="button" class="btn-toggle" id="btn-jump-pl-scorers">Load Premier League Seasons (1992–93 to 2024–25)</button>
+          <button type="button" class="btn-toggle" id="btn-jump-pl-scorers">Load Premier League Seasons (1992–93 to 2025–26)</button>
         </div>
 
         <div id="sec5-verified-panel" class="split-grid wide-left">
@@ -477,7 +487,7 @@
             <div class="chart-panel-header">
               <div>
                 <h3 class="chart-title">Top Scorer’s Share of Team Goals vs. Points Per Game</h3>
-                <p class="chart-subtitle" id="sec5-share-subtitle">Top-four clubs across verified Premier League seasons (1992–93 to 2024–25)</p>
+                <p class="chart-subtitle" id="sec5-share-subtitle">Top-four clubs across verified Premier League seasons (1992–93 to 2025–26)</p>
               </div>
             </div>
             <div class="chart-legend">
@@ -517,12 +527,12 @@
         </div>
       </section>
 
-      <!-- SECTION 6: INTERACTIVE 176-TABLE ARCHIVE -->
+      <!-- SECTION 6: INTERACTIVE 180-TABLE ARCHIVE -->
       <section id="sec-archive" class="analysis-section" aria-labelledby="sec6-title">
         <div class="section-header-grid">
           <div>
             <p class="section-kicker">06 / League Table Archive</p>
-            <h2 id="sec6-title" class="section-title">All 176 Historical Tables (Tiers 1–4, 1981–82 to 2024–25)</h2>
+            <h2 id="sec6-title" class="section-title">All 180 Historical Tables (Tiers 1–4, 1981–82 to 2025–26)</h2>
             <div class="section-prose">
               <p>
                 Browse any of the <strong id="archive-season-count"></strong> league tables in your current filter. Each season uses its historical division name rather than modern rebrands.
@@ -621,7 +631,7 @@
         <div class="section-header-grid">
           <div>
             <p class="section-kicker">07 / Sources &amp; Methods</p>
-            <h2 id="sec7-title" class="section-title">How These 176 Tables Were Built and Checked</h2>
+            <h2 id="sec7-title" class="section-title">How These 180 Tables Were Built and Checked</h2>
             <div class="section-prose" id="sec7-prose"></div>
           </div>
           <aside class="finding-callout" aria-label="Data audit summary">
@@ -634,13 +644,13 @@
 
     <footer class="site-footer">
       <div>
-        <strong>The Championship Formula</strong> — Plain-English study of English Tiers 1–4 across 1981–82 through 2024–25 (completed seasons only; no forecasts or betting advice).
+        <strong>The Championship Formula</strong> — Plain-English study of English Tiers 1–4 across 1981–82 through 2025–26 (completed seasons only; no forecasts or betting advice).
       </div>
       <div id="footer-verification-note"></div>
     </footer>
   </div>
 
-  <script src="./data/england-tiers-1-4-1981-2025-bundle.js"></script>
+  <script src="./data/england-tiers-1-4-1981-2026-bundle.js"></script>
   <script defer src="./analysis.js"></script>
   <script defer src="./app.js"></script>
 </body>
