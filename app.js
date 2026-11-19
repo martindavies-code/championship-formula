@@ -25,7 +25,10 @@
       for (const [k, v] of Object.entries(opts)) {
         if (v === undefined || v === null) continue;
         if (k === 'className') node.className = v;
-        else if (k === 'textContent') node.textContent = String(v);
+        else if (k === 'textContent') {
+          if (typeof v === 'string' && v.includes('«')) setRich(node, v);
+          else node.textContent = String(v);
+        }
         else if (k === 'dataset' && typeof v === 'object') {
           for (const [dk, dv] of Object.entries(v)) {
             if (dv !== undefined && dv !== null) node.dataset[dk] = String(dv);
@@ -42,7 +45,12 @@
     for (const child of children) {
       if (child === undefined || child === null || child === false) continue;
       if (typeof child === 'string' || typeof child === 'number') {
-        node.appendChild(document.createTextNode(String(child)));
+        const s = String(child);
+        if (s.includes('«')) {
+          for (const n of richNodes(s)) node.appendChild(n);
+        } else {
+          node.appendChild(document.createTextNode(s));
+        }
       } else {
         node.appendChild(child);
       }
@@ -116,6 +124,124 @@
       el('span', { className: 'mx-radical', textContent: '√' }),
       el('span', { className: 'mx-sqrt-body' }, ...parts)
     );
+  }
+
+  /* ========================================================================
+     RICH INLINE MATH ZONES
+     Strings may wrap inline math in guillemets, e.g. «N_slots = 0». Zones
+     render as .math-inline spans with real sub/superscripts, italic
+     single-letter variables and upright multi-letter identifiers. Unicode
+     sub/superscript glyphs (ᵢ, ₀, ²) and _ / ^ shorthands become true
+     sub/sup elements. All nodes are built with textContent only: the
+     zero-innerHTML invariant holds.
+     ======================================================================== */
+  const SUB_GLYPHS = { '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4', '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9', '₊': '+', '₋': '−', '₌': '=', '₍': '(', '₎': ')', 'ᵢ': 'i', 'ᵣ': 'r', 'ᵤ': 'u', 'ᵥ': 'v', 'ₓ': 'x', 'ₖ': 'k' };
+  const SUP_GLYPHS = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁺': '+', '⁻': '−', '⁼': '=', '⁽': '(', '⁾': ')', 'ⁿ': 'n' };
+
+  function mathZoneNodes(zone) {
+    const out = [];
+    let buf = '';
+    const flush = () => {
+      if (buf) {
+        out.push(document.createTextNode(buf));
+        buf = '';
+      }
+    };
+    let i = 0;
+    while (i < zone.length) {
+      const ch = zone[i];
+      if (ch === '_' || ch === '^') {
+        i++;
+        let script = '';
+        if (zone[i] === '{') {
+          const close = zone.indexOf('}', i + 1);
+          if (close === -1) {
+            script = zone.slice(i + 1);
+            i = zone.length;
+          } else {
+            script = zone.slice(i + 1, close);
+            i = close + 1;
+          }
+        } else if (i < zone.length) {
+          script = zone[i];
+          i++;
+        }
+        if (script) {
+          flush();
+          out.push(el(ch === '_' ? 'sub' : 'sup', { textContent: script }));
+        }
+        continue;
+      }
+      if (SUB_GLYPHS[ch] !== undefined) {
+        flush();
+        out.push(el('sub', { textContent: SUB_GLYPHS[ch] }));
+        i++;
+        continue;
+      }
+      if (SUP_GLYPHS[ch] !== undefined) {
+        flush();
+        out.push(el('sup', { textContent: SUP_GLYPHS[ch] }));
+        i++;
+        continue;
+      }
+      if (/[A-Za-z]/.test(ch)) {
+        let j = i + 1;
+        while (j < zone.length && /[A-Za-z0-9]/.test(zone[j])) j++;
+        const word = zone.slice(i, j);
+        if (word.length === 1) {
+          flush();
+          out.push(mi(word));
+        } else {
+          buf += word;
+        }
+        i = j;
+        continue;
+      }
+      if (/[\u0300-\u036f]/.test(ch)) {
+        if (buf) {
+          buf += ch;
+        } else if (out.length > 0) {
+          const prev = out[out.length - 1];
+          prev.textContent += ch;
+        }
+        i++;
+        continue;
+      }
+      buf += ch;
+      i++;
+    }
+    flush();
+    return out;
+  }
+
+  function mathZoneAria(zone) {
+    let s = zone.replace(/_(\{[^}]*\}|.)/g, (mm, g) => ` sub ${g.replace(/[{}]/g, '')}`);
+    s = s.replace(/\^(\{[^}]*\}|.)/g, (mm, g) => ` sup ${g.replace(/[{}]/g, '')}`);
+    for (const [glyph, ascii] of Object.entries(SUB_GLYPHS)) s = s.split(glyph).join(` sub ${ascii}`);
+    for (const [glyph, ascii] of Object.entries(SUP_GLYPHS)) s = s.split(glyph).join(` sup ${ascii}`);
+    return s.replace(/\s+/g, ' ').trim();
+  }
+
+  function richNodes(str) {
+    const text = String(str);
+    if (!text.includes('«')) return [document.createTextNode(text)];
+    const nodes = [];
+    const re = /«([^«»]*)»/g;
+    let last = 0;
+    let match;
+    while ((match = re.exec(text)) !== null) {
+      if (match.index > last) nodes.push(document.createTextNode(text.slice(last, match.index)));
+      nodes.push(mathInline(mathZoneAria(match[1]), ...mathZoneNodes(match[1])));
+      last = match.index + match[0].length;
+    }
+    if (last < text.length) nodes.push(document.createTextNode(text.slice(last)));
+    return nodes;
+  }
+
+  function setRich(node, str) {
+    if (!node) return;
+    clearEl(node);
+    for (const n of richNodes(str)) node.appendChild(n);
   }
 
   function fmtNum(val, digits = 2) {
@@ -310,73 +436,73 @@
   const VOICE_CHROME = {
     'voice-label': 'Lexical Verbosity Vector:',
     'voice-hint': 'UNSUPERVISED QUANT MODE ENGAGED: zero hand-holding, maximum pedantry',
-    'masthead-kicker': 'Panel-Data Econometric Spec v2.0.0 · Linear 3-1-0 Payoff Regime (t ∈ [1981, 2025]) · Zero-Imputation ETL',
+    'masthead-kicker': 'Panel-Data Econometric Spec v2.0.0 · Linear 3-1-0 Payoff Regime («t ∈ [1981, 2025]») · Zero-Imputation ETL',
     'masthead-title': 'The Championship Formula: Within-Slot Pearsonian & Stacked OLS Decomposition of English Pyramid Standings',
-    'masthead-deck': 'An unsmoothed, non-causal longitudinal audit of 180 unbalanced tier-season slots across heterogeneous 38g–46g schedules and variable club cardinalities (K ∈ [20, 24]), isolating within-slot |r| hierarchies, right-tail champion drift, survival-boundary truncation, and single-elimination play-off variance.',
+    'masthead-deck': 'An unsmoothed, non-causal longitudinal audit of 180 unbalanced tier-season slots across heterogeneous 38g–46g schedules and variable club cardinalities («K ∈ [20, 24]»), isolating within-slot «|r|» hierarchies, right-tail champion drift, survival-boundary truncation, and single-elimination play-off variance.',
     'scope-presets-label': 'Slice Spec:',
     'preset-all': 'Full Panel: T1–T4 (1981–2026)',
     'preset-pl': 'PL Verified Subset (1992–2026)',
     'preset-t1': 'Top-Flight Stratum T1 (1981–2026)',
     'preset-efl': 'EFL Strata T2–T4 (1981–2026)',
-    'scope-points-label': 'Target Vector (y):',
+    'scope-points-label': 'Target Vector («y»):',
     'points-official': 'Observed Official Pts (post-penalty)',
-    'points-raw': 'Counterfactual Raw 3W+D Vector',
+    'points-raw': 'Counterfactual Raw «3W+D» Vector',
     'scope-tiers-legend': 'Pyramid Strata (joined on invariant tier ∈ {1..4}; historical division nomenclature preserved)',
     'tier-check-1': 'Stratum T1 · First Div / PL',
     'tier-check-2': 'Stratum T2 · Second Div / Championship',
     'tier-check-3': 'Stratum T3 · Third Div / League One',
     'tier-check-4': 'Stratum T4 · Fourth Div / League Two',
-    'scope-years-legend': 'Panel Window [t₀, t₁] (3-Pt Era Only; seasons indexed by start year)',
-    'scope-from': 't₀',
-    'scope-to': 't₁',
+    'scope-years-legend': 'Panel Window [«t₀», «t₁»] (3-Pt Era Only; seasons indexed by start year)',
+    'scope-from': '«t₀»',
+    'scope-to': '«t₁»',
     'scope-curtail-legend': 'COVID-Truncated 2019–20 Slots',
-    'scope-curtail-label': 'Ingest 2019–20 T3/T4 unweighted-PPG curtailed slots (n = +2; Bury FC expelled pre-kickoff)',
+    'scope-curtail-label': 'Ingest 2019–20 T3/T4 unweighted-PPG curtailed slots («n = +2»; Bury FC expelled pre-kickoff)',
     'nav-takeaways': '00. Priors & Anomalies',
     'nav-ledger': 'Summary Tensor',
-    'nav-sec1': '01. Within-Slot |r| & R²(PPG)',
+    'nav-sec1': '01. Within-Slot «|r|» & «R²(PPG)»',
     'nav-sec2': '02. Upper-Tail Drift',
-    'nav-sec3': '03. Truncation & χ² Play-Offs',
+    'nav-sec3': '03. Truncation & «χ²» Play-Offs',
     'nav-sec4': '04. Stalemate Distribution',
     'nav-sec5': '05. Scorer Concentration',
     'nav-sec6': '06. Raw Slot Ledger',
     'nav-sec7': '07. ETL & SHA-256 Spec',
-    'empty-title': 'Empty Panel Intersection (N_slots = 0)',
+    'empty-title': 'Empty Panel Intersection («N_slots = 0»)',
     'empty-btn': 'Reset Slice Spec to Full Panel (T1–T4, 1981–2026)',
     'takeaways-heading': 'Headline Distributional Anomalies (Strictly Non-Causal, Zero Priors Assumed)',
     'ledger-heading': 'Six-Card Empirical Summary Tensor',
-    'sec1-kicker': '01 / Within-Slot Collinearity, |r| & Stacked OLS R²(PPG)',
-    'sec1-callout-title': 'Within-Slot Med. |r| vs. Pooled R²(PPG)',
+    'sec1-kicker': '01 / Within-Slot Collinearity, «|r|» & Stacked OLS «R²(PPG)»',
+    'sec1-callout-title': 'Within-Slot Med. «|r|» vs. Pooled «R²(PPG)»',
     'sec1-scatter-title': 'Stacked Cross-Sectional Scatter & Bivariate OLS Fit',
-    'sec1-x-label': 'Regressor (x):',
+    'sec1-x-label': 'Regressor («x»):',
     'm-gf': 'GF/G',
     'm-ga': 'GA/G',
     'm-gd': 'GD/G',
     'm-w': 'W/G',
     'm-d': 'D/G',
-    'sec1-y-label': 'Response (y):',
+    'sec1-y-label': 'Response («y»):',
     'y-ppg': 'PPG',
     'y-finish': 'Norm. Finish Score [0,1]',
-    'leg-champ': 'I(pos=1) Champion',
-    'leg-ru': 'pos=2 / Promoted',
+    'leg-champ': '«I(pos=1)» Champion',
+    'leg-ru': '«pos=2» / Promoted',
     'leg-topq': 'Upper Quartile / PO',
     'leg-mid': 'Mid-Distribution Field',
     'leg-rel': 'Relegated Tail',
-    'sec1-bars-title': 'Within-Slot |r_finish| Distribution (IQR Whiskers + Pooled |r|)',
-    'sec1-bars-sub': 'Box = within-slot IQR [Q1, Q3]; circle = median(|r|); diamond = stacked cross-sectional |r|',
-    'sec1-table-cap': 'Within-Slot Pearson Distribution vs. Pooled Cross-Sectional R²(PPG)',
+    'sec1-bars-title': 'Within-Slot «|r_finish|» Distribution (IQR Whiskers + Pooled «|r|»)',
+    'sec1-bars-sub': 'Box = within-slot IQR «[Q1, Q3]»; circle = «median(|r|)»; diamond = stacked cross-sectional «|r|»',
+    'sec1-table-cap': 'Within-Slot Pearson Distribution vs. Pooled Cross-Sectional «R²(PPG)»',
     'sec1-th-stat': 'Feature',
-    'sec1-th-signed': 'Med. r',
-    'sec1-th-abs': 'Med. |r| (IQR)',
-    'sec1-th-ppg': 'Med. r(PPG)',
-    'sec1-th-r2': 'Pooled R²(PPG)',
+    'sec1-th-signed': 'Med. «r»',
+    'sec1-th-abs': 'Med. «|r|» (IQR)',
+    'sec1-th-ppg': 'Med. «r(PPG)»',
+    'sec1-th-r2': 'Pooled «R²(PPG)»',
     'sec1-tier-cap': 'Stratum-Level GA/G vs. GF/G Metric Divergence Matrix',
     'sec1-tth-tier': 'Stratum',
     'sec1-tth-n': 'Slots',
-    'sec1-tth-att': 'GF/G |r|',
-    'sec1-tth-def': 'GA/G |r|',
+    'sec1-tth-att': 'GF/G «|r|»',
+    'sec1-tth-def': 'GA/G «|r|»',
     'sec1-tth-led': 'GA>GF Slots',
-    'sec1-tth-var': 'R²(PPG) GF/GA',
-    'sec2-kicker': '02 / Upper-Tail Title Manifolds & Non-Monotonic argmax(W)',
+    'sec1-tth-var': '«R²(PPG)» GF/GA',
+    'sec2-kicker': '02 / Upper-Tail Title Manifolds & Non-Monotonic «argmax(W)»',
     'sec2-callout-title': 'Observed Champion Moment Vector (Per-Match)',
     'sec2-time-title': 'Longitudinal Title-Pair Trajectory (1st vs. 2nd Order Statistics)',
     'sec2-metric-label': 'Rate Vector:',
@@ -385,17 +511,17 @@
     'm2-gf': 'GF/G',
     'm2-ga': 'GA/G',
     'm2-gd': 'GD/G',
-    'leg2-c': 'Champion (pos=1)',
-    'leg2-r': 'Runner-Up (pos=2)',
+    'leg2-c': 'Champion («pos=1»)',
+    'leg2-r': 'Runner-Up («pos=2»)',
     'leg2-avg': 'Cross-Stratum Annual Mean',
     'sec2-dist-title': 'Empirical Quantile Spread: 1st vs. 2nd Place (IQR + Min–Max)',
-    'sec2-dist-sub': 'Box = interpolated IQR [Q1, Q3]; dot = median; whisker = [min, max]',
+    'sec2-dist-sub': 'Box = interpolated IQR «[Q1, Q3]»; dot = median; whisker = [min, max]',
     'sec2-tbl-title': 'Parametric & Non-Parametric Title Moments by Stratum',
     'sec2-tbl-sub': 'Per-match rates put 38- and 46-game schedules on a common scale',
-    'sec2-t1-cap': 'Order-Statistic Moments: pos=1 vs. pos=2 (Per-Match Rates)',
+    'sec2-t1-cap': 'Order-Statistic Moments: «pos=1» vs. «pos=2» (Per-Match Rates)',
     'sec2-th-stat': 'Rate Metric',
     'sec2-th-fin': 'Order Stat',
-    'sec2-th-avg': 'Mean (μ)',
+    'sec2-th-avg': 'Mean («μ»)',
     'sec2-th-med': 'Median',
     'sec2-th-iqr': 'IQR [Q1–Q3]',
     'sec2-th-rng': '[Min–Max]',
@@ -427,14 +553,14 @@
     'sec3-t1-hdrop': 'Max Drop PPG',
     'sec3-t1-club': 'Max-PPG Relegated Outlier',
     'sec3-t2-title': 'Automatic-Promotion Floor & All-Format Play-Off Seed Counts (T2–T4)',
-    'sec3-t2-sub': 'Official last automatic-promotion PPG + all 1986–2026 English league play-off winners (4-team χ² matrix below)',
+    'sec3-t2-sub': 'Official last automatic-promotion PPG + all 1986–2026 English league play-off winners (4-team «χ²» matrix below)',
     'sec3-t2-cap': 'Auto-Promotion PPG Floor & Top/Bottom Seed Conversions',
     'sec3-t2-mauto': 'Med. Auto PPG',
     'sec3-t2-lauto': 'Min Auto PPG',
     'sec3-t2-po': 'Brackets',
     'sec3-t2-top': 'Top Seed',
     'sec3-t2-bot': 'Bottom Seed',
-    'sec3-po-title': 'Empirical Play-Off Promotion Probability P(promo | seed_k) & Stratum Homogeneity (χ²)',
+    'sec3-po-title': 'Empirical Play-Off Promotion Probability «P(promo | seed_k)» & Stratum Homogeneity («χ²»)',
     'sec3-po-cap': 'Homogeneous 4-Team English League Play-Off Contingency Matrix (1988–89 Onward)',
     'sec3-po-tier': 'Stratum',
     'sec3-po-n': 'n',
@@ -442,15 +568,15 @@
     'sec3-po-s2': 'Seed 2',
     'sec3-po-s3': 'Seed 3',
     'sec3-po-s4': 'Seed 4',
-    'sec3-po-t2': 'Seeds 1+2 (Home 2L)',
-    'sec3-po-gap': 'Med. Δ(S1−S4)',
+    'sec3-po-t2': 'Seeds «S1 + S2» (Home 2L)',
+    'sec3-po-gap': 'Med. «Δ(S1−S4)»',
     'sec4-kicker': '04 / Stalemate-Maximizer Distribution & Co-Leader Non-Independence',
     'sec4-callout-title': 'Slot Draw-Leader Moments (Non-i.i.d.)',
     'sec4-c1-title': 'Empirical Finish-Percentile Quartile Capture of Slot Draw Leaders',
-    'sec4-c1-sub': 'All argmax(D) club-seasons per slot (tied co-leaders retained; official finish percentiles)',
-    'sec4-c2-title': 'Extreme Right-Tail Draw-Rate Outliers (D/G ≥ 14/38 ≈ 36.84%)',
+    'sec4-c1-sub': 'All «argmax(D)» club-seasons per slot (tied co-leaders retained; official finish percentiles)',
+    'sec4-c2-title': 'Extreme Right-Tail Draw-Rate Outliers («D/G ≥ 14/38 ≈ 36.84%»)',
     'sec4-c2-sub': '14+ D in 38g, 15+ in 40g, 16+ in 42g, or 17+ in 44g or 46g; top 20 sorted by D/G',
-    'sec4-t-cap': 'High-Stalemate Tail Tuples (D/G ≥ 0.3684)',
+    'sec4-t-cap': 'High-Stalemate Tail Tuples («D/G ≥ 0.3684»)',
     'sec4-th-s': 'Slot (Tier)',
     'sec4-th-d': 'D',
     'sec4-th-dp': 'D/G %',
@@ -460,9 +586,9 @@
     'sec5-jump-btn': 'Filter to Verified PL Scorer Stratum (1992–93..2025–26)',
     'sec5-c1-title': 'Leading-Scorer Goal-Share Concentration vs. Official PPG (Top-4 Subsample)',
     'sec5-c1-sub': 'Verified Tier 1 PL Top-4 tuples (1992–93..2025–26; zero extrapolation to T2–T4)',
-    'leg5-1': 'Champion (pos=1)',
-    'leg5-2': 'Runner-Up (pos=2)',
-    'leg5-34': 'pos ∈ {3, 4}',
+    'leg5-1': 'Champion («pos=1»)',
+    'leg5-2': 'Runner-Up («pos=2»)',
+    'leg5-34': '«pos ∈ {3, 4}»',
     'leg5-gb': 'Ring = Golden Boot Incidence',
     'sec5-c2-title': 'Golden Boot Winner-Season Finish Histogram',
     'sec5-t-cap': 'PL Golden Boot Winner-Seasons vs. Champion Leading Scorer Ledger',
@@ -470,7 +596,7 @@
     'sec5-th-fin': 'Club Rank',
     'sec5-th-ch': 'Champion (Top Scorer)',
     'sec6-kicker': '06 / Interactive 180-Slot JSON-Serialized Panel Archive',
-    'sec6-title': 'Full 180-Slot Historical Table Explorer (T1–T4, t ∈ [1981, 2025])',
+    'sec6-title': 'Full 180-Slot Historical Table Explorer (T1–T4, «t ∈ [1981, 2025]»)',
     'sec6-tier-lbl': 'Stratum:',
     'sec6-season-lbl': 'Slot:',
     'sec6-disp-lbl': 'Projection:',
@@ -479,7 +605,7 @@
     'arc-38': '38g Linear Scale',
     'arc-th-ppg': 'PPG',
     'sec6-sc-cap': 'Slot Top-Scorer Vector',
-    'sec6-sc-p38': 'G/38g',
+    'sec6-sc-p38': '«G/38g»',
     'sec7-kicker': '07 / Deterministic ETL Architecture, Audit Manifest & SHA-256 Spec',
     'sec7-title': 'Reproducible Ingestion Pipeline, Cross-Source Reconciliation & Formal Specification',
     'sec7-callout-title': 'Schema & Integrity Manifest',
@@ -503,7 +629,7 @@
         node.dataset.voiceNormal = node.textContent;
       }
       if (sicko && VOICE_CHROME[key] !== undefined) {
-        node.textContent = VOICE_CHROME[key];
+        setRich(node, VOICE_CHROME[key]);
       } else {
         node.textContent = node.dataset.voiceNormal;
       }
@@ -617,41 +743,41 @@
 
     if (m.isEmpty) {
       if (metaCov) {
-        metaCov.textContent = sicko
+        setRich(metaCov, sicko
           ? (m.excludedCurtailedSlots?.length > 0
-            ? `N_slots = 0 (${m.excludedCurtailedSlots.length} COVID-curtailed slots gated)`
-            : 'N_slots = 0 (Empty Panel)')
+            ? `«N_slots = 0» (${m.excludedCurtailedSlots.length} COVID-curtailed slots gated)`
+            : '«N_slots = 0» (Empty Panel)')
           : (m.excludedCurtailedSlots?.length > 0
             ? `0 Active Tables (${m.excludedCurtailedSlots.length} Curtailed Excluded)`
-            : '0 League Tables Selected');
+            : '0 League Tables Selected'));
       }
       if (metaMat) metaMat.textContent = '';
       if (metaGoals) metaGoals.textContent = '';
       if (sickoCap) {
-        sickoCap.textContent = 'Fig. 0.0: Analyst staring into an empty zero-row panel intersection (N_slots = 0). Expand slice predicates to resume ingest.';
+        setRich(sickoCap, 'Fig. 0.0: Analyst staring into an empty zero-row panel intersection («N_slots = 0»). Expand slice predicates to resume ingest.');
       }
       if (activeBanner) {
         clearEl(activeBanner);
         if (m.excludedCurtailedSlots?.length > 0) {
           activeBanner.append(
-            sicko
-              ? `All ${m.excludedCurtailedSlots.length} matching tier-season ${plural(m.excludedCurtailedSlots.length, 'slot')} (${m.excludedCurtailedSlots.map((s) => `${s.season} ${s.historicalDivisionName}`).join(' & ')}) are COVID-curtailed unweighted-PPG tables excluded by default. Toggle ingestion above or widen [t₀, t₁].`
-              : `All ${m.excludedCurtailedSlots.length} matching ${plural(m.excludedCurtailedSlots.length, 'table')} (${m.excludedCurtailedSlots.map((s) => `${s.season} ${s.historicalDivisionName}`).join(' and ')}) were curtailed and excluded by default. Enable "Include Curtailed" above or broaden your filter.`
+            ...richNodes(sicko
+              ? `All ${m.excludedCurtailedSlots.length} matching tier-season ${plural(m.excludedCurtailedSlots.length, 'slot')} (${m.excludedCurtailedSlots.map((s) => `${s.season} ${s.historicalDivisionName}`).join(' & ')}) are COVID-curtailed unweighted-PPG tables excluded by default. Toggle ingestion above or widen [«t₀», «t₁»].`
+              : `All ${m.excludedCurtailedSlots.length} matching ${plural(m.excludedCurtailedSlots.length, 'table')} (${m.excludedCurtailedSlots.map((s) => `${s.season} ${s.historicalDivisionName}`).join(' and ')}) were curtailed and excluded by default. Enable "Include Curtailed" above or broaden your filter.`)
           );
         } else {
-          activeBanner.append(sicko ? 'Empty slice: select ≥1 pyramid stratum ∈ {1..4} above.' : 'No league tables match this filter. Select at least one league tier above.');
+          activeBanner.append(...richNodes(sicko ? 'Empty slice: select «≥1» pyramid stratum «∈ {1..4}» above.' : 'No league tables match this filter. Select at least one league tier above.'));
         }
       }
       return;
     }
 
     if (metaCov) {
-      metaCov.textContent = sicko
-        ? `t ∈ [${m.firstSeason}, ${m.lastSeason}] · N_slots = ${m.numSlots} Tier-${plural(m.numSlots, 'Season')} (N_obs = ${fmtInt(m.allTeams.length)} Team-${plural(m.allTeams.length, 'Season')})`
-        : `${m.firstSeason} to ${m.lastSeason} · ${m.numSlots} League ${plural(m.numSlots, 'Table')} (${fmtInt(m.allTeams.length)} Team ${plural(m.allTeams.length, 'Season')})`;
+      setRich(metaCov, sicko
+        ? `«t ∈ [${m.firstSeason}, ${m.lastSeason}]» · «N_slots = ${m.numSlots}» Tier-${plural(m.numSlots, 'Season')} («N_obs = ${fmtInt(m.allTeams.length)}» Team-${plural(m.allTeams.length, 'Season')})`
+        : `${m.firstSeason} to ${m.lastSeason} · ${m.numSlots} League ${plural(m.numSlots, 'Table')} (${fmtInt(m.allTeams.length)} Team ${plural(m.allTeams.length, 'Season')})`);
     }
-    if (metaMat) metaMat.textContent = sicko ? `∑Matches = ${fmtInt(m.totalMatches)}` : `${fmtInt(m.totalMatches)} Matches`;
-    if (metaGoals) metaGoals.textContent = sicko ? `∑Goals = ${fmtInt(m.totalGoals)}` : `${fmtInt(m.totalGoals)} Goals`;
+    if (metaMat) setRich(metaMat, sicko ? `«∑Matches» = ${fmtInt(m.totalMatches)}` : `${fmtInt(m.totalMatches)} Matches`);
+    if (metaGoals) setRich(metaGoals, sicko ? `«∑Goals» = ${fmtInt(m.totalGoals)}` : `${fmtInt(m.totalGoals)} Goals`);
     if (sickoCap) {
       sickoCap.textContent = `Fig. 0.0: Unsupervised empirical sicko inspecting ${m.numSlots} unsmoothed CSV-reconciled tier-season slots (${fmtInt(m.allTeams.length)} rows, ${fmtInt(m.totalMatches)} matches; schema v${ds.schemaVersion}; strictly non-causal).`;
     }
@@ -661,7 +787,7 @@
       if (sicko) {
         banner.append(
           el('strong', { textContent: 'Specification & Normalization Invariant: ' }),
-          `Canonical ${ds.metadata.totalTierSeasonSlots}-slot JSON panel (${fmtInt(ds.metadata.totalTeamSeasons)} Team-Seasons, ${fmtInt(ds.metadata.totalMatchesPlayed)} matches; schemaVersion ${ds.schemaVersion}) covering Tiers 1–4 across the linear 3-1-0 payoff regime (1981–82..2025–26; Lucas-critique exclusion of pre-1981 2-pt tables and right-censored 2026/27 fixtures). Because schedule lengths vary across G ∈ {38g, 40g, 42g, 44g, 46g} and league cardinality across K ∈ [20, 24], all regressors are vectorized per match (W/G, D/G, GF/G, GA/G, GD/G, PPG) and standings projected onto normalized finish score y = 1 − (pos − 1)/(K − 1) ∈ [0, 1].`
+          ...richNodes(`Canonical ${ds.metadata.totalTierSeasonSlots}-slot JSON panel (${fmtInt(ds.metadata.totalTeamSeasons)} Team-Seasons, ${fmtInt(ds.metadata.totalMatchesPlayed)} matches; schemaVersion ${ds.schemaVersion}) covering Tiers 1–4 across the linear 3-1-0 payoff regime (1981–82..2025–26; Lucas-critique exclusion of pre-1981 2-pt tables and right-censored 2026/27 fixtures). Because schedule lengths vary across «G ∈ {38g, 40g, 42g, 44g, 46g}» and league cardinality across «K ∈ [20, 24]», all regressors are vectorized per match (W/G, D/G, GF/G, GA/G, GD/G, PPG) and standings projected onto normalized finish score «y = 1 − (pos − 1)/(K − 1) ∈ [0, 1]».`)
         );
       } else {
         banner.append(
@@ -676,7 +802,7 @@
       const tierStr = m.tiersPresent.map((t) => (sicko ? `T${t}` : `Tier ${t}`)).join(', ');
       const basisLabel = sicko
         ? (state.scope.pointsMode === 'raw'
-          ? 'Counterfactual Raw 3W+D Vector (recomputes Section 1 within-slot |r|, pooled R²(PPG), scatter & archive points; official pos/titles/relegations/Cards 03–06 held invariant)'
+          ? 'Counterfactual Raw «3W+D» Vector (recomputes Section 1 within-slot «|r|», pooled «R²(PPG)», scatter & archive points; official pos/titles/relegations/Cards 03–06 held invariant)'
           : 'Observed Official Table Points (inclusive of net administrative point adjustments)')
         : (state.scope.pointsMode === 'raw'
           ? 'On-pitch points before deductions (updates Section 1 correlations and scatter; titles, promotions, relegations and Cards 03–06 stay on official tables)'
@@ -684,16 +810,16 @@
       const frag = document.createDocumentFragment();
       frag.append(
         el('strong', { textContent: sicko ? 'Active Slice: ' : 'Showing: ' }),
-        sicko
-          ? `Strata {${tierStr}} · [${m.firstSeason}, ${m.lastSeason}] (N_slots = ${m.numSlots}, N_obs = ${fmtInt(m.allTeams.length)}) · Target Vector: ${basisLabel}. `
-          : `${tierStr} · ${m.firstSeason} to ${m.lastSeason} (${m.numSlots} ${plural(m.numSlots, 'table')}, ${fmtInt(m.allTeams.length)} team ${plural(m.allTeams.length, 'season')}) · Points: ${basisLabel}. `
+        ...richNodes(sicko
+          ? `Strata {${tierStr}} · [${m.firstSeason}, ${m.lastSeason}] («N_slots = ${m.numSlots}», «N_obs = ${fmtInt(m.allTeams.length)}») · Target Vector: ${basisLabel}. `
+          : `${tierStr} · ${m.firstSeason} to ${m.lastSeason} (${m.numSlots} ${plural(m.numSlots, 'table')}, ${fmtInt(m.allTeams.length)} team ${plural(m.allTeams.length, 'season')}) · Points: ${basisLabel}. `)
       );
       if (m.excludedCurtailedSlots.length > 0) {
         frag.append(
           el('strong', { textContent: sicko ? 'Gated by Default: ' : 'Excluded by default: ' }),
-          sicko
-            ? `${m.excludedCurtailedSlots.map((s) => `${s.season} ${s.historicalDivisionName}`).join(' & ')} (COVID-truncated at 34–37g; ranked via unweighted PPG; Bury FC expelled). Toggle ingestion above to append n=+${m.excludedCurtailedSlots.length}.`
-            : `${m.excludedCurtailedSlots.map((s) => `${s.season} ${s.historicalDivisionName}`).join(' and ')} (ended early by COVID-19 after 34–37 games and decided on points per game; Bury were expelled from League One). Tick the box above to include them.`
+          ...richNodes(sicko
+            ? `${m.excludedCurtailedSlots.map((s) => `${s.season} ${s.historicalDivisionName}`).join(' & ')} (COVID-truncated at 34–37g; ranked via unweighted PPG; Bury FC expelled). Toggle ingestion above to append «n = +${m.excludedCurtailedSlots.length}».`
+            : `${m.excludedCurtailedSlots.map((s) => `${s.season} ${s.historicalDivisionName}`).join(' and ')} (ended early by COVID-19 after 34–37 games and decided on points per game; Bury were expelled from League One). Tick the box above to include them.`)
         );
       } else if (m.includedCurtailedSlots.length > 0) {
         frag.append(
@@ -713,14 +839,14 @@
     if (!m || m.isEmpty) {
       const curtExcl = m?.excludedCurtailedSlots?.length ?? 0;
       const note = curtExcl > 0
-        ? `N_slots = 0 (${curtExcl} COVID-curtailed ${plural(curtExcl, 'slot')} gated by default)`
-        : 'N_slots = 0 (empty slice)';
+        ? `«N_slots = 0» (${curtExcl} COVID-curtailed ${plural(curtExcl, 'slot')} gated by default)`
+        : '«N_slots = 0» (empty slice)';
       return { isEmpty: true, note, cards: [] };
     }
 
     const note = isRaw
-      ? `N_slots = ${m.numSlots} Tier-${plural(m.numSlots, 'Season')} · N_obs = ${fmtInt(m.allTeams.length)} Team-${plural(m.allTeams.length, 'Season')} (Cards 01–02: counterfactual raw 3W+D; Cards 03–06: official standings invariant)`
-      : `N_slots = ${m.numSlots} Tier-${plural(m.numSlots, 'Season')} · N_obs = ${fmtInt(m.allTeams.length)} Team-${plural(m.allTeams.length, 'Season')} (observed official standings)`;
+      ? `«N_slots = ${m.numSlots}» Tier-${plural(m.numSlots, 'Season')} · «N_obs = ${fmtInt(m.allTeams.length)}» Team-${plural(m.allTeams.length, 'Season')} (Cards 01–02: counterfactual raw «3W+D»; Cards 03–06: official standings invariant)`
+      : `«N_slots = ${m.numSlots}» Tier-${plural(m.numSlots, 'Season')} · «N_obs = ${fmtInt(m.allTeams.length)}» Team-${plural(m.allTeams.length, 'Season')} (observed official standings)`;
 
     const drawPred = m.correlations.find((c) => c.key === 'drawRate');
     const winPred = m.correlations.find((c) => c.key === 'winRate');
@@ -741,36 +867,36 @@
 
     const cards = [
       {
-        idx: '01 · Within-Slot |r| Hierarchy',
-        stat: smallSample ? `n = ${m.numSlots}` : fmtNum(winPred?.medianAbsRFinish, 3),
+        idx: '01 · Within-Slot «|r|» Hierarchy',
+        stat: smallSample ? `«n = ${m.numSlots}»` : fmtNum(winPred?.medianAbsRFinish, 3),
         claim: smallSample
-          ? `Cross-slot median |r| suppressed (n = ${m.numSlots} < 3)${isRaw ? ' [raw 3W+D]' : ''}`
+          ? `Cross-slot «median(|r|)» suppressed («n = ${m.numSlots} < 3»)${isRaw ? ' [raw «3W+D»]' : ''}`
           : `W/G & GD/G dominate via algebraic collinearity; D/G ranks dead last${isRaw ? ' [raw 3W+D]' : ''}`,
         detail: smallSample
-          ? `Insufficient panel depth (n = ${m.numSlots} < 3) for robust within-slot median(|r|) estimation.`
-          : `Across ${m.numSlots} within-slot Pearson regressions onto normalized finish y ∈ [0,1], median |r| = ${fmtNum(winPred?.medianAbsRFinish, 3)} (W/G; linear identity PPG = 3·W/G + D/G + A/G with adjustment A = 0 in 98.6% of rows), ${fmtNum(gdPred?.medianAbsRFinish, 3)} (GD/G), vs ${fmtNum(drawPred?.medianAbsRFinish, 3)} (D/G; signed median r = ${fmtSigned(drawPred?.medianRFinish, 3)}, negative in ${drawNeg}/${drawSlotVals.length} slots, positive in ${drawPos}).`,
+          ? `Insufficient panel depth («n = ${m.numSlots} < 3») for robust within-slot «median(|r|)» estimation.`
+          : `Across ${m.numSlots} within-slot Pearson regressions onto normalized finish «y ∈ [0,1]», «median(|r|) = ${fmtNum(winPred?.medianAbsRFinish, 3)}» (W/G; linear identity «PPG = 3·W/G + D/G + A/G» with adjustment «A = 0» in 98.6% of rows), ${fmtNum(gdPred?.medianAbsRFinish, 3)} (GD/G), vs ${fmtNum(drawPred?.medianAbsRFinish, 3)} (D/G; signed «median(r) = ${fmtSigned(drawPred?.medianRFinish, 3)}», negative in ${drawNeg}/${drawSlotVals.length} slots, positive in ${drawPos}).`,
       },
       {
         idx: '02 · Attack / Defence Aggregation Flip',
-        stat: smallSample ? `n = ${m.numSlots}` : `${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)}`,
+        stat: smallSample ? `«n = ${m.numSlots}»` : `${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)}`,
         claim: smallSample
           ? `Dual-metric GA/G vs GF/G decomposition suppressed (n < 3)`
           : atkDef.diverges
-            ? `Within-slot |r| favors ${atkDef.withinLeader === 'ga' ? 'GA/G' : 'GF/G'}; pooled OLS R²(PPG) flips to ${atkDef.pooledLeader === 'gf' ? 'GF/G' : 'GA/G'}`
-            : `Within-slot |r| (${atkDef.withinLeader}) vs pooled R²(PPG) (${atkDef.pooledLeader})${isRaw ? ' [raw 3W+D]' : ''}`,
+            ? `Within-slot «|r|» favors ${atkDef.withinLeader === 'ga' ? 'GA/G' : 'GF/G'}; pooled OLS «R²(PPG)» flips to ${atkDef.pooledLeader === 'gf' ? 'GF/G' : 'GA/G'}`
+            : `Within-slot «|r|» (${atkDef.withinLeader}) vs pooled «R²(PPG)» (${atkDef.pooledLeader})${isRaw ? ' [raw «3W+D»]' : ''}`,
         detail: smallSample
-          ? `Expand slice to ≥3 slots to compare within-slot median(|r|) against stacked cross-sectional OLS R²(PPG).`
-          : `Within-slot |r_finish|: GA/G = ${fmtNum(atkDef.gaWithin, 3)} vs GF/G = ${fmtNum(atkDef.gfWithin, 3)} (GA/G beats GF/G in ${m.withinSlot.gaBeatsGfCount}/${m.withinSlot.comparableGfGaSlots} slots). Stacked bivariate OLS R²(PPG): GF/G = ${fmtNum(atkDef.gfR2 * 100, 1)}% vs GA/G = ${fmtNum(atkDef.gaR2 * 100, 1)}%; collinear, descriptive, non-causal.`,
+          ? `Expand slice to ≥3 slots to compare within-slot «median(|r|)» against stacked cross-sectional OLS «R²(PPG)».`
+          : `Within-slot «|r_finish|»: «GA/G = ${fmtNum(atkDef.gaWithin, 3)}» vs «GF/G = ${fmtNum(atkDef.gfWithin, 3)}» (GA/G beats GF/G in ${m.withinSlot.gaBeatsGfCount}/${m.withinSlot.comparableGfGaSlots} slots). Stacked bivariate OLS «R²(PPG)»: «GF/G = ${fmtNum(atkDef.gfR2 * 100, 1)}%» vs «GA/G = ${fmtNum(atkDef.gaR2 * 100, 1)}%»; collinear, descriptive, non-causal.`,
       },
       {
         idx: '03 · Upper-Tail Champion Manifold',
         stat: smallSample
           ? (m.champs[0] ? `${fmtNum(m.champs[0].officialPpg, 2)} PPG` : 'N/A')
           : `${fmtNum(m.champStats.ppg?.median, 2)} PPG`,
-        claim: `${m.champFewerWinsCases.length}/${m.champs.length} champions took the title without argmax(W) [official]`,
+        claim: `${m.champFewerWinsCases.length}/${m.champs.length} champions took the title without «argmax(W)» [official]`,
         detail: smallSample
           ? `Observed champions: ${m.champs.map((c) => `${c.team} ${c.season} T${c.tier} (${fmtNum(c.officialPpg, 2)} official PPG)`).join('; ')}.`
-          : `Champion median = ${fmtNum(m.champStats.ppg?.median, 2)} official PPG, interpolated IQR [${fmtNum(m.champStats.ppg?.q1, 2)}, ${fmtNum(m.champStats.ppg?.q3, 2)}] (vs pos=2 median ${fmtNum(m.runnerStats.ppg?.median, 2)} PPG). In ${m.champFewerWinsCases.length} slots, argmax_i(3Wᵢ + Dᵢ) ≠ argmax_i(Wᵢ).`,
+          : `Champion median = ${fmtNum(m.champStats.ppg?.median, 2)} official PPG, interpolated IQR «[${fmtNum(m.champStats.ppg?.q1, 2)}, ${fmtNum(m.champStats.ppg?.q3, 2)}]» (vs «pos=2» median ${fmtNum(m.runnerStats.ppg?.median, 2)} PPG). In ${m.champFewerWinsCases.length} slots, «argmax_i(3Wᵢ + Dᵢ) ≠ argmax_i(Wᵢ)».`,
       },
       {
         idx: '04 · Relegation Truncation Floor',
@@ -786,8 +912,8 @@
       },
       {
         idx: '05 · Stalemate-Leader Quantile Capture',
-        stat: smallSample ? `n = ${dl.count}` : `${fmtNum(dlMidPct, 0)}% IQR`,
-        claim: `${dl.middleHalfCount}/${dl.count} argmax(D) tuples landed in [25%, 75%] finish-pct (${dl.championCount} title)`,
+        stat: smallSample ? `«n = ${dl.count}»` : `${fmtNum(dlMidPct, 0)}% IQR`,
+        claim: `${dl.middleHalfCount}/${dl.count} «argmax(D)» tuples landed in «[25%, 75%]» finish-pct (${dl.championCount} title)`,
         detail: `Across ${dl.count} division draw-leader team-seasons (${dl.coLeaderSlotsCount} tied co-leader slots, so these rows are not independent draws), median finish percentile = ${fmtNum((dl.finishScore?.median ?? 0) * 100, 1)}% (${ordinal(dl.pos?.median)} raw rank); ${dl.relegatedCount} relegated, ${dl.promotedCount} promoted, ${dl.championCount} title.`,
       },
       {
@@ -798,7 +924,7 @@
           : `${withGb}/${avail} PL champions (${fmtNum((withGb / Math.max(1, avail)) * 100, 1)}%) housed Golden Boot (${gbCount} winner-seasons)`,
         detail: m.scorerAnalysis.status === 'unavailable'
           ? 'Verified Golden Boot + club top-scorer vectors exist exclusively for Tier 1 PL (1992–93..2025–26). Pre-1992 T1 & T2–T4 are strictly non-imputed.'
-          : `Verified PL 1992–2026 subsample (${avail} slots; ${unavail} unverified slots explicitly gated rather than zero-filled): r_pb(GB, Champion) = ${fmtSigned(m.scorerAnalysis.shareStats?.rGbChampAll, 3)}; Top-4 concentration r(share, PPG) = ${fmtSigned(m.scorerAnalysis.shareStats?.rSharePpgTop4, 3)}.`,
+          : `Verified PL 1992–2026 subsample (${avail} slots; ${unavail} unverified slots explicitly gated rather than zero-filled): «r_pb(GB, Champion) = ${fmtSigned(m.scorerAnalysis.shareStats?.rGbChampAll, 3)}»; Top-4 concentration «r(share, PPG) = ${fmtSigned(m.scorerAnalysis.shareStats?.rSharePpgTop4, 3)}».`,
       },
     ];
 
@@ -1084,7 +1210,7 @@
     const grid = document.getElementById('ledger-grid');
     const noteEl = document.getElementById('ledger-sample-note');
     const view = buildLedgerView(m, state.scope);
-    if (noteEl) noteEl.textContent = view.note;
+    if (noteEl) setRich(noteEl, view.note);
     if (!grid) return;
     clearEl(grid);
     if (view.isEmpty) return;
@@ -1110,15 +1236,15 @@
       return { isEmpty: true, note: '', bullets: [] };
     }
 
-    const note = `t ∈ [${m.firstSeason}, ${m.lastSeason}] · N_slots = ${m.numSlots}${isRaw ? ' (within-slot |r| on counterfactual 3W+D; outcomes official)' : ' (observed official standings)'}`;
+    const note = `«t ∈ [${m.firstSeason}, ${m.lastSeason}]» · «N_slots = ${m.numSlots}»${isRaw ? ' (within-slot «|r|» on counterfactual «3W+D»; outcomes official)' : ' (observed official standings)'}`;
     const bullets = [];
     const hasSlot = (id) => m.slots.some((s) => s.slotId === id);
 
     if (m.numSlots < 3) {
       const champList = m.champs.map((c) => `${c.team} (${c.season} T${c.tier}, ${c.points} pts, ${fmtNum(c.officialPpg, 3)} PPG)`).join('; ');
       bullets.push({
-        lead: `Small-sample estimator suppression (N_slots = ${m.numSlots} < 3).`,
-        body: `Cross-slot median(|r|) and quantile spreads are gated below n=3. Observed pos=1 tuples: ${champList}.`,
+        lead: `Small-sample estimator suppression («N_slots = ${m.numSlots} < 3»).`,
+        body: `Cross-slot «median(|r|)» and quantile spreads are gated below «n = 3». Observed «pos=1» tuples: ${champList}.`,
       });
       if (m.survivalSeries.length > 0) {
         const cutList = m.survivalSeries.map((s) => `${s.season} T${s.tier}: lowest merit survivor ${s.survivingTeam} (${fmtNum(s.survivingPpg, 3)} PPG) vs max relegated ${s.relegatedTeam} (${fmtNum(s.relegatedHighPpg, 3)} PPG)`).join('; ');
@@ -1138,14 +1264,14 @@
       };
       const ex = m.champFewerWinsCases.length === 1 ? fmtCase(firstCase) : `${fmtCase(firstCase)} through ${fmtCase(lastCase)}`;
       bullets.push({
-        lead: 'Non-monotonicity of argmax(W) under the linear 3W+D payoff.',
-        body: `In ${m.champFewerWinsCases.length}/${m.champs.length} title races (exclusively T2–T4), argmax_i(3Wᵢ + Dᵢ) ≠ argmax_i(Wᵢ), spanning ${ex}.`,
+        lead: 'Non-monotonicity of «argmax(W)» under the linear «3W+D» payoff.',
+        body: `In ${m.champFewerWinsCases.length}/${m.champs.length} title races (exclusively T2–T4), «argmax_i(3Wᵢ + Dᵢ) ≠ argmax_i(Wᵢ)», spanning ${ex}.`,
       });
     } else {
       const latest = m.champs.slice().sort((a, b) => b.startYear - a.startYear)[0];
       bullets.push({
-        lead: 'Zero argmax(W) inversions observed in this slice.',
-        body: `Every pos=1 tuple weakly dominated the field in raw win count (latest: ${latest.team} ${latest.season}, ${latest.won}W, ${fmtNum(latest.officialPpg, 3)} PPG).`,
+        lead: 'Zero «argmax(W)» inversions observed in this slice.',
+        body: `Every «pos=1» tuple weakly dominated the field in raw win count (latest: ${latest.team} ${latest.season}, ${latest.won}W, ${fmtNum(latest.officialPpg, 3)} PPG).`,
       });
     }
 
@@ -1162,28 +1288,28 @@
       const rel40 = pl38.filter((x) => x.relegatedPts >= 40).length;
       bullets.push({
         lead: 'Empirical CDF on 38g Premier League slots falsifies the naive 40-point heuristic.',
-        body: `Across n=${pl38.length} homogeneous 38g PL slots, P(Pts_17th < 40) = ${under40}/${pl38.length} (${fmtNum((under40 / pl38.length) * 100, 1)}%), while P(Pts_18th ≥ 40) = ${rel40}/${pl38.length}.`,
+        body: `Across «n = ${pl38.length}» homogeneous 38g PL slots, «P(Pts_17th < 40) = ${under40}/${pl38.length}» (${fmtNum((under40 / pl38.length) * 100, 1)}%), while «P(Pts_18th ≥ 40) = ${rel40}/${pl38.length}».`,
       });
     } else {
       const rel40Count = ss.relegatedAtOrAbove40Over38Rate.length;
       const rel40Pct = (rel40Count / ss.slotCount) * 100;
       const pl38Tail = pl38.length >= 3
-        ? ` Conversely, in the n=${pl38.length} 38g PL sub-panel, 17th stayed safe below 40 pts in ${pl38.filter((x) => x.survivingPts < 40).length}/${pl38.length} slots (${fmtNum((pl38.filter((x) => x.survivingPts < 40).length / pl38.length) * 100, 1)}%).`
+        ? ` Conversely, in the «n = ${pl38.length}» 38g PL sub-panel, 17th stayed safe below 40 pts in ${pl38.filter((x) => x.survivingPts < 40).length}/${pl38.length} slots (${fmtNum((pl38.filter((x) => x.survivingPts < 40).length / pl38.length) * 100, 1)}%).`
         : '';
       bullets.push({
         lead: 'Cross-stratum truncation non-stationarity breaks the 1.053 PPG (40/38g) heuristic.',
-        body: `Across ${ss.slotCount} relegation-active slots, ≥1 relegated club exceeded 1.053 PPG in ${rel40Count} slots (${fmtNum(rel40Pct, 1)}%); median merit survival floor = ${fmtNum(ss.survivingPpg?.median, 3)} PPG (${fmtNum(ss.survivingPts46?.median, 1)}/46g).${pl38Tail}`,
+        body: `Across ${ss.slotCount} relegation-active slots, ≥1 relegated club exceeded «1.053 PPG» in ${rel40Count} slots (${fmtNum(rel40Pct, 1)}%); median merit survival floor = ${fmtNum(ss.survivingPpg?.median, 3)} PPG (${fmtNum(ss.survivingPts46?.median, 1)}/46g).${pl38Tail}`,
       });
     }
 
     // 3. Attack vs defence aggregation reversal
     const atkDef = describeAtkVsDef(m);
-    const basisTag = isRaw ? ' [counterfactual raw 3W+D]' : '';
+    const basisTag = isRaw ? ' [counterfactual raw «3W+D»]' : '';
     bullets.push({
       lead: atkDef.diverges
-        ? 'Aggregation-operator reversal between within-slot |r| and stacked OLS R²(PPG).'
-        : 'Bivariate attack vs. defence comparison across within-slot |r| and pooled R²(PPG).',
-      body: `Within-slot |r_finish|${basisTag}: GA/G = ${fmtNum(atkDef.gaWithin, 3)} vs GF/G = ${fmtNum(atkDef.gfWithin, 3)} (GA/G wins ${m.withinSlot.gaBeatsGfCount}/${m.withinSlot.comparableGfGaSlots} slots); stacked bivariate OLS R²(PPG): GF/G = ${fmtNum(atkDef.gfR2 * 100, 1)}% vs GA/G = ${fmtNum(atkDef.gaR2 * 100, 1)}%; non-orthogonal variance projections, NOT causal marginal effects.`,
+        ? 'Aggregation-operator reversal between within-slot «|r|» and stacked OLS «R²(PPG)».'
+        : 'Bivariate attack vs. defence comparison across within-slot «|r|» and pooled «R²(PPG)».',
+      body: `Within-slot «|r_finish|»${basisTag}: «GA/G = ${fmtNum(atkDef.gaWithin, 3)}» vs «GF/G = ${fmtNum(atkDef.gfWithin, 3)}» (GA/G wins ${m.withinSlot.gaBeatsGfCount}/${m.withinSlot.comparableGfGaSlots} slots); stacked bivariate OLS «R²(PPG)»: «GF/G = ${fmtNum(atkDef.gfR2 * 100, 1)}%» vs «GA/G = ${fmtNum(atkDef.gaR2 * 100, 1)}%»; non-orthogonal variance projections, NOT causal marginal effects.`,
     });
 
     // 4. Stalemate distribution
@@ -1197,8 +1323,8 @@
         ? ` High-leverage 2025–26 residual: ${dl25T1.team} (${dl25T1.drawn}D, pos=${dl25T1.officialPos}).`
         : '';
     bullets.push({
-      lead: 'argmax(D) tuples cluster in the mid-finish IQR, with outliers at both tails.',
-      body: `${fmtNum(dlMidPct, 0)}% (${dl.middleHalfCount}/${dl.count}) of division draw leaders landed inside the [25%, 75%] finish-percentile IQR (${dl.coLeaderSlotsCount} tied co-leader slots, so these tuples are not independent draws), ${dl.relegatedCount} suffered relegation, and ${dl.championCount} won a title.${dl25Clause}`,
+      lead: '«argmax(D)» tuples cluster in the mid-finish IQR, with outliers at both tails.',
+      body: `${fmtNum(dlMidPct, 0)}% (${dl.middleHalfCount}/${dl.count}) of division draw leaders landed inside the «[25%, 75%]» finish-percentile IQR (${dl.coLeaderSlotsCount} tied co-leader slots, so these tuples are not independent draws), ${dl.relegatedCount} suffered relegation, and ${dl.championCount} won a title.${dl25Clause}`,
     });
 
     // 5. Golden Boot covariance
@@ -1206,8 +1332,8 @@
     if (sa.status !== 'unavailable' && sa.availableSlotsCount >= 3) {
       const has25T1 = hasSlot('2025-26-T1');
       bullets.push({
-        lead: 'Weak bivariate point-biserial covariance between Golden Boot incidence and I(pos=1).',
-        body: `Verified PL strata only (n=${sa.availableSlotsCount}; zero-imputation strictly refused on unverified slots): ${sa.champWithGbCount}/${sa.availableSlotsCount} (${fmtNum((sa.champWithGbCount / sa.availableSlotsCount) * 100, 0)}%) champions fielded the Golden Boot winner (r_pb = ${fmtSigned(sa.shareStats?.rGbChampAll, 3)}), with lower median top-scorer concentration (${fmtNum(sa.shareStats.champ?.median, 1)}% vs ${fmtNum(sa.shareStats.thirdFourth?.median, 1)}% in pos ∈ {3,4}).${has25T1 ? ' In 2025–26, Arsenal’s Gyökeres logged 14G vs Haaland’s 27G.' : ''}`,
+        lead: 'Weak bivariate point-biserial covariance between Golden Boot incidence and «I(pos=1)».',
+        body: `Verified PL strata only («n = ${sa.availableSlotsCount}»; zero-imputation strictly refused on unverified slots): ${sa.champWithGbCount}/${sa.availableSlotsCount} (${fmtNum((sa.champWithGbCount / sa.availableSlotsCount) * 100, 0)}%) champions fielded the Golden Boot winner («r_pb = ${fmtSigned(sa.shareStats?.rGbChampAll, 3)}»), with lower median top-scorer concentration (${fmtNum(sa.shareStats.champ?.median, 1)}% vs ${fmtNum(sa.shareStats.thirdFourth?.median, 1)}% in «pos ∈ {3,4}»).${has25T1 ? ' In 2025–26, Arsenal’s Gyökeres logged 14G vs Haaland’s 27G.' : ''}`,
       });
     }
 
@@ -1218,19 +1344,19 @@
       const ov = pb.overall;
       const [s1, s2, s3, s4] = ov.seeds;
       const chiStr = typeof pb.chi2TierContingency === 'number'
-        ? ` (stratum×seed homogeneity χ²(${pb.chi2TierDf}) = ${fmtNum(pb.chi2TierContingency, 2)}, well within noise)`
+        ? ` (stratum×seed homogeneity «χ²(${pb.chi2TierDf}) = ${fmtNum(pb.chi2TierContingency, 2)}», well within noise)`
         : '';
       const dedStr = ds.relegatedDueToDeductionCount > 0
-        ? ` Separately, ${ds.relegatedDueToDeductionCount} clubs flipped relegation status under administrative deductions vs raw 3W+D${hasSlot('2025-26-T2') ? ' (including 2025–26 Leicester −6 & Sheffield Wednesday −18 → 0 official pts).' : '.'}`
+        ? ` Separately, ${ds.relegatedDueToDeductionCount} clubs flipped relegation status under administrative deductions vs raw «3W+D»${hasSlot('2025-26-T2') ? ' (including 2025–26 Leicester −6 & Sheffield Wednesday −18 → 0 official pts).' : '.'}`
         : '';
       bullets.push({
         lead: 'Single-elimination play-off variance swamps 46g regular-season priors across every EFL stratum.',
-        body: `Across n=${ov.total} homogeneous 4-team brackets since 1988–89: P(promo | seed_1..4) = ${fmtNum(s1.pct, 1)}% / ${fmtNum(s2.pct, 1)}% / ${fmtNum(s3.pct, 1)}% / ${fmtNum(s4.pct, 1)}% (uniform χ²(3) = ${fmtNum(ov.chi2Uniform, 2)}; seeds 2–4 flat at χ²(2) = ${fmtNum(ov.chi2Seeds2to4, 2)}; P(promo | seed ∈ {1,2}) = ${fmtNum(ov.topTwoPct, 1)}%, the semi-final second-leg hosts)${chiStr}.${dedStr}`,
+        body: `Across «n = ${ov.total}» homogeneous 4-team brackets since 1988–89: «P(promo | seed_{1..4}) = ${fmtNum(s1.pct, 1)}% / ${fmtNum(s2.pct, 1)}% / ${fmtNum(s3.pct, 1)}% / ${fmtNum(s4.pct, 1)}%» (uniform «χ²(3) = ${fmtNum(ov.chi2Uniform, 2)}»; seeds 2–4 flat at «χ²(2) = ${fmtNum(ov.chi2Seeds2to4, 2)}»; «P(promo | seed ∈ {1, 2}) = ${fmtNum(ov.topTwoPct, 1)}%», the semi-final second-leg hosts)${chiStr}.${dedStr}`,
       });
     } else if (ds.relegatedDueToDeductionCount > 0) {
       bullets.push({
         lead: 'Administrative point deductions perturb relegation boundaries without shifting aggregate rank links.',
-        body: `${ds.affectedRowsCount} club-seasons carry non-zero signedAdjustment; ${ds.relegatedDueToDeductionCount} suffered counterfactual relegation flips relative to raw 3W+D.`,
+        body: `${ds.affectedRowsCount} club-seasons carry non-zero signedAdjustment; ${ds.relegatedDueToDeductionCount} suffered counterfactual relegation flips relative to raw «3W+D».`,
       });
     }
 
@@ -1343,7 +1469,7 @@
 
     // 3. Attack vs. defence flips by measurement
     const atkDef = describeAtkVsDef(m);
-    const rawBasisTag = isRaw ? ' on raw 3W+D points' : '';
+    const rawBasisTag = isRaw ? ' on raw «3W+D» points' : '';
     if (atkDef.diverges) {
       bullets.push({
         lead: 'Attack vs. defence has no single winner: it flips depending on how you measure it.',
@@ -1458,7 +1584,7 @@
     const listEl = document.getElementById('takeaways-list');
     const noteEl = document.getElementById('takeaways-scope-note');
     const view = buildTakeawaysView(m, state.scope);
-    if (noteEl) noteEl.textContent = view.note;
+    if (noteEl) setRich(noteEl, view.note);
     if (!listEl) return;
     clearEl(listEl);
     if (view.isEmpty) return;
@@ -1467,7 +1593,7 @@
       listEl.appendChild(
         el('li', null,
           el('span', { className: 'takeaways-lead', textContent: `${b.lead} ` }),
-          document.createTextNode(b.body)
+          ...richNodes(b.body)
         )
       );
     }
@@ -1508,12 +1634,12 @@
     winRate: {
       label: 'W/G (Win-Rate Affine Component)',
       short: 'W/G',
-      note: 'Linear identity: PPG = 3·W/G + D/G + A/G (A = net points adjustment)',
+      note: 'Linear identity: «PPG = 3·W/G + D/G + A/G» («A» = net points adjustment)',
     },
     gdPerGame: {
       label: 'GD/G (Net Goal Differential / Match)',
       short: 'GD/G',
-      note: 'First-order net scoring residual (GF/G − GA/G)',
+      note: 'First-order net scoring residual («GF/G − GA/G»)',
     },
     gfPerGame: {
       label: 'GF/G (Offensive Output Rate)',
@@ -1566,13 +1692,13 @@
 
     if (titleEl) {
       if (smallSample) {
-        titleEl.textContent = sicko
-          ? `Small-Sample Guard (N_slots = ${m.numSlots} < 3): Cross-Slot Median |r| Suppressed`
-          : `Small Sample (${m.numSlots} ${plural(m.numSlots, 'Table')}): Cross-Season Ranking Suppressed`;
+        setRich(titleEl, sicko
+          ? `Small-Sample Guard («N_slots = ${m.numSlots} < 3»): Cross-Slot Median «|r|» Suppressed`
+          : `Small Sample (${m.numSlots} ${plural(m.numSlots, 'Table')}): Cross-Season Ranking Suppressed`);
       } else if (sicko) {
-        titleEl.textContent = atkDef.diverges
-          ? `Within-Slot |r| Favors ${atkDef.withinLeader === 'ga' ? 'GA/G' : 'GF/G'} While Stacked OLS R²(PPG) Reverses to ${atkDef.pooledLeader === 'gf' ? 'GF/G' : 'GA/G'}, and D/G Ranks ${ordinal(drawRankOverall)}/5`
-          : `Within-Slot Median |r| vs. Pooled Cross-Sectional R²(PPG): W/G & GD/G Lead via Collinearity While D/G Ranks ${ordinal(drawRankOverall)}/5`;
+        setRich(titleEl, atkDef.diverges
+          ? `Within-Slot «|r|» Favors ${atkDef.withinLeader === 'ga' ? 'GA/G' : 'GF/G'} While Stacked OLS «R²(PPG)» Reverses to ${atkDef.pooledLeader === 'gf' ? 'GF/G' : 'GA/G'}, and D/G Ranks ${ordinal(drawRankOverall)}/5`
+          : `Within-Slot Median «|r|» vs. Pooled Cross-Sectional «R²(PPG)»: W/G & GD/G Lead via Collinearity While D/G Ranks ${ordinal(drawRankOverall)}/5`);
       } else {
         const marginVerb = atkDef.withinDiff < 0.002 ? 'Barely Leads' : atkDef.withinDiff < 0.02 ? 'Narrowly Leads' : 'Leads';
         const drawSuffix = drawAlwaysLast
@@ -1601,14 +1727,14 @@
         proseEl.append(
           el('p', null,
             sicko
-              ? `Insufficient panel depth (N_slots = ${m.numSlots}, N_obs = ${fmtInt(m.allTeams.length)}) for non-degenerate within-slot quantile estimation. Inspect single-slot OLS residuals below or widen [t₀, t₁] to ≥3 slots.`
+              ? `Insufficient panel depth («N_slots = ${m.numSlots}», «N_obs = ${fmtInt(m.allTeams.length)}») for non-degenerate within-slot quantile estimation. Inspect single-slot OLS residuals below or widen [«t₀», «t₁»] to ≥3 slots.`
               : `Too few tables (${m.numSlots} ${plural(m.numSlots, 'table')}, ${fmtInt(m.allTeams.length)} team ${plural(m.allTeams.length, 'season')}) to summarise cross-season medians reliably. Inspect individual club figures below or widen the filter to at least three tables.`
           )
         );
       } else if (sicko) {
         proseEl.append(
           el('p', null,
-            `Across N_slots = ${m.numSlots} tier-season slots (N_obs = ${fmtInt(m.allTeams.length)} team-seasons), each per-match regressor x is compared with final rank inside each slot separately, via the Pearson correlation between x and the finish score y:`
+            `Across «N_slots = ${m.numSlots}» tier-season slots («N_obs = ${fmtInt(m.allTeams.length)}» team-seasons), each per-match regressor «x» is compared with final rank inside each slot separately, via the Pearson correlation between «x» and the finish score «y»:`
           ),
           mathDisplay(
             'y sub i equals 1 minus open paren p sub i minus 1 close paren over open paren K minus 1 close paren, where p sub i is final position and K is the number of clubs',
@@ -1625,12 +1751,12 @@
             )
           ),
           el('p', null,
-            `Both maps are affine: they change units, not correlations, putting K ∈ [20, 24] clubs and 38–46 fixtures on common scales (0–1 finish, per-match rates). They do not remove heteroskedasticity, which no rescaling can remove; every r is still computed slot by slot, so no cross-slot demeaning is involved. `,
-            el('strong', { textContent: `W/G (median |r| = ${fmtNum(winPred?.medianAbsRFinish, 3)})` }),
+            `Both maps are affine: they change units, not correlations, putting «K ∈ [20, 24]» clubs and 38–46 fixtures on common scales (0–1 finish, per-match rates). They do not remove heteroskedasticity, which no rescaling can remove; every «r» is still computed slot by slot, so no cross-slot demeaning is involved. `,
+            el('strong', { textContent: `W/G («median(|r|) = ${fmtNum(winPred?.medianAbsRFinish, 3)}»)` }),
             ' and ',
             el('strong', { textContent: `GD/G (${fmtNum(gdPred?.medianAbsRFinish, 3)})` }),
             ' top the hierarchy by construction, since points are built from wins and draws and goal difference from goals for and against:',
-            isRawMode() ? ' Counterfactual raw 3W+D mode is active: deductions are stripped from PPG and finishScore here while official pos/relegation vectors stay fixed.' : ''
+            isRawMode() ? ' Counterfactual raw «3W+D» mode is active: deductions are stripped from PPG and finishScore here while official pos/relegation vectors stay fixed.' : ''
           ),
           mathDisplay(
             'P P G equals 3 times W over G plus D over G plus A over G, where A is the net points adjustment; A is 0 for 4,033 of 4,092 team-seasons',
@@ -1643,15 +1769,15 @@
           ),
           el('p', null,
             'Attack vs. defence exhibits a textbook aggregation-operator sensitivity: within-slot ',
-            el('strong', { textContent: `median(|r_finish|) puts GA/G at ${fmtNum(atkDef.gaWithin, 3)} vs GF/G at ${fmtNum(atkDef.gfWithin, 3)}` }),
+            el('strong', { textContent: `«median(|r_finish|)» puts GA/G at ${fmtNum(atkDef.gaWithin, 3)} vs GF/G at ${fmtNum(atkDef.gfWithin, 3)}` }),
             ` (Δ = ${fmtNum(atkDef.withinDiff, 3)}; GA/G strictly exceeds GF/G in ${m.withinSlot.gaBeatsGfCount}/${m.withinSlot.comparableGfGaSlots} slots vs ${m.withinSlot.gfBeatsGaCount} for GF/G), whereas stacking all club-seasons into one cross-section and fitting bivariate OLS of PPG on each regressor separately yields `,
-            el('strong', { textContent: `R²(PPG) = ${fmtNum(atkDef.gfR2 * 100, 1)}% for GF/G vs ${fmtNum(atkDef.gaR2 * 100, 1)}% for GA/G` }),
-            ', with R² = r(x, PPG)² for each single-regressor fit. The two operators answer different questions (typical in-table link vs pooled variation), and GF/G and GA/G are collinear, so neither figure is an additive variance share or a causal effect.'
+            el('strong', { textContent: `«R²(PPG)» = ${fmtNum(atkDef.gfR2 * 100, 1)}% for GF/G vs ${fmtNum(atkDef.gaR2 * 100, 1)}% for GA/G` }),
+            ', with «R² = r(x, PPG)²» for each single-regressor fit. The two operators answer different questions (typical in-table link vs pooled variation), and GF/G and GA/G are collinear, so neither figure is an additive variance share or a causal effect.'
           ),
           el('p', null,
-            `D/G ranks ${ordinal(drawRankOverall)}/5 overall. Its r flips sign across slots (r < 0 in ${drawNegSlots}/${drawPred?.slotCount ?? 0}, r > 0 in ${drawPosSlots}). The median of an absolute value is always at least the absolute value of the median, and the two are equal when every sign agrees. Here the signs split, and that split is what opens the gap: absolute values pull the negative slots up alongside the positive ones, so `,
-            el('strong', { textContent: `median(|r|) = ${fmtNum(drawPred?.medianAbsRFinish, 3)} ≥ |median(r)| = ${fmtNum(Math.abs(drawPred?.medianRFinish ?? 0), 3)}` }),
-            ` (signed median r = ${fmtSigned(drawPred?.medianRFinish, 3)}, IQR [${fmtSigned(drawPred?.q1RFinish, 3)}, ${fmtSigned(drawPred?.q3RFinish, 3)}]). Payoff arithmetic completes the story: over 22 fixtures, 11W + 11L yields 33 pts vs 22 pts for 22D (and 11 pts for 11D).`
+            `D/G ranks ${ordinal(drawRankOverall)}/5 overall. Its «r» flips sign across slots («r < 0» in ${drawNegSlots}/${drawPred?.slotCount ?? 0}, «r > 0» in ${drawPosSlots}). The median of an absolute value is always at least the absolute value of the median, and the two are equal when every sign agrees. Here the signs split, and that split is what opens the gap: absolute values pull the negative slots up alongside the positive ones, so `,
+            el('strong', { textContent: `«median(|r|) = ${fmtNum(drawPred?.medianAbsRFinish, 3)} ≥ |median(r)| = ${fmtNum(Math.abs(drawPred?.medianRFinish ?? 0), 3)}»` }),
+            ` (signed «median(r) = ${fmtSigned(drawPred?.medianRFinish, 3)}», IQR «[${fmtSigned(drawPred?.q1RFinish, 3)}, ${fmtSigned(drawPred?.q3RFinish, 3)}]»). Payoff arithmetic completes the story: over 22 fixtures, «11W + 11L» yields 33 pts vs 22 pts for «22D» (and 11 pts for «11D»).`
           )
         );
       } else {
@@ -1713,7 +1839,7 @@
           calloutEl,
           `${idx + 1}. ${pp.short}`,
           sicko
-            ? `|r|=${fmtNum(c.medianAbsRFinish, 3)} (r=${fmtSigned(c.medianRFinish, 3)})`
+            ? `«|r| = ${fmtNum(c.medianAbsRFinish, 3)}» («r = ${fmtSigned(c.medianRFinish, 3)}»)`
             : `${fmtNum(c.medianAbsRFinish, 3)} strength (signed ${fmtSigned(c.medianRFinish, 3)})`,
           idx === 0 ? 'highlight' : ''
         );
@@ -1721,7 +1847,7 @@
       if (gfPool && gaPool) {
         appendKV(
           calloutEl,
-          sicko ? 'Pooled OLS R²(PPG) GF/GA' : 'Pooled points variation (Att / Def)',
+          sicko ? 'Pooled OLS «R²(PPG)» GF/GA' : 'Pooled points variation (Att / Def)',
           `${fmtNum(gfPool.r2Ppg * 100, 1)}% / ${fmtNum(gaPool.r2Ppg * 100, 1)}%`
         );
       }
@@ -1790,18 +1916,18 @@
 
     if (subEl) {
       const sicko = isSicko();
-      const basisTag = isRawMode() ? (sicko ? ' · counterfactual raw 3W+D' : ' · On-pitch points (before deductions)') : '';
-      subEl.textContent = sicko
-        ? `N_obs = ${fmtInt(valid.length)} Team-${plural(valid.length, 'Season')} · x = ${pp.short} vs y = ${targetIsPpg ? 'PPG' : 'y_finish ∈ [0,1]'}${basisTag}`
-        : `${fmtInt(valid.length)} team ${plural(valid.length, 'season')} · ${pp.label} vs ${targetIsPpg ? 'Points per game' : 'Table rank (1 = 1st, 0 = last)'}${basisTag}`;
+      const basisTag = isRawMode() ? (sicko ? ' · counterfactual raw «3W+D»' : ' · On-pitch points (before deductions)') : '';
+      setRich(subEl, sicko
+        ? `«N_obs = ${fmtInt(valid.length)}» Team-${plural(valid.length, 'Season')} · «x = ${pp.short}» vs ${targetIsPpg ? '«y = PPG»' : '«y = y_finish ∈ [0,1]»'}${basisTag}`
+        : `${fmtInt(valid.length)} team ${plural(valid.length, 'season')} · ${pp.label} vs ${targetIsPpg ? 'Points per game' : 'Table rank (1 = 1st, 0 = last)'}${basisTag}`);
     }
     if (noteEl) {
       const sicko = isSicko();
-      const basisNote = isRawMode() ? (sicko ? ' [Counterfactual raw 3W+D active]' : ' (On-pitch points active: deductions excluded here.)') : '';
+      const basisNote = isRawMode() ? (sicko ? ' [Counterfactual raw «3W+D» active]' : ' (On-pitch points active: deductions excluded here.)') : '';
       const targetName = targetIsPpg ? 'points per game' : 'table rank';
-      noteEl.textContent = sicko
-        ? `${pp.note}. Within-slot median r_finish = ${fmtSigned(slotMatch?.medianRFinish, 3)}; stacked OLS r = ${fmtSigned(pooledR, 3)}, R² = ${fmtPct((pooledR ?? 0) ** 2 * 100, 1)} (β̂₁ = ${fmtSigned(fit?.slope, 3)})${basisNote}`
-        : `${pp.note}. Median link to table rank: ${fmtSigned(slotMatch?.medianRFinish, 3)}; pooled linear link to ${targetName}: ${fmtSigned(pooledR, 3)} (${fmtPct((pooledR ?? 0) ** 2 * 100, 1)} of variation)${basisNote}`;
+      setRich(noteEl, sicko
+        ? `${pp.note}. Within-slot «median(r_finish) = ${fmtSigned(slotMatch?.medianRFinish, 3)}»; stacked OLS «r = ${fmtSigned(pooledR, 3)}», «R² = ${fmtPct((pooledR ?? 0) ** 2 * 100, 1)}» («β̂₁ = ${fmtSigned(fit?.slope, 3)}»)${basisNote}`
+        : `${pp.note}. Median link to table rank: ${fmtSigned(slotMatch?.medianRFinish, 3)}; pooled linear link to ${targetName}: ${fmtSigned(pooledR, 3)} (${fmtPct((pooledR ?? 0) ** 2 * 100, 1)} of variation)${basisNote}`);
     }
 
     const W = 760;
@@ -1993,18 +2119,18 @@
     const rStats = m.runnerStats;
     const smallSample = m.numSlots < 3;
     const rawNote = isRawMode()
-      ? (sicko ? ' (Official standings held invariant under raw 3W+D toggle.)' : ' (Based on official league tables, unaffected by the on-pitch points toggle.)')
+      ? (sicko ? ' (Official standings held invariant under raw «3W+D» toggle.)' : ' (Based on official league tables, unaffected by the on-pitch points toggle.)')
       : '';
 
     if (titleEl) {
       if (smallSample) {
-        titleEl.textContent = sicko
-          ? `Small-Sample Title Manifold (n = ${m.champs.length} < 3)`
-          : `Title Race Snapshot: ${m.champs.length} ${plural(m.champs.length, 'Champion')} Selected`;
+        setRich(titleEl, sicko
+          ? `Small-Sample Title Manifold («n = ${m.champs.length} < 3»)`
+          : `Title Race Snapshot: ${m.champs.length} ${plural(m.champs.length, 'Champion')} Selected`);
       } else if (sicko) {
-        titleEl.textContent = m.champFewerWinsCases.length > 0
-          ? `pos=1 Outperforms pos=2 by +${fmtNum((cStats.gdPerGame?.mean ?? 0) - (rStats.gdPerGame?.mean ?? 0), 2)} GD/G, Yet ${m.champFewerWinsCases.length}/${m.champs.length} Violated argmax(W)`
-          : `Upper-Tail Separation: pos=1 Diverges from pos=2 Primarily via Mean GF/G (+${fmtNum((cStats.gfPerGame?.mean ?? 0) - (rStats.gfPerGame?.mean ?? 0), 2)})`;
+        setRich(titleEl, m.champFewerWinsCases.length > 0
+          ? `«pos=1» Outperforms «pos=2» by «+${fmtNum((cStats.gdPerGame?.mean ?? 0) - (rStats.gdPerGame?.mean ?? 0), 2)} GD/G», Yet ${m.champFewerWinsCases.length}/${m.champs.length} Violated «argmax(W)»`
+          : `Upper-Tail Separation: «pos=1» Diverges from «pos=2» Primarily via Mean GF/G («+${fmtNum((cStats.gfPerGame?.mean ?? 0) - (rStats.gfPerGame?.mean ?? 0), 2)}»)`);
       } else {
         titleEl.textContent = m.champFewerWinsCases.length > 0
           ? `Champions Average +${fmtNum((cStats.gdPerGame?.mean ?? 0) - (rStats.gdPerGame?.mean ?? 0), 2)} Better Goal Difference per Game, Yet ${m.champFewerWinsCases.length} Won Fewer Matches Than a Rival`
@@ -2019,7 +2145,7 @@
         proseEl.append(
           el('p', null,
             sicko
-              ? `Small-sample estimator suppression (N_slots = ${m.champs.length} < 3): cross-slot μ and IQR spreads gated. Observed pairs: `
+              ? `Small-sample estimator suppression («N_slots = ${m.champs.length} < 3»): cross-slot «μ» and IQR spreads gated. Observed pairs: `
               : `Small-sample scope (${m.champs.length} ${plural(m.champs.length, 'title race')}, fewer than three tables): cross-season averages and spreads are suppressed. `,
             pairSummaries ? `${pairSummaries}.${rawNote}` : rawNote.trim()
           )
@@ -2027,18 +2153,18 @@
       } else if (sicko) {
         proseEl.append(
           el('p', null,
-            `Across N_slots = ${m.champs.length} completed title manifolds, first-order statistics yield μ_PPG(1st) = `,
+            `Across «N_slots = ${m.champs.length}» completed title manifolds, first-order statistics yield «μ_PPG(1st)» = `,
             el('strong', { textContent: `${fmtNum(cStats.ppg?.mean, 3)} PPG` }),
-            ` (IQR [${fmtNum(cStats.ppg?.q1, 2)}, ${fmtNum(cStats.ppg?.q3, 2)}]) vs μ_PPG(2nd) = ${fmtNum(rStats.ppg?.mean, 3)} PPG. Decomposition into offensive and defensive components shows `,
-            el('strong', { textContent: `ΔGF/G = +${fmtNum((cStats.gfPerGame?.mean ?? 0) - (rStats.gfPerGame?.mean ?? 0), 3)}` }),
+            ` (IQR «[${fmtNum(cStats.ppg?.q1, 2)}, ${fmtNum(cStats.ppg?.q3, 2)}]») vs «μ_PPG(2nd) = ${fmtNum(rStats.ppg?.mean, 3)}» PPG. Decomposition into offensive and defensive components shows `,
+            el('strong', { textContent: `«ΔGF/G = +${fmtNum((cStats.gfPerGame?.mean ?? 0) - (rStats.gfPerGame?.mean ?? 0), 3)}»` }),
             ` (${fmtNum(cStats.gfPerGame?.mean, 2)} vs ${fmtNum(rStats.gfPerGame?.mean, 2)}) exceeding `,
-            el('strong', { textContent: `|ΔGA/G| = ${fmtNum(Math.abs((cStats.gaPerGame?.mean ?? 0) - (rStats.gaPerGame?.mean ?? 0)), 3)}` }),
-            ` (${fmtNum(cStats.gaPerGame?.mean, 2)} vs ${fmtNum(rStats.gaPerGame?.mean, 2)}); pos=1 outscored pos=2 in ${m.champMoreGfThanRunnerUp}/${m.titlePairs.length} slots and held lower GA/G in ${m.champFewerGaThanRunnerUp}.${rawNote}`
+            el('strong', { textContent: `«|ΔGA/G| = ${fmtNum(Math.abs((cStats.gaPerGame?.mean ?? 0) - (rStats.gaPerGame?.mean ?? 0)), 3)}»` }),
+            ` (${fmtNum(cStats.gaPerGame?.mean, 2)} vs ${fmtNum(rStats.gaPerGame?.mean, 2)}); «pos=1» outscored «pos=2» in ${m.champMoreGfThanRunnerUp}/${m.titlePairs.length} slots and held lower GA/G in ${m.champFewerGaThanRunnerUp}.${rawNote}`
           ),
           el('p', null,
             m.champFewerWinsCases.length === 0
-              ? 'Zero argmax(W) inversions occurred in this slice: every pos=1 tuple weakly dominated the division in raw W.'
-              : `Crucially, the 3W+D linear functional is non-monotonic in W alone: ${m.champFewerWinsCases.length}/${m.champs.length} champions (exclusively T2–T4) satisfied argmax_i(3W_i + D_i) ≠ argmax_i(W_i), converting marginal draw-accumulation edges into title margins (e.g., ${m.champFewerWinsCases[0].champion.team} ${m.champFewerWinsCases[0].season} through ${m.champFewerWinsCases[m.champFewerWinsCases.length - 1].champion.team} ${m.champFewerWinsCases[m.champFewerWinsCases.length - 1].season}).`
+              ? 'Zero «argmax(W)» inversions occurred in this slice: every «pos=1» tuple weakly dominated the division in raw «W».'
+              : `Crucially, the «3W+D» linear functional is non-monotonic in «W» alone: ${m.champFewerWinsCases.length}/${m.champs.length} champions (exclusively T2–T4) satisfied «argmax_i(3W_i + D_i) ≠ argmax_i(W_i)», converting marginal draw-accumulation edges into title margins (e.g., ${m.champFewerWinsCases[0].champion.team} ${m.champFewerWinsCases[0].season} through ${m.champFewerWinsCases[m.champFewerWinsCases.length - 1].champion.team} ${m.champFewerWinsCases[m.champFewerWinsCases.length - 1].season}).`
           )
         );
       } else {
@@ -2074,11 +2200,11 @@
 
     if (calloutEl) {
       clearEl(calloutEl);
-      appendKV(calloutEl, sicko ? 'pos=1 PPG (μ / Med)' : 'Champion pts/game (Avg / Med)', smallSample && m.champs.length === 1 ? fmtNum(cStats.ppg?.mean, 2) : `${fmtNum(cStats.ppg?.mean, 2)} / ${fmtNum(cStats.ppg?.median, 2)}`, 'highlight');
-      appendKV(calloutEl, sicko ? 'pos=2 PPG (μ / Med)' : 'Runner-up pts/game (Avg / Med)', smallSample && m.runnersUp.length === 1 ? fmtNum(rStats.ppg?.mean, 2) : `${fmtNum(rStats.ppg?.mean, 2)} / ${fmtNum(rStats.ppg?.median, 2)}`);
-      appendKV(calloutEl, sicko ? 'pos=1 Mean W/G' : 'Champion win rate', `${fmtNum((cStats.winRate?.mean ?? 0) * 100, 1)}%`);
-      appendKV(calloutEl, sicko ? 'pos=1 Mean GF/G / GA/G' : 'Champion scored / conceded', `${fmtNum(cStats.gfPerGame?.mean, 2)} / ${fmtNum(cStats.gaPerGame?.mean, 2)}`);
-      appendKV(calloutEl, sicko ? 'argmax(W) inversions' : 'Champions trailing in wins', `${m.champFewerWinsCases.length} of ${m.champs.length}`);
+      appendKV(calloutEl, sicko ? '«pos=1» PPG («μ» / Med)' : 'Champion pts/game (Avg / Med)', smallSample && m.champs.length === 1 ? fmtNum(cStats.ppg?.mean, 2) : `${fmtNum(cStats.ppg?.mean, 2)} / ${fmtNum(cStats.ppg?.median, 2)}`, 'highlight');
+      appendKV(calloutEl, sicko ? '«pos=2» PPG («μ» / Med)' : 'Runner-up pts/game (Avg / Med)', smallSample && m.runnersUp.length === 1 ? fmtNum(rStats.ppg?.mean, 2) : `${fmtNum(rStats.ppg?.mean, 2)} / ${fmtNum(rStats.ppg?.median, 2)}`);
+      appendKV(calloutEl, sicko ? '«pos=1» Mean W/G' : 'Champion win rate', `${fmtNum((cStats.winRate?.mean ?? 0) * 100, 1)}%`);
+      appendKV(calloutEl, sicko ? '«pos=1» Mean GF/G / GA/G' : 'Champion scored / conceded', `${fmtNum(cStats.gfPerGame?.mean, 2)} / ${fmtNum(cStats.gaPerGame?.mean, 2)}`);
+      appendKV(calloutEl, sicko ? '«argmax(W)» inversions' : 'Champions trailing in wins', `${m.champFewerWinsCases.length} of ${m.champs.length}`);
     }
 
     if (eraEl) {
@@ -2087,7 +2213,7 @@
         eraEl.appendChild(el('div', { className: 'era-card' },
           el('div', { className: 'era-years', textContent: `${e.name} · ${e.years} (${e.count} ${plural(e.count, sicko ? 'slot' : 'table')})` }),
           el('div', { className: 'era-main num', textContent: `${fmtNum(e.champPpg, 2)} ${sicko ? 'PPG' : 'pts/game'}` }),
-          el('div', { className: 'era-sub num', textContent: sicko ? `pos=2 ${fmtNum(e.runnerPpg, 2)} PPG · GD/G ${fmtSigned(e.champGdPerGame, 2)}` : `Runner-up ${fmtNum(e.runnerPpg, 2)} · Goal diff ${fmtSigned(e.champGdPerGame, 2)}/g` })
+          el('div', { className: 'era-sub num', textContent: sicko ? `«pos=2» ${fmtNum(e.runnerPpg, 2)} PPG · «GD/G ${fmtSigned(e.champGdPerGame, 2)}»` : `Runner-up ${fmtNum(e.runnerPpg, 2)} · Goal diff ${fmtSigned(e.champGdPerGame, 2)}/g` })
         ));
       }
     }
@@ -2106,7 +2232,7 @@
           }));
         }
         fewerBox.append(
-          el('h4', { textContent: sicko ? `argmax(W) Monotonicity Violations (n = ${m.champFewerWinsCases.length})` : `Champions With Fewer Wins Than a Rival (${m.champFewerWinsCases.length})` }),
+          el('h4', { textContent: sicko ? `«argmax(W)» Monotonicity Violations («n = ${m.champFewerWinsCases.length}»)` : `Champions With Fewer Wins Than a Rival (${m.champFewerWinsCases.length})` }),
           list
         );
       }
@@ -2335,7 +2461,7 @@
     const ss = m.survivalStats;
     const relAbove40Pct = ss.slotCount ? (ss.relegatedAtOrAbove40Over38Rate.length / ss.slotCount) * 100 : 0;
     const rawNote = isRawMode()
-      ? (sicko ? ' (Official truncation boundaries held invariant under raw 3W+D toggle.)' : ' (Based on official league tables, unaffected by the on-pitch points toggle.)')
+      ? (sicko ? ' (Official truncation boundaries held invariant under raw «3W+D» toggle.)' : ' (Based on official league tables, unaffected by the on-pitch points toggle.)')
       : '';
     const smallSample = ss.slotCount < 3;
     const boundaryReprieves = (m.excludedSurvivalRows || []).filter((r) => r.relegationActiveSlot);
@@ -2348,13 +2474,13 @@
           ? (reElecOnly ? 'Zero Automatic Relegation (Pre-1986 Re-Election Regime)' : 'Zero Relegation-Active Slots in Current Slice')
           : (reElecOnly ? 'No Automatic Relegation in Selected Re-Election Seasons' : 'No Relegation in Selected Tables');
       } else if (smallSample) {
-        titleEl.textContent = sicko
-          ? `Small-Sample Truncation Snapshot (n = ${ss.slotCount} < 3)`
-          : `Survival Cutoff Snapshot (${ss.slotCount} ${plural(ss.slotCount, 'Table')} With Relegation)`;
+        setRich(titleEl, sicko
+          ? `Small-Sample Truncation Snapshot («n = ${ss.slotCount} < 3»)`
+          : `Survival Cutoff Snapshot (${ss.slotCount} ${plural(ss.slotCount, 'Table')} With Relegation)`);
       } else {
-        titleEl.textContent = sicko
-          ? 'Cross-Stratum Truncation Non-Stationarity: 40/38g (1.053 PPG) Fails Below T1 While 50/46g (1.087 PPG) Overshoots Median Floors'
-          : 'Safety Varies by Tier: 40-Point Pace Fails Lower-Tier Cutoffs, While 50-Point Pace Is Rarely Reached';
+        setRich(titleEl, sicko
+          ? 'Cross-Stratum Truncation Non-Stationarity: 40/38g («1.053 PPG») Fails Below T1 While 50/46g («1.087 PPG») Overshoots Median Floors'
+          : 'Safety Varies by Tier: 40-Point Pace Fails Lower-Tier Cutoffs, While 50-Point Pace Is Rarely Reached');
       }
     }
 
@@ -2379,11 +2505,11 @@
         const highRelDesc = highRelTies.map((x) => `${x.relegatedTeam}, ${x.relegatedHighPts} pts in ${x.season} T${x.tier}`).join('; ');
         proseEl.append(
           el('p', null,
-            `Across N_rel = ${ss.slotCount} relegation-active slots (${ss.excludedNoRelegationCount} non-relegating slots separated via typed outcomeType enum), the empirical median lowest merit survivor sits at `,
+            `Across «N_rel = ${ss.slotCount}» relegation-active slots (${ss.excludedNoRelegationCount} non-relegating slots separated via typed outcomeType enum), the empirical median lowest merit survivor sits at `,
             el('strong', { textContent: `${fmtNum(ss.survivingPpg?.median, 3)} official PPG` }),
-            ` (linear projections: ${fmtNum(ss.survivingPts38?.median, 1)}/38g; ${fmtNum(ss.survivingPts46?.median, 1)}/46g), versus median relegation ceiling ${fmtNum(ss.relegatedPpg?.median, 3)} PPG. Relegated clubs reached ≥1.053 PPG (40/38g) in `,
+            ` (linear projections: ${fmtNum(ss.survivingPts38?.median, 1)}/38g; ${fmtNum(ss.survivingPts46?.median, 1)}/46g), versus median relegation ceiling ${fmtNum(ss.relegatedPpg?.median, 3)} PPG. Relegated clubs reached «≥1.053 PPG» (40/38g) in `,
             el('strong', { textContent: `${ss.relegatedAtOrAbove40Over38Rate.length}/${ss.slotCount} slots (${fmtNum(relAbove40Pct, 1)}%)` }),
-            ` and ≥1.087 PPG (50/46g) in ${ss.relegatedAtOrAbove50Over46Rate.length}/${ss.slotCount}. Max-PPG relegated outlier: `,
+            ` and «≥1.087 PPG» (50/46g) in ${ss.relegatedAtOrAbove50Over46Rate.length}/${ss.slotCount}. Max-PPG relegated outlier: `,
             el('strong', { textContent: `${fmtNum(highRelSlot?.relegatedHighPpg, 3)} PPG` }),
             highRelSlot ? ` (${highRelDesc}${highRelTies.length > 1 ? ', tied' : ''}).${rawNote}` : `.${rawNote}`
           )
@@ -2394,9 +2520,9 @@
           const [s1, s2, s3, s4] = ov.seeds;
           proseEl.append(
             el('p', null,
-              `At the upper promotion boundary of T2–T4, single-elimination knockout variance heavily discounts 46g regular-season priors: across n=${ov.total} homogeneous 4-team brackets (1988–89..2025–26), P(promo | seed_1..4) = `,
+              `At the upper promotion boundary of T2–T4, single-elimination knockout variance heavily discounts 46g regular-season priors: across «n = ${ov.total}» homogeneous 4-team brackets (1988–89..2025–26), «P(promo | seed_{1..4})» = `,
               el('strong', { textContent: `${fmtNum(s1.pct, 1)}% / ${fmtNum(s2.pct, 1)}% / ${fmtNum(s3.pct, 1)}% / ${fmtNum(s4.pct, 1)}%` }),
-              ` (uniform χ²(3) = ${fmtNum(ov.chi2Uniform, 2)}; full χ² stratum-homogeneity matrix rendered below).`
+              ` (uniform «χ²(3) = ${fmtNum(ov.chi2Uniform, 2)}»; full «χ²» stratum-homogeneity matrix rendered below).`
             )
           );
         }
@@ -2412,8 +2538,8 @@
             const pl38SurvUnder40 = pl38Series.filter((x) => x.survivingPts < 40).length;
             proseEl.append(
               el('p', null,
-                el('strong', { textContent: `38g PL homogeneous sub-panel (n=${n38}, excl. ${pl42Series.length} 42g 1992–95 slots): ` }),
-                `pos=18 μ = ${fmtNum(pl38RelStats.mean, 1)} pts (med ${fmtNum(pl38RelStats.median, 0)}); P(Pts_18th ≥ 35) = ${pl38Rel35Plus}/${n38}; P(Pts_18th ≥ 40) = ${pl38Rel40Plus}/${n38}; P(Pts_17th < 40) = ${pl38SurvUnder40}/${n38} (${fmtNum((pl38SurvUnder40 / n38) * 100, 1)}%).`
+                el('strong', { textContent: `38g PL homogeneous sub-panel («n = ${n38}», excl. ${pl42Series.length} 42g 1992–95 slots): ` }),
+                `«pos = 18» «μ = ${fmtNum(pl38RelStats.mean, 1)}» pts (med ${fmtNum(pl38RelStats.median, 0)}); «P(Pts_18th ≥ 35) = ${pl38Rel35Plus}/${n38}»; «P(Pts_18th ≥ 40) = ${pl38Rel40Plus}/${n38}»; «P(Pts_17th < 40) = ${pl38SurvUnder40}/${n38}» (${fmtNum((pl38SurvUnder40 / n38) * 100, 1)}%).`
               )
             );
           }
@@ -2590,20 +2716,20 @@
     const digits = mode === 'ppg' ? 2 : 1;
     const sicko = isSicko();
     const basisTag = isRawMode()
-      ? (sicko ? ' · Official tables invariant under raw 3W+D toggle' : ' · Official league tables (unaffected by on-pitch toggle)')
+      ? (sicko ? ' · Official tables invariant under raw «3W+D» toggle' : ' · Official league tables (unaffected by on-pitch toggle)')
       : '';
     const curtOn3 = (m.includedCurtailedSlots?.length ?? 0) > 0;
     const rangeTag = curtOn3 ? 'completed 38g–46g plus curtailed 34g–37g schedules' : 'completed 38g–46g schedules';
     const rangeTagPlain = curtOn3 ? 'completed 38- to 46-game seasons and the curtailed 34–37-game 2019–20 tables' : 'completed 38- to 46-game seasons';
 
     if (subEl) {
-      subEl.textContent = sicko
+      setRich(subEl, sicko
         ? (mode === 'ppg'
           ? `Observed lowest merit survivor vs. highest relegated ceiling in official PPG (invariant across ${rangeTag})${basisTag}`
-          : `${mult}g linear point-equivalent projection across N_rel = ${m.survivalSeries.length} relegation-active ${plural(m.survivalSeries.length, 'slot')}${basisTag}`)
+          : `${mult}g linear point-equivalent projection across «N_rel = ${m.survivalSeries.length}» relegation-active ${plural(m.survivalSeries.length, 'slot')}${basisTag}`)
         : (mode === 'ppg'
           ? `Lowest safe vs. highest relegated club in official points per game (comparable across ${rangeTagPlain})${basisTag}`
-          : `${mult}-game official point equivalent across ${m.survivalSeries.length} ${plural(m.survivalSeries.length, 'table')} with relegation${basisTag}`);
+          : `${mult}-game official point equivalent across ${m.survivalSeries.length} ${plural(m.survivalSeries.length, 'table')} with relegation${basisTag}`));
     }
     if (noteEl) {
       const notes = [];
@@ -2773,9 +2899,9 @@
     const [s1, s2, s3, s4] = ov.seeds;
 
     if (subEl) {
-      subEl.textContent = isSicko()
-        ? `Empirical P(promo | seed_k) across n = ${ov.total} homogeneous 4-team brackets (${firstStd}..${lastStd}; uniform χ²(3) = ${fmtNum(ov.chi2Uniform, 2)})${rawBasisTag}`
-        : `Official promotion share by play-off seed across ${ov.total} standard four-team tournaments (${firstStd} to ${lastStd})${rawBasisTag}`;
+      setRich(subEl, isSicko()
+        ? `Empirical «P(promo | seed_k)» across «n = ${ov.total}» homogeneous 4-team brackets (${firstStd}..${lastStd}; uniform «χ²(3) = ${fmtNum(ov.chi2Uniform, 2)}»)${rawBasisTag}`
+        : `Official promotion share by play-off seed across ${ov.total} standard four-team tournaments (${firstStd} to ${lastStd})${rawBasisTag}`);
     }
 
     const tierPalette = {
@@ -2811,19 +2937,19 @@
     if (proseEl) {
       if (isSicko()) {
         const tierChiTxt = typeof pb.chi2TierContingency === 'number'
-          ? `A ${pb.byTier.length}×4 contingency test yields Pearson χ²(${pb.chi2TierDf}) = ${fmtNum(pb.chi2TierContingency, 2)}, comfortably inside the null sampling distribution: no detectable seed-by-tier gradient (a failure to reject, not proof of uniformity).`
-          : 'Single-stratum filter active; expand to ≥2 EFL strata to evaluate inter-tier contingency homogeneity χ².';
+          ? `A «${pb.byTier.length}×4» contingency test yields Pearson «χ²(${pb.chi2TierDf}) = ${fmtNum(pb.chi2TierContingency, 2)}», comfortably inside the null sampling distribution: no detectable seed-by-tier gradient (a failure to reject, not proof of uniformity).`
+          : 'Single-stratum filter active; expand to «≥2» EFL strata to evaluate inter-tier contingency homogeneity «χ²».';
         proseEl.append(
           el('p', null,
-            `Conditioning on n = ${ov.total} homogeneous 4-team single-division knockout brackets (${firstStd}..${lastStd}), empirical promotion probabilities deviate modestly from discrete uniformity U{1..4} (25% baseline; goodness-of-fit `,
-            el('strong', { textContent: `χ²(3) = ${fmtNum(ov.chi2Uniform, 2)}` }),
+            `Conditioning on «n = ${ov.total}» homogeneous 4-team single-division knockout brackets (${firstStd}..${lastStd}), empirical promotion probabilities deviate modestly from discrete uniformity «U{1..4}» (25% baseline; goodness-of-fit `,
+            el('strong', { textContent: `«χ²(3) = ${fmtNum(ov.chi2Uniform, 2)}»` }),
             `): `,
-            el('strong', { textContent: `P(promo | S1) = ${fmtNum(s1.pct, 1)}% (${s1.count}/${ov.total})` }),
+            el('strong', { textContent: `«P(promo | S1) = ${fmtNum(s1.pct, 1)}% (${s1.count}/${ov.total})»` }),
             ` vs `,
-            el('strong', { textContent: `S2 = ${fmtNum(s2.pct, 1)}% (${s2.count}), S3 = ${fmtNum(s3.pct, 1)}% (${s3.count}), S4 = ${fmtNum(s4.pct, 1)}% (${s4.count})` }),
+            el('strong', { textContent: `«S2 = ${fmtNum(s2.pct, 1)}% (${s2.count})», «S3 = ${fmtNum(s3.pct, 1)}% (${s3.count})», «S4 = ${fmtNum(s4.pct, 1)}% (${s4.count})»` }),
             `. Conditioning out Seed 1 leaves a virtually flat tail across Seeds 2–4 (`,
-            el('strong', { textContent: `χ²_S2–4(2) = ${fmtNum(ov.chi2Seeds2to4, 2)}` }),
-            `). Seeds S1 ∪ S2, the semi-final second-leg hosts, convert `,
+            el('strong', { textContent: `«χ²_{S2–4}(2) = ${fmtNum(ov.chi2Seeds2to4, 2)}»` }),
+            `). Seeds «S1 ∪ S2», the semi-final second-leg hosts, convert `,
             el('strong', { textContent: `${fmtNum(ov.topTwoPct, 1)}% (${ov.topTwoCount}/${ov.total})` }),
             ` vs ${fmtNum(100 - ov.topTwoPct, 1)}% for away-second-leg seeds.`
           ),
@@ -3160,7 +3286,7 @@
     const midPct = dl.count > 0 ? (dl.middleHalfCount / dl.count) * 100 : 0;
     const topPct = dl.count > 0 ? (dl.topQuarterCount / dl.count) * 100 : 0;
     const rawNote = isRawMode()
-      ? (sicko ? ' (Observed official finish percentiles held invariant under raw 3W+D toggle.)' : ' (Based on official league tables, unaffected by the on-pitch points toggle.)')
+      ? (sicko ? ' (Observed official finish percentiles held invariant under raw «3W+D» toggle.)' : ' (Based on official league tables, unaffected by the on-pitch points toggle.)')
       : '';
     const champText = dl.championCount > 0
       ? dl.championCampaigns.map((c) => `${c.team} (${c.season} Tier ${c.tier}, ${c.won}W–${c.drawn}D–${c.lost}L)`).join('; ')
@@ -3168,13 +3294,13 @@
 
     if (titleEl) {
       if (smallSample) {
-        titleEl.textContent = sicko
-          ? `Small-Sample Stalemate Leaders (n = ${dl.count})`
-          : `Draw Leaders in Selected Scope (${dl.count} Team ${plural(dl.count, 'Season')})`;
+        setRich(titleEl, sicko
+          ? `Small-Sample Stalemate Leaders («n = ${dl.count}»)`
+          : `Draw Leaders in Selected Scope (${dl.count} Team ${plural(dl.count, 'Season')})`);
       } else if (sicko) {
-        titleEl.textContent = dl.championCount > 0
-          ? `argmax(D) Tuples Exhibit ${fmtNum(midPct, 0)}% IQR Finish-Percentile Capture, With Just ${dl.championCount} Title Outlier`
-          : `argmax(D) Tuples Exhibit ${fmtNum(midPct, 0)}% IQR Finish-Percentile Capture (0 Title Outliers)`;
+        setRich(titleEl, dl.championCount > 0
+          ? `«argmax(D)» Tuples Exhibit ${fmtNum(midPct, 0)}% IQR Finish-Percentile Capture, With Just ${dl.championCount} Title Outlier`
+          : `«argmax(D)» Tuples Exhibit ${fmtNum(midPct, 0)}% IQR Finish-Percentile Capture (0 Title Outliers)`);
       } else if (dl.championCount > 0) {
         titleEl.textContent = `Draw Leaders Cluster in the Middle Half (${fmtNum(midPct, 0)}%), With Only ${dl.championCount} ${plural(dl.championCount, 'Champion')}`;
       } else {
@@ -3194,11 +3320,11 @@
       } else if (sicko) {
         proseEl.append(
           el('p', null,
-            `Extracting all slot-level stalemate maximizers (n = ${dl.count} club-seasons across ${dl.slotCount} slots; ${dl.coLeaderSlotsCount} tied co-leader slots, so the n tuples are not independent draws) yields a median normalized finish percentile of `,
+            `Extracting all slot-level stalemate maximizers («n = ${dl.count}» club-seasons across ${dl.slotCount} slots; ${dl.coLeaderSlotsCount} tied co-leader slots, so the «n» tuples are not independent draws) yields a median normalized finish percentile of `,
             el('strong', { textContent: `${fmtNum((dl.finishScore?.median ?? 0) * 100, 1)}%` }),
-            ` (${ordinal(dl.pos?.median)} raw rank across K ∈ [20, 24]). Quartile decomposition: `,
-            el('strong', { textContent: `${dl.middleHalfCount} (${fmtNum(midPct, 1)}%) in [25%, 75%] IQR` }),
-            `, ${dl.bottomQuarterCount} (${fmtNum(botPct, 1)}%) in <25%, and ${dl.topQuarterCount} (${fmtNum(topPct, 1)}%) in >75%; ${dl.relegatedCount} relegated, ${dl.promotedCount} promoted, `,
+            ` (${ordinal(dl.pos?.median)} raw rank across «K ∈ [20, 24]»). Quartile decomposition: `,
+            el('strong', { textContent: `${dl.middleHalfCount} (${fmtNum(midPct, 1)}%) in «[25%, 75%]» IQR` }),
+            `, ${dl.bottomQuarterCount} (${fmtNum(botPct, 1)}%) in «<25%», and ${dl.topQuarterCount} (${fmtNum(topPct, 1)}%) in «>75%»; ${dl.relegatedCount} relegated, ${dl.promotedCount} promoted, `,
             champText ? `and ${dl.championCount} title outlier (${champText}).${rawNote}` : `and zero titles.${rawNote}`
           )
         );
@@ -3256,7 +3382,7 @@
 
     if (calloutEl) {
       clearEl(calloutEl);
-      appendKV(calloutEl, sicko ? 'argmax(D) tuples' : 'Draw-leading clubs', dl.coLeaderSlotsCount > 0 ? `${dl.count} across ${dl.slotCount} ${plural(dl.slotCount, sicko ? 'slot' : 'table')}` : String(dl.count));
+      appendKV(calloutEl, sicko ? '«argmax(D)» tuples' : 'Draw-leading clubs', dl.coLeaderSlotsCount > 0 ? `${dl.count} across ${dl.slotCount} ${plural(dl.slotCount, sicko ? 'slot' : 'table')}` : String(dl.count));
       appendKV(calloutEl, sicko ? 'Med. finish % Pct' : 'Median finish', smallSample && dl.count === 1 ? `${ordinal(dl.pos?.min)} (${fmtNum((dl.finishScore?.min ?? 0) * 100, 1)}%)` : `${ordinal(dl.pos?.median)} (${sicko ? '' : 'ahead of '}${fmtNum((dl.finishScore?.median ?? 0) * 100, 1)}%)`, 'highlight');
       appendKV(calloutEl, sicko ? 'IQR [25%–75%] capture' : 'Middle half (25%–75%)', `${dl.middleHalfCount} / ${dl.count} (${fmtNum(midPct, 1)}%)`);
       appendKV(calloutEl, sicko ? 'Upper / lower quartile' : 'Top / bottom quarter', `${dl.topQuarterCount} / ${dl.bottomQuarterCount}`);
@@ -3388,7 +3514,7 @@
     const pctWithoutGb = (100 - Number(pctWithGb)).toFixed(0);
     if (titleEl) {
       if (sicko) {
-        titleEl.textContent = `Weak Point-Biserial Covariance: ${sa.champWithGbCount}/${sa.availableSlotsCount} (${pctWithGb}%) Verified PL Champions Housed the Golden Boot (r_pb = ${fmtSigned(ss.rGbChampAll, 3)})`;
+        setRich(titleEl, `Weak Point-Biserial Covariance: ${sa.champWithGbCount}/${sa.availableSlotsCount} (${pctWithGb}%) Verified PL Champions Housed the Golden Boot («r_pb = ${fmtSigned(ss.rGbChampAll, 3)}»)`);
       } else {
         titleEl.textContent = sa.champWithGbCount === 0
           ? `None of the ${sa.availableSlotsCount} Verified Premier League Champions Fielded the Golden Boot Winner`
@@ -3400,14 +3526,14 @@
     if (proseEl) {
       clearEl(proseEl);
       const rawNote = isRawMode()
-        ? (sicko ? ' (Official PL standings invariant under counterfactual raw 3W+D mode.)' : ' (Based on official Premier League tables, unaffected by the on-pitch points toggle.)')
+        ? (sicko ? ' (Official PL standings invariant under counterfactual raw «3W+D» mode.)' : ' (Based on official Premier League tables, unaffected by the on-pitch points toggle.)')
         : '';
       if (sicko) {
         proseEl.append(
           el('p', null,
-            `Restricting strictly to the n = ${sa.availableSlotsCount} verified Tier 1 Premier League slots (1992–93..2025–26; zero-imputation explicitly enforced across ${sa.unavailableSlotsCount} unverified pre-1992/EFL slots), `,
+            `Restricting strictly to the «n = ${sa.availableSlotsCount}» verified Tier 1 Premier League slots (1992–93..2025–26; zero-imputation explicitly enforced across ${sa.unavailableSlotsCount} unverified pre-1992/EFL slots), `,
             el('strong', { textContent: `${sa.champWithGbCount}/${sa.availableSlotsCount} (${pctWithGb}%)` }),
-            ` pos=1 tuples included the League Golden Boot recipient (point-biserial r_pb(GB, I(pos=1)) = ${fmtSigned(ss.rGbChampAll, 3)}; r_pb(GB, officialPPG) = ${fmtSigned(ss.rGbPpgAll, 3)}). The point-biserial coefficient is just Pearson's r on a 0/1 indicator:`
+            ` «pos=1» tuples included the League Golden Boot recipient (point-biserial «r_pb(GB, I(pos=1)) = ${fmtSigned(ss.rGbChampAll, 3)}»; «r_pb(GB, officialPPG) = ${fmtSigned(ss.rGbPpgAll, 3)}»). The point-biserial coefficient is just Pearson's «r» on a 0/1 indicator:`
           ),
           mathDisplay(
             'r sub p b equals open paren M sub 1 minus M sub 0 close paren over s sub n, times the square root of p times q, where M sub 1 and M sub 0 are the group means, s sub n the population standard deviation, and p and q the group shares; it equals the Pearson r of the same pairs',
@@ -3417,11 +3543,11 @@
             ' = ', mi('r'), '(', mi('x'), ', ', mi('y'), ') for ', mi('x'), ' ∈ {0, 1}'
           ),
           el('p', null,
-            `Across the Top-4 concentration subsample (n = ${sa.top4Teams.length} club-seasons), pos=1 exhibits lower median single-scorer goal share (`,
+            `Across the Top-4 concentration subsample («n = ${sa.top4Teams.length}» club-seasons), «pos=1» exhibits lower median single-scorer goal share (`,
             el('strong', { textContent: `${fmtNum(ss.champ?.median, 1)}%` }),
-            `, IQR [${fmtNum(ss.champ?.q1, 1)}%, ${fmtNum(ss.champ?.q3, 1)}%]) than pos ∈ {3, 4} (`,
+            `, IQR «[${fmtNum(ss.champ?.q1, 1)}%, ${fmtNum(ss.champ?.q3, 1)}%]») than «pos ∈ {3, 4}» (`,
             el('strong', { textContent: `${fmtNum(ss.thirdFourth?.median, 1)}%` }),
-            `), yielding bivariate r(share, officialPPG) = ${fmtSigned(ss.rSharePpgTop4, 3)}; purely descriptive, zero causal identification.${rawNote}`
+            `), yielding bivariate «r(share, officialPPG) = ${fmtSigned(ss.rSharePpgTop4, 3)}»; purely descriptive, zero causal identification.${rawNote}`
           )
         );
       } else {
@@ -3450,7 +3576,7 @@
           proseEl.append(
             el('p', null,
               sicko
-                ? `2025–26 verification tuple: pos=1 ${c25.team} logged top-scorer share ${cShare}% (${c25.topScorer.player}: ${c25.topScorer.goals}/${c25.gf} GF) vs pos=2 ${ru25.team} at ${ruShare}% (Golden Boot ${ru25.topScorer.player}: ${ru25.topScorer.goals}/${ru25.gf} GF).`
+                ? `2025–26 verification tuple: «pos=1» ${c25.team} logged top-scorer share ${cShare}% (${c25.topScorer.player}: ${c25.topScorer.goals}/${c25.gf} GF) vs «pos=2» ${ru25.team} at ${ruShare}% (Golden Boot ${ru25.topScorer.player}: ${ru25.topScorer.goals}/${ru25.gf} GF).`
                 : `The 2025–26 season illustrates that pattern cleanly: ${c25.team} won the title with ${c25.topScorer.player} supplying ${c25.topScorer.goals} of their ${c25.gf} goals (${cShare}%), while runner-up ${ru25.team}’s ${ru25.topScorer.player} won the Golden Boot with ${ru25.topScorer.goals} of their ${ru25.gf} (${ruShare}%).`
             )
           );
@@ -3461,10 +3587,10 @@
     if (calloutEl) {
       clearEl(calloutEl);
       appendKV(calloutEl, sicko ? 'Verified scorer slots' : 'Verified scorer tables', `${sa.availableSlotsCount} (PL 1992–2026)`);
-      appendKV(calloutEl, sicko ? 'pos=1 w/ Golden Boot' : 'Champions with Golden Boot', `${sa.champWithGbCount} / ${sa.availableSlotsCount} (${pctWithGb}%)`, 'highlight');
-      appendKV(calloutEl, sicko ? 'pos=1 Med. Goal Share' : 'Champion top-scorer share', `${fmtNum(ss.champ?.median, 1)}% median`);
-      appendKV(calloutEl, sicko ? 'pos∈{3,4} Med. Share' : '3rd–4th top-scorer share', `${fmtNum(ss.thirdFourth?.median, 1)}% median`);
-      appendKV(calloutEl, sicko ? 'Top-4 r(share, PPG)' : 'Share vs. points link (Top 4)', fmtSigned(ss.rSharePpgTop4, 3));
+      appendKV(calloutEl, sicko ? '«pos=1» w/ Golden Boot' : 'Champions with Golden Boot', `${sa.champWithGbCount} / ${sa.availableSlotsCount} (${pctWithGb}%)`, 'highlight');
+      appendKV(calloutEl, sicko ? '«pos=1» Med. Goal Share' : 'Champion top-scorer share', `${fmtNum(ss.champ?.median, 1)}% median`);
+      appendKV(calloutEl, sicko ? '«pos ∈ {3,4}» Med. Share' : '3rd–4th top-scorer share', `${fmtNum(ss.thirdFourth?.median, 1)}% median`);
+      appendKV(calloutEl, sicko ? 'Top-4 «r(share, PPG)»' : 'Share vs. points link (Top 4)', fmtSigned(ss.rSharePpgTop4, 3));
     }
 
     const gbSubEl = document.getElementById('sec5-gb-subtitle');
@@ -3847,7 +3973,7 @@
             elv.attribution || 'Sean Elvidge, England-football-results (CC BY 4.0).',
             elv.pinnedCommitSha ? ' Pinned SHA ' : '',
             elv.pinnedCommitSha ? el('code', { textContent: elv.pinnedCommitSha.slice(0, 12) }) : '',
-            `. All ${meta.totalTierSeasonSlots ?? 180} JSON-validated tier-season slots (${fmtInt(meta.totalMatchesPlayed)} matches, ${fmtInt(meta.totalGoalsScored)} goals; schemaVersion ${state.dataset.schemaVersion}) are aggregated deterministically from raw fixture scores, strictly excluding forecast/Elo columns and enforcing exact ∑W = ∑L, ∑GF = ∑GA conservation laws.`
+            `. All ${meta.totalTierSeasonSlots ?? 180} JSON-validated tier-season slots (${fmtInt(meta.totalMatchesPlayed)} matches, ${fmtInt(meta.totalGoalsScored)} goals; schemaVersion ${state.dataset.schemaVersion}) are aggregated deterministically from raw fixture scores, strictly excluding forecast/Elo columns and enforcing exact «∑W = ∑L», «∑GF = ∑GA» conservation laws.`
           ),
           el('p', null,
             el('strong', { textContent: 'Cross-Source Reconciliation & Residual Audit: ' }),
@@ -3855,11 +3981,11 @@
           ),
           el('p', null,
             el('strong', { textContent: 'Estimator Specification & Boundary Guards: ' }),
-            'Section 1 pairs within-slot median(|r_finish|) (plus signed median r, so the sign-flipping D/G gap between median(|r|) and |median(r)| stays transparent) with stacked bivariate OLS R²(PPG). Counterfactual raw 3W+D mode mutates PPG/finishScore in Section 1 and archive points while freezing official standings, titles, play-offs, and survival boundaries. Closed-set outcomeType enums isolate reprieved/expelled boundary rows (e.g., Stevenage 2019–20 T4) from lowest merit survivor estimation.'
+            'Section 1 pairs within-slot «median(|r_finish|)» (plus signed «median(r)», so the sign-flipping D/G gap between «median(|r|)» and «|median(r)|» stays transparent) with stacked bivariate OLS «R²(PPG)». Counterfactual raw «3W+D» mode mutates PPG/finishScore in Section 1 and archive points while freezing official standings, titles, play-offs, and survival boundaries. Closed-set outcomeType enums isolate reprieved/expelled boundary rows (e.g., Stevenage 2019–20 T4) from lowest merit survivor estimation.'
           ),
           el('p', null,
             el('strong', { textContent: 'Lucas-Critique Floor (1981–82): ' }),
-            'Pre-1981 two-point-for-a-win tables are omitted rather than naively rescaled via 3W+D because counterfactual point remapping ignores endogenous tactical equilibrium shifts toward victory-seeking risk. Right-censored post-2025–26 fixtures are strictly gated.'
+            'Pre-1981 two-point-for-a-win tables are omitted rather than naively rescaled via «3W+D» because counterfactual point remapping ignores endogenous tactical equilibrium shifts toward victory-seeking risk. Right-censored post-2025–26 fixtures are strictly gated.'
           )
         );
       } else {
