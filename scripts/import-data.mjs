@@ -28,15 +28,16 @@ const START_YEAR = 1981;
 const args = process.argv.slice(2);
 const doFetch = args.includes('--fetch');
 const endYearArg = args.find((a) => a.startsWith('--end-year='));
-const END_YEAR = endYearArg ? Number(endYearArg.split('=')[1]) : 2024;
+const END_YEAR = endYearArg ? Number(endYearArg.split('=')[1]) : 2025;
 if (!Number.isInteger(END_YEAR) || END_YEAR < START_YEAR || END_YEAR > 2025) {
   throw new Error(`Invalid --end-year value: ${END_YEAR}`);
 }
 
-const OUT_JSON = path.join(REPO_DIR, 'data/england-tiers-1-4-1981-2025.json');
-const OUT_BUNDLE = path.join(REPO_DIR, 'data/england-tiers-1-4-1981-2025-bundle.js');
+const OUT_JSON = path.join(REPO_DIR, `data/england-tiers-1-4-1981-${END_YEAR + 1}.json`);
+const OUT_BUNDLE = path.join(REPO_DIR, `data/england-tiers-1-4-1981-${END_YEAR + 1}-bundle.js`);
 const OUT_MANIFEST = path.join(REPO_DIR, 'data/coverage-manifest.json');
 const PL_BASELINE_PATH = path.join(REPO_DIR, 'data/premier-league-1992-2025.json');
+const PL_2025_SCORERS_PATH = path.join(REPO_DIR, 'data/premier-league-2025-26-scorers.json');
 
 // Sourced outcomes for clubs with no next-season league membership (sy < END_YEAR && nextTier === null).
 // Tiers 1-3 missing next-season membership MUST appear here or the importer fails loudly.
@@ -121,6 +122,7 @@ const SLOT_EXCEPTION_NOTES = new Map([
   ['2006|4', 'Boston United (23rd after a final-day 10-point administration penalty) were relegated two divisions directly to the Conference North alongside 24th-placed Torquay United.'],
   ['2019|3', 'Curtailed due to COVID-19: Bury were expelled before playing a fixture (leaving 23 active teams), and remaining clubs were ranked on unweighted points per game (34-36 matches played). Play-offs still took place; 3rd-placed Wycombe Wanderers (1.735 PPG vs Oxford United 1.714 PPG) won the final.'],
   ['2019|4', 'Curtailed due to COVID-19: final table ranked on unweighted PPG (36-37 matches played). Only bottom club Macclesfield Town (-17 points deducted net of appeals & August 2020 arbitration ruling) were relegated; 23rd-placed Stevenage were reprieved due to Bury\'s Tier 3 expulsion. Play-offs still took place; 7th-placed Northampton Town won promotion.'],
+  ['2025|2', '2025-26 EFL Championship: Sheffield Wednesday (-18 pts: -12 administration, -6 payment breaches), Leicester City (-6 pts: PSR breach), and West Bromwich Albion (-2 pts: PSR breach) received points deductions. In the play-offs, 4th-placed Southampton were expelled after the semi-finals for filming opposition training sessions; 5th-placed Middlesbrough were reinstated for the Wembley final, where 6th-placed Hull City won 1-0.'],
 ]);
 
 async function fetchIfMissing(url, outPath) {
@@ -180,6 +182,12 @@ const resultsPath = path.join(ELVIDGE_DIR, 'EnglandLeagueResults.csv');
 const dedPath = path.join(ELVIDGE_DIR, 'EnglishTeamPointDeductions.csv');
 const namePeriodsPath = path.join(ELVIDGE_DIR, 'EnglishTeamNamePeriods.csv');
 const plBaseline = JSON.parse(fs.readFileSync(PL_BASELINE_PATH, 'utf8'));
+const pl2025Scorers = fs.existsSync(PL_2025_SCORERS_PATH)
+  ? JSON.parse(fs.readFileSync(PL_2025_SCORERS_PATH, 'utf8'))
+  : null;
+const pl2025ClubScorerMap = new Map(
+  Object.entries(pl2025Scorers?.clubTopScorers || {}).map(([team, info]) => [normalizeClubKey(team, 2025), info])
+);
 
 const elvMatchesRaw = parseCsv(fs.readFileSync(resultsPath, 'utf8'));
 const dedRowsRaw = parseCsv(fs.readFileSync(dedPath, 'utf8'));
@@ -421,8 +429,9 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
       creg.aliases.add(rr.rawName);
       if (fr) for (const fn of fr.fdNames) creg.aliases.add(fn);
 
-      // Preserve PL verified topScorer if tier === 1 && plRef
+      // Preserve PL verified topScorer if tier === 1 && (plRef || sy === 2025 with pl2025Scorers)
       let plRow = null;
+      let pl25Scorer = null;
       if (tier === 1 && plRef) {
         plRow = plRef.table.find((x) => normalizeClubKey(x.team, sy) === et.normKey);
         if (!plRow) throw new Error(`PL baseline missing team ${et.elvName} in ${seasonLabel}`);
@@ -434,6 +443,9 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
           throw new Error(`PL baseline pts diff ${seasonLabel} ${et.elvName}: pl=${plRow.points} vs calc=${officialPoints}`);
         }
         creg.aliases.add(plRow.team);
+      } else if (tier === 1 && sy === 2025 && pl2025Scorers) {
+        pl25Scorer = pl2025ClubScorerMap.get(et.normKey) ?? null;
+        if (!pl25Scorer) throw new Error(`PL 2025-26 scorer file missing team ${et.elvName} (${et.normKey})`);
       }
 
       const deductionReasons = dedEntries
@@ -464,8 +476,16 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
         rsssfUpper: Boolean(rr.upper),
         rsssfRelegatedMarker: Boolean(rr.relegatedMarker),
         rsssfPromotedMarker: Boolean(rr.promotedMarker),
-        topScorer: plRow ? plRow.topScorer : null,
-        hasGoldenBootWinner: plRow ? Boolean(plRow.hasGoldenBootWinner) : null,
+        topScorer: plRow
+          ? plRow.topScorer
+          : pl25Scorer
+            ? { player: pl25Scorer.player, goals: pl25Scorer.goals, inLeagueTop10: Boolean(pl25Scorer.inLeagueTop10) }
+            : null,
+        hasGoldenBootWinner: plRow
+          ? Boolean(plRow.hasGoldenBootWinner)
+          : pl25Scorer
+            ? Boolean(pl25Scorer.hasGoldenBootWinner)
+            : null,
       });
     }
 
@@ -611,13 +631,13 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
       };
     });
 
-    // Sanity check 2024-25 T2/T3/T4 playoff winners extracted cleanly!
+    // Sanity check final-season T2/T3/T4 playoff winners extracted cleanly!
     if (sy === END_YEAR && tier >= 2 && promotedCount === 0) {
       throw new Error(`No promoted clubs found at ${slotKey}`);
     }
-    if (sy === 2024 && tier >= 2) {
+    if ((sy === 2024 || sy === END_YEAR) && tier >= 2) {
       const poWinner = rowsFinal.find((r) => r.promotionMethod === 'playoff')?.team;
-      if (!poWinner) throw new Error(`Missing 2024-25 playoff winner extraction for T${tier}`);
+      if (!poWinner) throw new Error(`Missing ${seasonLabel} playoff winner extraction for T${tier}`);
     }
 
     // Relegation & survival boundary positions (honest when 0 relegated, e.g. 1981-85 T4 re-election or reprieved seasons)
@@ -670,10 +690,10 @@ for (let sy = START_YEAR; sy <= END_YEAR; sy++) {
           : (sy === 1992 && tier === 4)
             ? [{ clubId: 'maidstone-united', team: 'Maidstone United', outcome: 'Resigned from the Football League in August 1992 prior to fixtures commencing.' }]
             : [],
-      scorerCoverage: (tier === 1 && sy >= 1992 && plRef) ? 'verified_pl_complete' : 'unavailable',
-      goldenBootGoals: (tier === 1 && plRef) ? plRef.goldenBootGoals : null,
-      goldenBootWinners: (tier === 1 && plRef) ? plRef.goldenBootWinners : [],
-      topScorers: (tier === 1 && plRef) ? plRef.topScorers : null,
+      scorerCoverage: (tier === 1 && sy >= 1992 && (plRef || (sy === 2025 && pl2025Scorers))) ? 'verified_pl_complete' : 'unavailable',
+      goldenBootGoals: (tier === 1 && plRef) ? plRef.goldenBootGoals : (tier === 1 && sy === 2025 && pl2025Scorers) ? pl2025Scorers.goldenBootGoals : null,
+      goldenBootWinners: (tier === 1 && plRef) ? plRef.goldenBootWinners : (tier === 1 && sy === 2025 && pl2025Scorers) ? pl2025Scorers.goldenBootWinners : [],
+      topScorers: (tier === 1 && plRef) ? plRef.topScorers : (tier === 1 && sy === 2025 && pl2025Scorers) ? pl2025Scorers.topScorers : null,
       reconciliationStatus: fdMap ? 'triple_source_reconciled' : 'double_source_reconciled',
       sourceUrls: [
         `https://github.com/seanelvidge/England-football-results/blob/${PINNED_ELVIDGE_SHA}/EnglandLeagueResults.csv`,
@@ -782,11 +802,13 @@ if (plCheck.seasons !== 33 || plCheck.rows !== 666 || plCheck.matches !== 12786 
 }
 
 // Assemble canonical dataset
+const endSeasonLbl = formatSeasonLabel(END_YEAR);
+const fdSlotCount = (END_YEAR - 1993 + 1) * 4;
 const dataset = {
   schemaVersion: '2.0.0',
   metadata: {
-    title: 'The Championship Formula — English League Tiers 1–4 (1981–82 to 2024–25)',
-    seasonsCovered: `${formatSeasonLabel(START_YEAR)} to ${formatSeasonLabel(END_YEAR)}`,
+    title: `The Championship Formula — English League Tiers 1–4 (${formatSeasonLabel(START_YEAR).replace('-', '–')} to ${endSeasonLbl.replace('-', '–')})`,
+    seasonsCovered: `${formatSeasonLabel(START_YEAR)} to ${endSeasonLbl}`,
     startYear: START_YEAR,
     endYear: END_YEAR,
     tiersCovered: [1, 2, 3, 4],
@@ -799,7 +821,7 @@ const dataset = {
     excludedFutureSeasons: [...excludedFutureSeasons].sort(),
     scorerCoverageSummary: {
       verifiedSlots: tierSeasons.filter((s) => s.scorerCoverage === 'verified_pl_complete').length,
-      verifiedRange: 'Tier 1 (Premier League) 1992-93 to 2024-25',
+      verifiedRange: `Tier 1 (Premier League) 1992-93 to ${endSeasonLbl}`,
       unavailableSlots: tierSeasons.filter((s) => s.scorerCoverage !== 'verified_pl_complete').length,
       policy: 'Missing scorer data is explicitly marked unavailable rather than zero-filled or estimated from partial lists.',
     },
@@ -819,27 +841,27 @@ const dataset = {
       },
       {
         id: 'rsssf',
-        name: 'RSSSF — England Football Statistics Archive (Paul Felton / Stuart Jackson & Ian King)',
+        name: 'RSSSF — England Football Statistics Archive (Paul Felton / Stuart Jackson & Ian King / Karel Stokkermans)',
         url: 'https://www.rsssf.org/engpaul/FLA/',
-        scope: 'Official final table positions, promotions, play-off finals, relegations & deduction verification (1981-82..2024-25)',
+        scope: `Official final table positions, promotions, play-off finals, relegations & deduction verification (1981-82..${endSeasonLbl})`,
       },
       {
         id: 'football-data',
         name: 'Football-Data.co.uk — England Historical Match Results (E0–E3 CSVs)',
         url: 'https://www.football-data.co.uk/englandm.php',
-        scope: 'Independent match-by-match cross-check across all 4 tiers from 1993-94 through 2024-25 (128 tier-seasons)',
+        scope: `Independent match-by-match cross-check across all 4 tiers from 1993-94 through ${endSeasonLbl} (${fdSlotCount} tier-seasons)`,
       },
       {
         id: 'wikipedia-efl',
         name: 'Wikipedia / EFL Official Statements',
         url: 'https://en.wikipedia.org/wiki/2019%E2%80%9320_EFL_League_One',
-        scope: 'Verification of 2019-20 curtailed League One & League Two PPG tables and 8 resolved EFL deduction/ordering omissions in RSSSF',
+        scope: 'Verification of 2019-20 curtailed League One & League Two PPG tables, 2025-26 Championship play-off disqualification/reinstatement, and 8 resolved EFL deduction/ordering omissions in RSSSF',
       },
       {
         id: 'pl-baseline',
-        name: 'Audited Championship Formula Premier League Baseline (1992-93..2024-25)',
+        name: `Audited Premier League Scorer Records (1992-93..${endSeasonLbl})`,
         url: './data/premier-league-1992-2025.json',
-        scope: 'Preserved Golden Boot and top-10 club/player scorer attribution for Tier 1 1992-93..2024-25 (666 team-seasons)',
+        scope: `Golden Boot and top-10 / club scorer attribution for Tier 1 1992-93..2024-25 (666 team-seasons) plus verified 2025-26 Premier League scorers (./data/premier-league-2025-26-scorers.json, 20 team-seasons)`,
       },
     ],
     structuralRules: {
@@ -868,11 +890,11 @@ const bundleStr = [
 
 const manifestObj = {
   schemaVersion: '2.0.0',
-  generatedForEndpoint: formatSeasonLabel(END_YEAR),
-  canonicalDatasetFile: 'data/england-tiers-1-4-1981-2025.json',
+  generatedForEndpoint: endSeasonLbl,
+  canonicalDatasetFile: `data/england-tiers-1-4-1981-${END_YEAR + 1}.json`,
   canonicalJsonSha256: finalHash,
   totals: {
-    slotsExpected: 176,
+    slotsExpected: (END_YEAR - START_YEAR + 1) * 4,
     slotsPresent: tierSeasons.length,
     completedSlots: dataset.metadata.completedSlots,
     curtailedSlots: dataset.metadata.curtailedSlots,
@@ -911,4 +933,4 @@ console.log(`SUCCESS: Generated ${tierSeasons.length} tier-seasons (${totalRows}
 console.log(`PL 1992-2025 Regression Parity: ${JSON.stringify(plCheck)}`);
 console.log(`Match discrepancies documented: ${matchDiscrepancies.length}`);
 console.log(`Deductions audited: ${deductionAudit.length}`);
-console.log(`2024-25 playoff winners detected: T2=${tierSeasons.find((s) => s.slotId === '2024-25-T2').table.find((r) => r.promotionMethod === 'playoff')?.team}, T3=${tierSeasons.find((s) => s.slotId === '2024-25-T3').table.find((r) => r.promotionMethod === 'playoff')?.team}, T4=${tierSeasons.find((s) => s.slotId === '2024-25-T4').table.find((r) => r.promotionMethod === 'playoff')?.team}`);
+console.log(`${endSeasonLbl} playoff winners detected: T2=${tierSeasons.find((s) => s.slotId === `${endSeasonLbl}-T2`).table.find((r) => r.promotionMethod === 'playoff')?.team}, T3=${tierSeasons.find((s) => s.slotId === `${endSeasonLbl}-T3`).table.find((r) => r.promotionMethod === 'playoff')?.team}, T4=${tierSeasons.find((s) => s.slotId === `${endSeasonLbl}-T4`).table.find((r) => r.promotionMethod === 'playoff')?.team}`);

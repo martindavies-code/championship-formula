@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "The Championship Formula: static statistical exploration of completed English league football tables (Tiers 1-4, 1981-82 through 2024-25).",
+  "description": "The Championship Formula: static statistical exploration of completed English league football tables (Tiers 1-4, 1981-82 through 2025-26).",
   "engines": {
     "node": ">=22.0.0"
   },

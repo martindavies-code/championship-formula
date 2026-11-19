@@ -1,0 +1,254 @@
+{
+  "season": "2025-26",
+  "startYear": 2025,
+  "endYear": 2026,
+  "sources": [
+    "https://www.premierleague.com/en/stats/top/players/goals/2025-26",
+    "https://en.wikipedia.org/wiki/2025%E2%80%9326_Premier_League"
+  ],
+  "goldenBootGoals": 27,
+  "goldenBootWinners": [
+    {
+      "player": "Erling Haaland",
+      "clubs": [
+        "Manchester City"
+      ],
+      "clubDisplay": "Manchester City",
+      "goals": 27
+    }
+  ],
+  "topScorers": [
+    {
+      "rank": 1,
+      "player": "Erling Haaland",
+      "clubs": [
+        "Manchester City"
+      ],
+      "clubDisplay": "Manchester City",
+      "goals": 27,
+      "clubBreakdown": null
+    },
+    {
+      "rank": 2,
+      "player": "Igor Thiago",
+      "clubs": [
+        "Brentford"
+      ],
+      "clubDisplay": "Brentford",
+      "goals": 22,
+      "clubBreakdown": null
+    },
+    {
+      "rank": 3,
+      "player": "Antoine Semenyo",
+      "clubs": [
+        "AFC Bournemouth",
+        "Manchester City"
+      ],
+      "clubDisplay": "AFC Bournemouth / Manchester City",
+      "goals": 17,
+      "clubBreakdown": [
+        {
+          "club": "AFC Bournemouth",
+          "goals": 10
+        },
+        {
+          "club": "Manchester City",
+          "goals": 7
+        }
+      ]
+    },
+    {
+      "rank": 4,
+      "player": "Ollie Watkins",
+      "clubs": [
+        "Aston Villa"
+      ],
+      "clubDisplay": "Aston Villa",
+      "goals": 16,
+      "clubBreakdown": null
+    },
+    {
+      "rank": 5,
+      "player": "Morgan Gibbs-White",
+      "clubs": [
+        "Nottingham Forest"
+      ],
+      "clubDisplay": "Nottingham Forest",
+      "goals": 15,
+      "clubBreakdown": null
+    },
+    {
+      "rank": 5,
+      "player": "João Pedro",
+      "clubs": [
+        "Chelsea"
+      ],
+      "clubDisplay": "Chelsea",
+      "goals": 15,
+      "clubBreakdown": null
+    },
+    {
+      "rank": 7,
+      "player": "Dominic Calvert-Lewin",
+      "clubs": [
+        "Leeds United"
+      ],
+      "clubDisplay": "Leeds United",
+      "goals": 14,
+      "clubBreakdown": null
+    },
+    {
+      "rank": 7,
+      "player": "Viktor Gyökeres",
+      "clubs": [
+        "Arsenal"
+      ],
+      "clubDisplay": "Arsenal",
+      "goals": 14,
+      "clubBreakdown": null
+    },
+    {
+      "rank": 9,
+      "player": "Eli Junior Kroupi",
+      "clubs": [
+        "AFC Bournemouth"
+      ],
+      "clubDisplay": "AFC Bournemouth",
+      "goals": 13,
+      "clubBreakdown": null
+    },
+    {
+      "rank": 9,
+      "player": "Danny Welbeck",
+      "clubs": [
+        "Brighton & Hove Albion"
+      ],
+      "clubDisplay": "Brighton & Hove Albion",
+      "goals": 13,
+      "clubBreakdown": null
+    }
+  ],
+  "clubTopScorers": {
+    "Arsenal": {
+      "player": "Viktor Gyökeres",
+      "goals": 14,
+      "inLeagueTop10": true,
+      "hasGoldenBootWinner": false
+    },
+    "Manchester City": {
+      "player": "Erling Haaland",
+      "goals": 27,
+      "inLeagueTop10": true,
+      "hasGoldenBootWinner": true
+    },
+    "Manchester United": {
+      "player": "Benjamin Šeško / Bryan Mbeumo",
+      "goals": 11,
+      "inLeagueTop10": false,
+      "hasGoldenBootWinner": false
+    },
+    "Aston Villa": {
+      "player": "Ollie Watkins",
+      "goals": 16,
+      "inLeagueTop10": true,
+      "hasGoldenBootWinner": false
+    },
+    "Liverpool": {
+      "player": "Hugo Ekitiké",
+      "goals": 11,
+      "inLeagueTop10": false,
+      "hasGoldenBootWinner": false
+    },
+    "AFC Bournemouth": {
+      "player": "Eli Junior Kroupi",
+      "goals": 13,
+      "inLeagueTop10": true,
+      "hasGoldenBootWinner": false
+    },
+    "Sunderland": {
+      "player": "Brian Brobbey",
+      "goals": 7,
+      "inLeagueTop10": false,
+      "hasGoldenBootWinner": false
+    },
+    "Brighton & Hove Albion": {
+      "player": "Danny Welbeck",
+      "goals": 13,
+      "inLeagueTop10": true,
+      "hasGoldenBootWinner": false
+    },
+    "Brentford": {
+      "player": "Igor Thiago",
+      "goals": 22,
+      "inLeagueTop10": true,
+      "hasGoldenBootWinner": false
+    },
+    "Chelsea": {
+      "player": "João Pedro",
+      "goals": 15,
+      "inLeagueTop10": true,
+      "hasGoldenBootWinner": false
+    },
+    "Fulham": {
+      "player": "Harry Wilson",
+      "goals": 10,
+      "inLeagueTop10": false,
+      "hasGoldenBootWinner": false
+    },
+    "Newcastle United": {
+      "player": "Bruno Guimarães",
+      "goals": 9,
+      "inLeagueTop10": false,
+      "hasGoldenBootWinner": false
+    },
+    "Everton": {
+      "player": "Beto",
+      "goals": 9,
+      "inLeagueTop10": false,
+      "hasGoldenBootWinner": false
+    },
+    "Leeds United": {
+      "player": "Dominic Calvert-Lewin",
+      "goals": 14,
+      "inLeagueTop10": true,
+      "hasGoldenBootWinner": false
+    },
+    "Crystal Palace": {
+      "player": "Jean-Philippe Mateta",
+      "goals": 12,
+      "inLeagueTop10": false,
+      "hasGoldenBootWinner": false
+    },
+    "Nottingham Forest": {
+      "player": "Morgan Gibbs-White",
+      "goals": 15,
+      "inLeagueTop10": true,
+      "hasGoldenBootWinner": false
+    },
+    "Tottenham Hotspur": {
+      "player": "Richarlison",
+      "goals": 11,
+      "inLeagueTop10": false,
+      "hasGoldenBootWinner": false
+    },
+    "West Ham United": {
+      "player": "Jarrod Bowen",
+      "goals": 9,
+      "inLeagueTop10": false,
+      "hasGoldenBootWinner": false
+    },
+    "Burnley": {
+      "player": "Zian Flemming",
+      "goals": 11,
+      "inLeagueTop10": false,
+      "hasGoldenBootWinner": false
+    },
+    "Wolverhampton Wanderers": {
+      "player": "Tolu Arokodare / Santiago Bueno / Rodrigo Gomes / Mateus Mané",
+      "goals": 3,
+      "inLeagueTop10": false,
+      "hasGoldenBootWinner": false
+    }
+  }
+}

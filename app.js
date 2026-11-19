@@ -245,7 +245,7 @@
     scope: {
       tiers: [1, 2, 3, 4],
       startYear: 1981,
-      endYear: 2024,
+      endYear: 2025,
       includeCurtailed: false,
       pointsMode: 'official',
     },
@@ -254,7 +254,7 @@
     sec2Metric: 'ppg',
     sec3Mode: 'ppg',
     archiveTier: 1,
-    archiveSeason: '2024-25',
+    archiveSeason: '2025-26',
     archiveMode: 'raw',
     archiveSortCol: 0,
     archiveSortDir: 'asc',
@@ -274,7 +274,7 @@
         throw new Error('Offline file:// bundle (window.__CHAMPIONSHIP_DATASET__) was not loaded.');
       }
     } else if (typeof fetch === 'function') {
-      const res = await fetch('./data/england-tiers-1-4-1981-2025.json', { cache: 'no-store' });
+      const res = await fetch('./data/england-tiers-1-4-1981-2026.json', { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status} fetching dataset JSON`);
       ds = await res.json();
     } else if (typeof window !== 'undefined' && window.__CHAMPIONSHIP_DATASET__) {
@@ -376,7 +376,7 @@
       clearEl(banner);
       banner.append(
         el('strong', { textContent: 'Scope: ' }),
-        `All ${ds.metadata.totalTierSeasonSlots} league tables (${fmtInt(ds.metadata.totalTeamSeasons)} team seasons, ${fmtInt(ds.metadata.totalMatchesPlayed)} matches) across Tiers 1–4 from 1981–82 (when three points for a win began) through 2024–25. Because seasons span 38 to 46 matches and leagues range from 20 to 24 clubs, comparisons use per-game rates and a 0-to-1 finish scale (1 = first, 0 = last). Seasons after 2024–25 are excluded.`
+        `All ${ds.metadata.totalTierSeasonSlots} league tables (${fmtInt(ds.metadata.totalTeamSeasons)} team seasons, ${fmtInt(ds.metadata.totalMatchesPlayed)} matches) across Tiers 1–4 from 1981–82 (when three points for a win began) through 2025–26. Because seasons span 38 to 46 matches and leagues range from 20 to 24 clubs, comparisons use per-game rates and a 0-to-1 finish scale (1 = first, 0 = last). In-progress seasons after 2025–26 are excluded.`
       );
     }
 
@@ -587,7 +587,7 @@
     const scorerCardStat = m.scorerAnalysis.status === 'unavailable' ? 'Unavailable' : `${withGb} / ${avail}`;
 
     let scorerClaim = 'No uniform scorer data before 1992 or below Tier 1';
-    let scorerDetail = 'Verified Golden Boot and club scorer tables cover the Premier League (1992–93 to 2024–25) only; widen your filter to inspect them.';
+    let scorerDetail = 'Verified Golden Boot and club scorer tables cover the Premier League (1992–93 to 2025–26) only; widen your filter to inspect them.';
     if (m.scorerAnalysis.status !== 'unavailable') {
       if (withGb === 0) {
         scorerClaim = avail === 1
@@ -699,6 +699,223 @@
         )
       );
     });
+  }
+
+  function buildTakeawaysView(m, scope) {
+    const activeScope = scope || m?.scope || state.scope;
+    const isRaw = (activeScope?.pointsMode || m?.scope?.pointsMode) === 'raw';
+    if (!m || m.isEmpty) {
+      return { isEmpty: true, note: '', bullets: [] };
+    }
+
+    const note = `${m.firstSeason} to ${m.lastSeason} · ${m.numSlots} ${plural(m.numSlots, 'table')}${isRaw ? ' (rank links on raw 3W+D points; outcomes official)' : ''}`;
+    const bullets = [];
+    const hasSlot = (id) => m.slots.some((s) => s.slotId === id);
+
+    if (m.numSlots < 3) {
+      const champList = m.champs.map((c) => `${c.team} (${c.season} Tier ${c.tier}, ${c.points} pts)`).join('; ');
+      bullets.push({
+        lead: `Small-sample snapshot (${m.numSlots} ${plural(m.numSlots, 'table')}).`,
+        body: `Cross-season averages are suppressed below three tables. Official ${plural(m.champs.length, 'champion')}: ${champList}.`,
+      });
+      if (m.survivalSeries.length > 0) {
+        const cutList = m.survivalSeries.map((s) => `${s.season} Tier ${s.tier}: ${s.survivingTeam} stayed up on ${s.survivingPts} pts while ${s.relegatedTeam} went down on ${s.relegatedHighPts}`).join('; ');
+        bullets.push({ lead: 'Relegation boundary.', body: `${cutList}.` });
+      } else if (m.noRelegationSlots.length > 0) {
+        const allReElec = m.noRelegationSlots.every((x) => x.reElectionEra);
+        bullets.push({
+          lead: allReElec ? 'No automatic relegation here.' : 'No relegation here.',
+          body: allReElec
+            ? 'Automatic relegation was not in place in these Fourth Division re-election seasons; bottom clubs faced re-election.'
+            : 'None of the selected tables had automatic relegation.',
+        });
+      }
+      if (m.deductionSensitivity.affectedRowsCount > 0) {
+        bullets.push({
+          lead: 'Points deductions.',
+          body: `${m.deductionSensitivity.affectedRowsCount} team ${plural(m.deductionSensitivity.affectedRowsCount, 'season')} here had points adjustments (${m.deductionSensitivity.relegatedDueToDeductionCount} relegated despite finishing safe on pitch points).`,
+        });
+      }
+      return { isEmpty: false, note, bullets };
+    }
+
+    // 1. Fewer-wins champions (or top-flight win dominance + era climb)
+    if (m.champFewerWinsCases.length > 0) {
+      const firstCase = m.champFewerWinsCases[0];
+      const lastCase = m.champFewerWinsCases[m.champFewerWinsCases.length - 1];
+      const fmtCase = (c) => {
+        const rival = c.winLeaders[0];
+        const rivalPart = rival ? ` vs ${ordinal(rival.pos)}-placed ${rival.team}’s ${rival.won}` : '';
+        return `${c.champion.team} in ${c.season} ${c.historicalDivisionName} (${c.champion.won} wins${rivalPart})`;
+      };
+      const examples = m.champFewerWinsCases.length === 1
+        ? `—${fmtCase(firstCase)}`
+        : `—from ${fmtCase(firstCase)} to ${fmtCase(lastCase)}`;
+      bullets.push({
+        lead: 'You do not have to win the most matches to win the league.',
+        body: `In ${m.champFewerWinsCases.length} of ${m.champs.length} title races (all in Tiers 2–4), the champion won fewer games than a rival${examples}.`,
+      });
+    } else {
+      const latestChamp = m.champs.slice().sort((a, b) => b.startYear - a.startYear)[0];
+      const firstEra = m.eraSplits[0];
+      const lastEra = m.eraSplits[m.eraSplits.length - 1];
+      const eraClause = firstEra && lastEra && firstEra.id !== lastEra.id
+        ? ` Champion pace also climbed from ${fmtNum(firstEra.champPpg, 2)} points a game in ${firstEra.years} to ${fmtNum(lastEra.champPpg, 2)} in ${lastEra.years}.`
+        : '';
+      bullets.push({
+        lead: 'Every champion here at least matched the field for wins.',
+        body: `No title winner in this selection trailed a rival in matches won—most recently ${latestChamp.team} (${latestChamp.won} wins, ${latestChamp.points} points in ${latestChamp.season}).${eraClause}`,
+      });
+    }
+
+    // 2. Survival myth (40-point rule vs reality across tiers & PL 38-game baseline)
+    const ss = m.survivalStats;
+    const pl38 = m.survivalSeries.filter((x) => x.tier === 1 && x.startYear >= 1995 && x.gamesPerTeam === 38);
+    if (ss.slotCount === 0) {
+      const allReElec = m.noRelegationSlots.every((x) => x.reElectionEra);
+      bullets.push({
+        lead: allReElec ? 'Automatic relegation did not yet exist here.' : 'None of these tables had relegation.',
+        body: allReElec
+          ? `Across all ${m.noRelegationSlots.length} selected Fourth Division re-election seasons, bottom clubs faced re-election rather than automatic relegation.`
+          : `All ${m.noRelegationSlots.length} selected tables finished with zero clubs relegated.`,
+      });
+    } else if (m.tiersPresent.length === 1 && m.tiersPresent[0] === 1 && pl38.length >= 3) {
+      const under40 = pl38.filter((x) => x.survivingPts < 40).length;
+      const rel40 = pl38.filter((x) => x.relegatedPts >= 40).length;
+      const s25T1 = m.survivalSeries.find((x) => x.slotId === '2025-26-T1');
+      const s25Tail = s25T1
+        ? ` Even so, ${s25T1.season} came close: ${s25T1.relegatedTeam} went down on ${s25T1.relegatedHighPts} points while ${s25T1.survivingTeam} survived on ${s25T1.survivingPts}.`
+        : '';
+      bullets.push({
+        lead: 'The famous “40 points for safety” rule is usually higher than Premier League clubs need.',
+        body: `In ${pl38.length} 38-game Premier League seasons, 17th place stayed up below 40 points ${under40} times (${fmtNum((under40 / pl38.length) * 100, 1)}%), and only ${rel40} of ${pl38.length} saw a club go down on 40 or more.${s25Tail}`,
+      });
+    } else {
+      const rel40Count = ss.relegatedAtOrAbove40Over38Rate.length;
+      const rel40Pct = (rel40Count / ss.slotCount) * 100;
+      const pl38Tail = pl38.length >= 3
+        ? ` By contrast, in the ${pl38.length} 38-game Premier League seasons, 17th place stayed safe below 40 points ${pl38.filter((x) => x.survivingPts < 40).length} times (${fmtNum((pl38.filter((x) => x.survivingPts < 40).length / pl38.length) * 100, 1)}%).`
+        : '';
+      bullets.push({
+        lead: rel40Pct >= 20
+          ? 'The “40 points for safety” rule breaks down outside the top flight.'
+          : 'Safety lines shift sharply from division to division.',
+        body: `Across ${ss.slotCount} tables with relegation, a relegated club reached 40-in-38 pace (1.053 points a game) in ${rel40Count} tables (${fmtNum(rel40Pct, 1)}%), while the median lowest survivor earned ${fmtNum(ss.survivingPpg?.median, 3)}.${pl38Tail}`,
+      });
+    }
+
+    // 3. Attack vs. defence flips by measurement
+    const atkDef = describeAtkVsDef(m);
+    const rawBasisTag = isRaw ? ' on raw 3W+D points' : '';
+    if (atkDef.diverges) {
+      bullets.push({
+        lead: 'Attack vs. defence has no single winner—it flips depending on how you measure it.',
+        body: `Inside individual tables${rawBasisTag}, ${atkDef.withinLeader === 'ga' ? 'conceding edges scoring' : 'scoring edges conceding'} (${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)}, leading ${atkDef.withinLeader === 'ga' ? m.withinSlot.gaBeatsGfCount : m.withinSlot.gfBeatsGaCount} of ${m.withinSlot.comparableGfGaSlots} tables); pooled across clubs, ${atkDef.pooledLeader === 'gf' ? 'scoring' : 'conceding'} tracks more points-per-game variation (${fmtNum(atkDef.gfR2 * 100, 1)}% vs ${fmtNum(atkDef.gaR2 * 100, 1)}%, overlapping descriptive links).`,
+      });
+    } else if (atkDef.withinLeader === 'near-tie' || atkDef.withinLeader === 'tie') {
+      bullets.push({
+        lead: 'Attack and defence are nearly dead level on table rank.',
+        body: `Within a table${rawBasisTag}, conceding and scoring sit at ${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)}, while pooled across clubs they track ${fmtNum(atkDef.gfR2 * 100, 1)}% (scoring) and ${fmtNum(atkDef.gaR2 * 100, 1)}% (conceding) of points-per-game variation.`,
+      });
+    } else {
+      const winner = atkDef.withinLeader === 'ga' ? 'Defence' : 'Scoring';
+      bullets.push({
+        lead: `${winner} edges both measures here, though by a modest margin.`,
+        body: `Inside individual tables${rawBasisTag}, conceding sits at ${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)} for scoring, and pooled across clubs scoring tracks ${fmtNum(atkDef.gfR2 * 100, 1)}% of points-per-game variation vs ${fmtNum(atkDef.gaR2 * 100, 1)}% for conceding.`,
+      });
+    }
+
+    // 4. Draws as a mid-table trap — with wild exceptions
+    const dl = m.drawLeaderStats;
+    const dlMidPct = dl.count > 0 ? (dl.middleHalfCount / dl.count) * 100 : 0;
+    const dlChampNames = (dl.championCampaigns || []).map((c) => `${c.team} in ${c.season}`).join('; ');
+    const dl25T1 = m.seasonDrawLeaders.find((r) => r.slotId === '2025-26-T1');
+    const dl25T3 = m.seasonDrawLeaders.find((r) => r.slotId === '2025-26-T3');
+    const dl25T2 = m.seasonDrawLeaders.find((r) => r.slotId === '2025-26-T2');
+    let dl25Example = '';
+    if (dl25T1 && dl25T3) {
+      dl25Example = ` Yet 2025–26 showed both extremes: Premier League draw leaders ${dl25T1.team} (${dl25T1.drawn} draws) still finished ${ordinal(dl25T1.officialPos)}, while League One draw leaders ${dl25T3.team} (${dl25T3.drawn} draws) won promotion.`;
+    } else if (dl25T1) {
+      dl25Example = ` Yet in 2025–26, ${dl25T1.team} led the Premier League with ${dl25T1.drawn} draws and still finished ${ordinal(dl25T1.officialPos)}.`;
+    } else if (dl25T2 && dl25T3) {
+      dl25Example = ` In 2025–26, Championship draw leaders ${dl25T2.team} went down while League One draw leaders ${dl25T3.team} won promotion.`;
+    }
+    bullets.push({
+      lead: 'Leading the league in draws usually pulls clubs to the middle—with wild exceptions.',
+      body: `${fmtNum(dlMidPct, 0)}% (${dl.middleHalfCount} of ${dl.count}) of division draw leaders finished in the middle half, ${dl.relegatedCount} went down, and ${dl.championCount === 0 ? 'none won the title' : `only ${dl.championCount} won the league (${dlChampNames})`}.${dl25Example}`,
+    });
+
+    // 5. Golden Boot vs champions (when verified PL seasons are in scope)
+    const sa = m.scorerAnalysis;
+    if (sa.status !== 'unavailable' && sa.availableSlotsCount >= 3) {
+      const withGb = sa.champWithGbCount;
+      const avail = sa.availableSlotsCount;
+      const lead = withGb * 2 < avail
+        ? 'Most Premier League champions did not have the Golden Boot winner.'
+        : withGb * 2 === avail
+          ? 'Exactly half of Premier League champions here had the Golden Boot winner.'
+          : 'A majority of Premier League champions here fielded the Golden Boot winner.';
+      const has25T1 = hasSlot('2025-26-T1');
+      const s25Note = has25T1
+        ? ' In 2025–26, Arsenal won the title with Viktor Gyökeres on 14 goals while Manchester City’s Erling Haaland led the league with 27.'
+        : '';
+      bullets.push({
+        lead,
+        body: `Only ${withGb} of ${avail} verified Premier League champions (${fmtNum((withGb / avail) * 100, 0)}%) fielded the league’s top scorer, and champions relied slightly less on one scorer (${fmtNum(sa.shareStats.champ?.median, 1)}% median share of team goals) than 3rd- and 4th-place clubs (${fmtNum(sa.shareStats.thirdFourth?.median, 1)}%).${s25Note}`,
+      });
+    }
+
+    // 6. EFL play-off upsets & points deductions (or Tier 1 deduction note)
+    const ds = m.deductionSensitivity;
+    if (m.byTierPromotion.length > 0) {
+      const poTotal = m.byTierPromotion.reduce((a, t) => a + t.poWinnerCount, 0);
+      const poTop = m.byTierPromotion.reduce((a, t) => a + (t.poWinnerTopSeedCount ?? t.poWinnerThirdCount), 0);
+      if (poTotal >= 3) {
+        const poTopPct = (poTop / poTotal) * 100;
+        const hasAll25Efl = hasSlot('2025-26-T2') && hasSlot('2025-26-T3') && hasSlot('2025-26-T4');
+        const po25Note = hasAll25Efl
+          ? ' In 2025–26, all three EFL play-off finals went to lower seeds (6th-placed Hull City, 5th-placed Bolton Wanderers and 5th-placed Notts County).'
+          : '';
+        let dedPart = '';
+        if (ds.relegatedDueToDeductionCount > 0) {
+          const has25T2 = hasSlot('2025-26-T2');
+          dedPart = ` Meanwhile, ${ds.relegatedDueToDeductionCount} ${plural(ds.relegatedDueToDeductionCount, 'club')} went down after points deductions despite finishing safe on pitch points${has25T2 ? '—including Leicester City (−6) in 2025–26, when Sheffield Wednesday’s −18 penalty left them on an era-low 0 points.' : '.'}`;
+        }
+        bullets.push({
+          lead: poTop * 2 < poTotal
+            ? 'Top play-off seeds miss out most of the time—and deductions can decide relegation.'
+            : 'Play-offs remain volatile—and deductions can decide relegation.',
+          body: `Across ${poTotal} EFL play-off tournaments, the top play-off seed won promotion ${poTop} times (${fmtNum(poTopPct, 0)}%).${po25Note}${dedPart}`,
+        });
+      }
+    } else if (ds.relegatedDueToDeductionCount > 0) {
+      bullets.push({
+        lead: 'Points deductions have decided relegation without changing the wider patterns.',
+        body: `${ds.affectedRowsCount} team ${plural(ds.affectedRowsCount, 'season')} here had points adjustments, and ${ds.relegatedDueToDeductionCount} ${plural(ds.relegatedDueToDeductionCount, 'club')} (${ds.relegatedDueToDeduction.map((x) => `${x.team} ${x.season}`).join(', ')}) went down despite finishing above the relegation line on pitch points alone.`,
+      });
+    }
+
+    return { isEmpty: false, note, bullets };
+  }
+
+  function renderKeyTakeaways() {
+    const m = state.model;
+    const listEl = document.getElementById('takeaways-list');
+    const noteEl = document.getElementById('takeaways-scope-note');
+    const view = buildTakeawaysView(m, state.scope);
+    if (noteEl) noteEl.textContent = view.note;
+    if (!listEl) return;
+    clearEl(listEl);
+    if (view.isEmpty) return;
+
+    for (const b of view.bullets) {
+      listEl.appendChild(
+        el('li', null,
+          el('span', { className: 'takeaways-lead', textContent: `${b.lead} ` }),
+          document.createTextNode(b.body)
+        )
+      );
+    }
   }
 
   /* ========================================================================
@@ -1153,11 +1370,22 @@
             el('strong', { textContent: `${fmtNum(cStats.gaPerGame?.mean, 2)}` }),
             ` (runners-up: ${fmtNum(rStats.gaPerGame?.mean, 2)}). Champions outscored the runner-up in ${m.champMoreGfThanRunnerUp} of ${m.titlePairs.length} races and conceded fewer in ${m.champFewerGaThanRunnerUp}.${rawNote}`
           ),
-          el('p', null,
-            m.champFewerWinsCases.length > 0
-              ? `Looking beyond the top flight shows that title winners do not always win the most matches: ${m.champFewerWinsCases.length} ${plural(m.champFewerWinsCases.length, 'champion')} (all in Tiers 2–4) finished first with fewer wins than a rival, starting with Burnley in the 1981–82 Third Division (21 wins and 17 draws for 80 points, ahead of Carlisle United’s 23 wins).`
-              : 'Every champion in this selection won at least as many matches as any rival.'
-          )
+          el('p', null, (() => {
+            if (m.champFewerWinsCases.length === 0) {
+              return 'Every champion in this selection won at least as many matches as any rival.';
+            }
+            const firstFw = m.champFewerWinsCases[0];
+            const lastFw = m.champFewerWinsCases[m.champFewerWinsCases.length - 1];
+            const fmtFw = (c) => {
+              const rival = c.winLeaders[0];
+              const rivalTxt = rival ? ` ahead of ${ordinal(rival.pos)}-placed ${rival.team}’s ${rival.won} wins` : '';
+              return `${c.champion.team} in the ${c.season} ${c.historicalDivisionName} (${c.champion.won} wins and ${c.champion.drawn} draws for ${c.champion.points} points${rivalTxt})`;
+            };
+            const spanTxt = m.champFewerWinsCases.length === 1
+              ? `: ${fmtFw(firstFw)}`
+              : `, from ${fmtFw(firstFw)} through ${fmtFw(lastFw)}`;
+            return `Looking beyond the top flight shows that title winners do not always win the most matches: ${m.champFewerWinsCases.length} ${plural(m.champFewerWinsCases.length, 'champion')} (all in Tiers 2–4) finished first with fewer wins than a rival${spanTxt}.`;
+          })())
         );
       }
     }
@@ -1475,6 +1703,27 @@
             highRelSlot ? ` (${highRelSlot.relegatedTeam}, ${highRelSlot.relegatedHighPts} pts in the ${highRelSlot.season} ${highRelSlot.historicalDivisionName}).` : '.'
           )
         );
+        if (m.byTierPromotion.length > 0) {
+          const poTotal = m.byTierPromotion.reduce((a, t) => a + t.poWinnerCount, 0);
+          const poTop = m.byTierPromotion.reduce((a, t) => a + (t.poWinnerTopSeedCount ?? t.poWinnerThirdCount), 0);
+          if (poTotal >= 3) {
+            const has25T2 = m.slots.some((s) => s.slotId === '2025-26-T2');
+            const has25EflAll = has25T2 && m.slots.some((s) => s.slotId === '2025-26-T3') && m.slots.some((s) => s.slotId === '2025-26-T4');
+            const po25Clause = has25EflAll
+              ? ' In 2025–26, all three EFL play-off finals went to lower seeds: 6th-placed Hull City (after 4th-placed Southampton were expelled for filming opposition training), 5th-placed Bolton Wanderers, and 5th-placed Notts County.'
+              : '';
+            const ded25Clause = has25T2
+              ? ' Points deductions also reshaped the 2025–26 Championship bottom three: Leicester City (−6) dropped from 52 on-pitch points to 46 and went down, while Sheffield Wednesday (−18) finished on 0 points—the lowest official points total in the dataset.'
+              : '';
+            proseEl.append(
+              el('p', null,
+                `At the top of Tiers 2–4, play-off seeding is rarely decisive: across ${poTotal} EFL play-off tournaments, the highest-ranked play-off entrant won promotion `,
+                el('strong', { textContent: `${poTop} times (${fmtNum((poTop / poTotal) * 100, 1)}%)` }),
+                `.${po25Clause}${ded25Clause}`
+              )
+            );
+          }
+        }
         const pl42Series = m.survivalSeries.filter((x) => x.tier === 1 && x.startYear >= 1992 && x.startYear <= 1994);
         const pl38Series = m.survivalSeries.filter((x) => x.tier === 1 && x.startYear >= 1995 && x.gamesPerTeam === 38);
         if (m.tiersPresent.length === 1 && m.tiersPresent[0] === 1 && pl42Series.length > 0 && pl38Series.length >= 3) {
@@ -1547,7 +1796,7 @@
             el('td', { textContent: fmtNum(t.lastAutoPpg?.median, 3) }),
             el('td', { textContent: fmtNum(t.lastAutoPpg?.min, 3) }),
             el('td', { textContent: String(t.poWinnerCount) }),
-            el('td', { textContent: `${t.poWinnerThirdCount}/${t.poWinnerCount}` }),
+            el('td', { textContent: `${t.poWinnerTopSeedCount ?? t.poWinnerThirdCount}/${t.poWinnerCount}` }),
             el('td', { textContent: `${t.poWinnerLowestPosCount}/${t.poWinnerCount}` })
           ));
         }
@@ -1752,6 +2001,28 @@
               : `No draw-leading side in scope won the league title.${rawNote}`
           )
         );
+        const dl25T1 = m.seasonDrawLeaders.find((r) => r.slotId === '2025-26-T1');
+        const dl25T2 = m.seasonDrawLeaders.find((r) => r.slotId === '2025-26-T2');
+        const dl25T3 = m.seasonDrawLeaders.find((r) => r.slotId === '2025-26-T3');
+        if (dl25T1 && dl25T2 && dl25T3) {
+          proseEl.append(
+            el('p', null,
+              `The 2025–26 season captures that spread in one year: ${dl25T1.team} led the Premier League with ${dl25T1.drawn} draws and still finished ${ordinal(dl25T1.officialPos)}, ${dl25T3.team} led League One with ${dl25T3.drawn} draws and won promotion via the play-offs, and Championship draw leaders ${dl25T2.team} (${dl25T2.drawn} draws, after a 6-point deduction) were relegated.`
+            )
+          );
+        } else if (dl25T1) {
+          proseEl.append(
+            el('p', null,
+              `In 2025–26, ${dl25T1.team} drew ${dl25T1.drawn} of 38 Premier League matches—nearly half their schedule—yet still finished ${ordinal(dl25T1.officialPos)}.`
+            )
+          );
+        } else if (dl25T2 && dl25T3) {
+          proseEl.append(
+            el('p', null,
+              `In 2025–26, draw leaders went in opposite directions: ${dl25T3.team} led League One with ${dl25T3.drawn} draws and won promotion, while Championship draw leaders ${dl25T2.team} (${dl25T2.drawn} draws, after a 6-point deduction) were relegated.`
+            )
+          );
+        }
       }
     }
 
@@ -1846,8 +2117,8 @@
     const verifiedPanel = document.getElementById('sec5-verified-panel');
 
     if (sa.status === 'unavailable') {
-      const unavailText = 'Verified Golden Boot and club top-scorer records cover the Premier League (1992–93 to 2024–25) only. Pre-1992 First Division seasons and Tiers 2–4 lack uniform club-level scorer tables in our verified sources, so nothing is estimated or filled in.';
-      if (titleEl) titleEl.textContent = 'Top-Scorer Records Are Unavailable Outside the Premier League (1992–2025)';
+      const unavailText = 'Verified Golden Boot and club top-scorer records cover the Premier League (1992–93 to 2025–26) only. Pre-1992 First Division seasons and Tiers 2–4 lack uniform club-level scorer tables in our verified sources, so nothing is estimated or filled in.';
+      if (titleEl) titleEl.textContent = 'Top-Scorer Records Are Unavailable Outside the Premier League (1992–2026)';
       if (proseEl) {
         clearEl(proseEl);
         proseEl.append(el('p', { textContent: unavailText }));
@@ -1855,7 +2126,7 @@
       if (calloutEl) {
         clearEl(calloutEl);
         appendKV(calloutEl, 'Verified scorer tables', `0 of ${m.numSlots}`, 'highlight');
-        appendKV(calloutEl, 'Coverage policy', 'Premier League 1992–2025 only (no estimates)');
+        appendKV(calloutEl, 'Coverage policy', 'Premier League 1992–2026 only (no estimates)');
       }
       if (scopeBanner) scopeBanner.hidden = true;
       if (unavailPanel) unavailPanel.hidden = false;
@@ -1869,7 +2140,7 @@
     if (scopeBanner) {
       if (sa.status === 'verified-partial') {
         scopeBanner.hidden = false;
-        scopeBanner.textContent = `Coverage note: Showing ${sa.availableSlotsCount} verified Premier League ${plural(sa.availableSlotsCount, 'season')} (1992–93 to 2024–25). ${sa.unavailableSlotsCount} pre-1992 or lower-tier ${plural(sa.unavailableSlotsCount, 'table')} in your filter ${sa.unavailableSlotsCount === 1 ? 'is' : 'are'} omitted because matching club scorer records are not available.`;
+        scopeBanner.textContent = `Coverage note: Showing ${sa.availableSlotsCount} verified Premier League ${plural(sa.availableSlotsCount, 'season')} (1992–93 to 2025–26). ${sa.unavailableSlotsCount} pre-1992 or lower-tier ${plural(sa.unavailableSlotsCount, 'table')} in your filter ${sa.unavailableSlotsCount === 1 ? 'is' : 'are'} omitted because matching club scorer records are not available.`;
       } else {
         scopeBanner.hidden = true;
       }
@@ -1890,7 +2161,7 @@
       const rawNote = isRawMode() ? ' (Based on official Premier League tables, unaffected by the on-pitch points toggle.)' : '';
       proseEl.append(
         el('p', null,
-          `Across ${sa.availableSlotsCount} verified Premier League ${plural(sa.availableSlotsCount, 'season')} (1992–93 to 2024–25), `,
+          `Across ${sa.availableSlotsCount} verified Premier League ${plural(sa.availableSlotsCount, 'season')} (1992–93 to 2025–26), `,
           el('strong', { textContent: `${sa.champWithGbCount} of ${sa.availableSlotsCount} (${pctWithGb}%)` }),
           ` champions had the league’s Golden Boot winner (linear link between fielding the Golden Boot winner and winning the title: ${fmtSigned(ss.rGbChampAll, 3)}).`
         ),
@@ -1902,11 +2173,25 @@
           ` (linear link between top-scorer share and official points per game: ${fmtSigned(ss.rSharePpgTop4, 3)}; descriptive only).${rawNote}`
         )
       );
+      const s25Pl = m.slots.find((s) => s.slotId === '2025-26-T1');
+      if (s25Pl && sa.availableSlotsCount >= 3) {
+        const c25 = s25Pl.enrichedTable[0];
+        const ru25 = s25Pl.enrichedTable[1];
+        if (c25?.topScorer && ru25?.topScorer) {
+          const cShare = fmtNum((c25.topScorer.goals / c25.gf) * 100, 1);
+          const ruShare = fmtNum((ru25.topScorer.goals / ru25.gf) * 100, 1);
+          proseEl.append(
+            el('p', null,
+              `The 2025–26 season illustrates that pattern cleanly: ${c25.team} won the title with ${c25.topScorer.player} supplying ${c25.topScorer.goals} of their ${c25.gf} goals (${cShare}%), while runner-up ${ru25.team}’s ${ru25.topScorer.player} won the Golden Boot with ${ru25.topScorer.goals} of their ${ru25.gf} (${ruShare}%).`
+            )
+          );
+        }
+      }
     }
 
     if (calloutEl) {
       clearEl(calloutEl);
-      appendKV(calloutEl, 'Verified scorer tables', `${sa.availableSlotsCount} (PL 1992–2025)`);
+      appendKV(calloutEl, 'Verified scorer tables', `${sa.availableSlotsCount} (PL 1992–2026)`);
       appendKV(calloutEl, 'Champions with Golden Boot', `${sa.champWithGbCount} / ${sa.availableSlotsCount} (${pctWithGb}%)`, 'highlight');
       appendKV(calloutEl, 'Champion top-scorer share', `${fmtNum(ss.champ?.median, 1)}% median`);
       appendKV(calloutEl, '3rd–4th top-scorer share', `${fmtNum(ss.thirdFourth?.median, 1)}% median`);
@@ -2109,7 +2394,7 @@
       appendKV(sumList, 'Clubs / Matches', `${slot.participantCount} / ${slot.matchCount}`);
       appendKV(sumList, 'Total Goals', `${slot.totalGoals} (${fmtNum(slot.totalGoals / Math.max(1, slot.matchCount), 2)}/game)`);
       appendKV(sumList, 'Tie-Break Rule', slot.tieBreakRules?.[1] === 'gf' ? 'Points → Goals Scored → Goal Diff' : slot.status === 'curtailed' ? 'Points per Game → Goal Diff/Game' : 'Points → Goal Diff → Goals Scored');
-      appendKV(sumList, 'Golden Boot', slot.scorerCoverage === 'verified_pl_complete' ? `${(slot.goldenBootWinners || []).map((w) => w.player).join(' / ')} (${slot.goldenBootGoals})` : 'Unavailable (Premier League 1992–2025 only)');
+      appendKV(sumList, 'Golden Boot', slot.scorerCoverage === 'verified_pl_complete' ? `${(slot.goldenBootWinners || []).map((w) => w.player).join(' / ')} (${slot.goldenBootGoals})` : 'Unavailable (Premier League 1992–2026 only)');
     }
 
     if (tbody) {
@@ -2150,7 +2435,7 @@
       clearEl(scorersTbody);
       if (slot.scorerCoverage !== 'verified_pl_complete' && slot.scorerCoverage !== 'verified') {
         scorersTbody.appendChild(el('tr', null,
-          el('td', { colSpan: 5, className: 'text-col table-note-cell', textContent: `Scorer chart unavailable for ${slot.season} ${slot.historicalDivisionName}. Verified top-scorer records in this static archive cover Premier League (Tier 1, 1992–93 to 2024–25) only.` })
+          el('td', { colSpan: 5, className: 'text-col table-note-cell', textContent: `Scorer chart unavailable for ${slot.season} ${slot.historicalDivisionName}. Verified top-scorer records in this static archive cover Premier League (Tier 1, 1992–93 to 2025–26) only.` })
         ));
       } else {
         for (const sc of slot.topScorers || []) {
@@ -2250,11 +2535,11 @@
           elv.attribution || 'Sean Elvidge — England-football-results (CC BY 4.0).',
           elv.pinnedCommitSha ? ' Pinned commit ' : '',
           elv.pinnedCommitSha ? el('code', { textContent: elv.pinnedCommitSha.slice(0, 12) }) : '',
-          `. All ${meta.totalTierSeasonSlots ?? 176} league tables (${fmtInt(meta.totalMatchesPlayed)} matches, ${fmtInt(meta.totalGoalsScored)} goals) are built directly from historical match scores, with no predictive models or ratings.`
+          `. All ${meta.totalTierSeasonSlots ?? 180} league tables (${fmtInt(meta.totalMatchesPlayed)} matches, ${fmtInt(meta.totalGoalsScored)} goals) are built directly from historical match scores, with no predictive models or ratings.`
         ),
         el('p', null,
           el('strong', { textContent: 'Independent checks and known differences: ' }),
-          'RSSSF English league tables (1981–82 to 2024–25) and football-data.co.uk match records (1993–94 to 2024–25) were used to verify every points deduction, appeal, expunged record (Aldershot 1991–92), club expulsion (Bury 2019–20), and the Football League’s goals-scored-before-goal-difference tie-breaker (1992–93 to 1998–99 in Tiers 2–4). Across 89,234 matches, 46 minor historical single-goal discrepancies between RSSSF and Elvidge are logged in the project manifest rather than papered over.'
+          `RSSSF English league tables (1981–82 to 2025–26) and football-data.co.uk match records (1993–94 to 2025–26) were used to verify every points deduction, appeal, expunged record (Aldershot 1991–92), club expulsion (Bury 2019–20), and the Football League’s goals-scored-before-goal-difference tie-breaker (1992–93 to 1998–99 in Tiers 2–4). Across ${fmtInt(meta.totalMatchesPlayed)} matches, 46 minor historical single-goal discrepancies between RSSSF and Elvidge are logged in the project manifest rather than papered over.`
         ),
         el('p', null,
           el('strong', { textContent: 'How the numbers work: ' }),
@@ -2262,7 +2547,7 @@
         ),
         el('p', null,
           el('strong', { textContent: 'Why the study starts in 1981–82: ' }),
-          'English football adopted three points for a win across all four top tiers in 1981–82. Earlier two-point seasons are left out because recalculating old tables under three points cannot replay how teams would have played for a win instead of a draw. Only completed seasons through 2024–25 are included.'
+          'English football adopted three points for a win across all four top tiers in 1981–82. Earlier two-point seasons are left out because recalculating old tables under three points cannot replay how teams would have played for a win instead of a draw. Only completed seasons through 2025–26 are included.'
         )
       );
     }
@@ -2273,7 +2558,7 @@
       appendKV(calloutEl, 'Team seasons / matches', `${fmtInt(meta.totalTeamSeasons)} / ${fmtInt(meta.totalMatchesPlayed)}`);
       appendKV(calloutEl, 'Match file SHA-256', elv.sha256?.EnglandLeagueResults ? elv.sha256.EnglandLeagueResults.slice(0, 16) + '…' : 'N/A');
       appendKV(calloutEl, 'Scorer coverage', meta.scorerCoverageSummary ? `${meta.scorerCoverageSummary.verifiedSlots} verified / ${meta.scorerCoverageSummary.unavailableSlots} unavailable` : 'N/A');
-      appendKV(calloutEl, 'Excluded future seasons', Array.isArray(meta.excludedFutureSeasons) ? meta.excludedFutureSeasons.join(', ') : '2025/2026+');
+      appendKV(calloutEl, 'Excluded future seasons', Array.isArray(meta.excludedFutureSeasons) ? meta.excludedFutureSeasons.join(', ') : '2026/2027+');
     }
 
     if (footerEl) {
@@ -2291,13 +2576,14 @@
 
     const emptyPanel = document.getElementById('empty-scope-panel');
     const emptyMsgEl = document.getElementById('empty-scope-message');
-    const sections = document.querySelectorAll('#main-content > section.analysis-section, #ledger');
+    const sections = document.querySelectorAll('#main-content > section.analysis-section, #key-takeaways, #ledger');
     if (state.model.isEmpty) {
       if (emptyMsgEl) {
         emptyMsgEl.textContent = state.model.excludedCurtailedSlots?.length > 0
           ? `All ${state.model.excludedCurtailedSlots.length} matching ${plural(state.model.excludedCurtailedSlots.length, 'table')} (${state.model.excludedCurtailedSlots.map((s) => `${s.season} ${s.historicalDivisionName}`).join(' and ')}) were curtailed and excluded by default. Enable "Include Curtailed" above or broaden your year/tier filter.`
           : 'Select at least one league tier (1–4) or broaden your year range to inspect historical league tables.';
       }
+      renderKeyTakeaways();
       renderLedger();
       if (emptyPanel) emptyPanel.hidden = false;
       sections.forEach((sec) => { if (sec.id !== 'sec-methodology') sec.hidden = true; });
@@ -2307,6 +2593,7 @@
     if (emptyPanel) emptyPanel.hidden = true;
     sections.forEach((sec) => { sec.hidden = false; });
 
+    renderKeyTakeaways();
     renderLedger();
     renderSection1();
     renderSection2();
@@ -2370,7 +2657,7 @@
       updateScope({ ...CA.PRESETS['all-4-tiers'] });
     });
     document.getElementById('btn-jump-pl-scorers')?.addEventListener('click', () => {
-      updateScope({ ...CA.PRESETS['pl-1992-2025'] });
+      updateScope({ ...CA.PRESETS['pl-1992-2026'] });
     });
 
     document.querySelectorAll('[data-sec1-metric]').forEach((btn) => {
@@ -2454,7 +2741,7 @@
   }
 
   if (typeof globalThis !== 'undefined') {
-    globalThis.ChampionshipLedger = { describeAtkVsDef, buildLedgerView };
+    globalThis.ChampionshipLedger = { describeAtkVsDef, buildLedgerView, buildTakeawaysView };
   }
 
   if (typeof document !== 'undefined') {

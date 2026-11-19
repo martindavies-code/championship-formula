@@ -1,16 +1,16 @@
 {
   "schemaVersion": "2.0.0",
-  "generatedForEndpoint": "2024-25",
-  "canonicalDatasetFile": "data/england-tiers-1-4-1981-2025.json",
-  "canonicalJsonSha256": "5dcddcc452b28bc670a3e3297409e9b7ca62d011a5cfa34f06fc28cbef135387",
+  "generatedForEndpoint": "2025-26",
+  "canonicalDatasetFile": "data/england-tiers-1-4-1981-2026.json",
+  "canonicalJsonSha256": "8675f117202850107f6672aa76cf2ff0d5e862cff3e88706fa1010114374b1a5",
   "totals": {
-    "slotsExpected": 176,
-    "slotsPresent": 176,
-    "completedSlots": 174,
+    "slotsExpected": 180,
+    "slotsPresent": 180,
+    "completedSlots": 178,
     "curtailedSlots": 2,
-    "teamSeasons": 4047,
-    "matches": 89234,
-    "goals": 233356,
+    "teamSeasons": 4139,
+    "matches": 91270,
+    "goals": 238714,
     "plRegressionParity": {
       "seasons": 33,
       "rows": 666,
@@ -1495,6 +1495,60 @@
           "team": "Sheffield United",
           "signedAdjustment": -2,
           "note": "Default on payments to other clubs during 2022/2023 season"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2025-26",
+      "tier": 2,
+      "team": "West Bromwich Albion",
+      "signedAdjustment": -2,
+      "rsssfImpliedAdjustment": -2,
+      "entries": [
+        {
+          "date": "2026-04-24",
+          "team": "West Bromwich Albion",
+          "signedAdjustment": -2,
+          "note": "Breaking the EFL's profit and sustainability rules in the three seasons to 2024-25"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2025-26",
+      "tier": 2,
+      "team": "Leicester City",
+      "signedAdjustment": -6,
+      "rsssfImpliedAdjustment": -6,
+      "entries": [
+        {
+          "date": "2026-02-05",
+          "team": "Leicester City",
+          "signedAdjustment": -6,
+          "note": "Breached the EFL's profit and sustainability rules during the 2023/2024 season"
+        }
+      ],
+      "overrideNote": null
+    },
+    {
+      "season": "2025-26",
+      "tier": 2,
+      "team": "Sheffield Wednesday",
+      "signedAdjustment": -18,
+      "rsssfImpliedAdjustment": -18,
+      "entries": [
+        {
+          "date": "2025-10-24",
+          "team": "Sheffield Wednesday",
+          "signedAdjustment": -12,
+          "note": "Entered administration"
+        },
+        {
+          "date": "2025-12-01",
+          "team": "Sheffield Wednesday",
+          "signedAdjustment": -6,
+          "note": "Multiple breaches of EFL Regulations relating to payment obligations"
         }
       ],
       "overrideNote": null
@@ -7450,6 +7504,120 @@
       "relegatedTeams": [
         "Carlisle United (23)",
         "Morecambe (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2025-26-T1",
+      "season": "2025-26",
+      "tier": 1,
+      "historicalDivisionName": "Premier League",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 20,
+      "matchCount": 380,
+      "totalGoals": 1045,
+      "promotionSlots": 0,
+      "relegationSlots": 3,
+      "relegationLinePos": 18,
+      "survivalLinePos": 17,
+      "promotedTeams": [],
+      "relegatedTeams": [
+        "West Ham United (18)",
+        "Burnley (19)",
+        "Wolverhampton Wanderers (20)"
+      ],
+      "scorerCoverage": "verified_pl_complete",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2025-26-T2",
+      "season": "2025-26",
+      "tier": 2,
+      "historicalDivisionName": "EFL Championship",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1438,
+      "promotionSlots": 3,
+      "relegationSlots": 3,
+      "relegationLinePos": 22,
+      "survivalLinePos": 21,
+      "promotedTeams": [
+        "Coventry City (1)",
+        "Ipswich Town (2)",
+        "Hull City (6, PO)"
+      ],
+      "relegatedTeams": [
+        "Oxford United (22)",
+        "Leicester City (23)",
+        "Sheffield Wednesday (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": [
+        "2025-26 EFL Championship: Sheffield Wednesday (-18 pts: -12 administration, -6 payment breaches), Leicester City (-6 pts: PSR breach), and West Bromwich Albion (-2 pts: PSR breach) received points deductions. In the play-offs, 4th-placed Southampton were expelled after the semi-finals for filming opposition training sessions; 5th-placed Middlesbrough were reinstated for the Wembley final, where 6th-placed Hull City won 1-0.",
+        "West Bromwich Albion: -2 pts (-2 pts: Breaking the EFL's profit and sustainability rules in the three seasons to 2024-25)",
+        "Leicester City: -6 pts (-6 pts: Breached the EFL's profit and sustainability rules during the 2023/2024 season)",
+        "Sheffield Wednesday: -18 pts (-12 pts: Entered administration | -6 pts: Multiple breaches of EFL Regulations relating to payment obligations)"
+      ]
+    },
+    {
+      "slotId": "2025-26-T3",
+      "season": "2025-26",
+      "tier": 3,
+      "historicalDivisionName": "EFL League One",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1452,
+      "promotionSlots": 3,
+      "relegationSlots": 4,
+      "relegationLinePos": 21,
+      "survivalLinePos": 20,
+      "promotedTeams": [
+        "Lincoln City (1)",
+        "Cardiff City (2)",
+        "Bolton Wanderers (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Exeter City (21)",
+        "Port Vale (22)",
+        "Rotherham United (23)",
+        "Northampton Town (24)"
+      ],
+      "scorerCoverage": "unavailable",
+      "reconciliationStatus": "triple_source_reconciled",
+      "exceptions": []
+    },
+    {
+      "slotId": "2025-26-T4",
+      "season": "2025-26",
+      "tier": 4,
+      "historicalDivisionName": "EFL League Two",
+      "status": "completed",
+      "rankingBasis": "total_points",
+      "participantCount": 24,
+      "matchCount": 552,
+      "totalGoals": 1423,
+      "promotionSlots": 4,
+      "relegationSlots": 2,
+      "relegationLinePos": 23,
+      "survivalLinePos": 22,
+      "promotedTeams": [
+        "Bromley (1)",
+        "Milton Keynes Dons (2)",
+        "Cambridge United (3)",
+        "Notts County (5, PO)"
+      ],
+      "relegatedTeams": [
+        "Harrogate Town (23)",
+        "Barrow (24)"
       ],
       "scorerCoverage": "unavailable",
       "reconciliationStatus": "triple_source_reconciled",
