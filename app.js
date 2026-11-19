@@ -853,12 +853,12 @@
       if (sicko) {
         banner.append(
           el('strong', { textContent: 'Specification & Normalization Invariant: ' }),
-          ...richNodes(`Canonical ${ds.metadata.totalTierSeasonSlots}-slot JSON panel (${fmtInt(ds.metadata.totalTeamSeasons)} Team-Seasons, ${fmtInt(ds.metadata.totalMatchesPlayed)} matches; schemaVersion ${ds.schemaVersion}) covering Tiers 1–4 across the linear 3-1-0 payoff regime (1981–82..2025–26; Lucas-critique exclusion of pre-1981 2-pt tables and right-censored 2026/27 fixtures). Because schedule lengths vary across «G ∈ {38g, 40g, 42g, 44g, 46g}» and league cardinality across «K ∈ [20, 24]», all regressors are vectorized per match (W/G, D/G, GF/G, GA/G, GD/G, PPG) and standings projected onto normalized finish score «y = 1 − (pos − 1)/(K − 1) ∈ [0, 1]».`)
+          ...richNodes(`Canonical ${ds.metadata.totalTierSeasonSlots}-slot JSON panel (${fmtInt(ds.metadata.totalTeamSeasons)} Team-Seasons, ${fmtInt(ds.metadata.totalMatchesPlayed)} matches; schemaVersion ${ds.schemaVersion}) covering Tiers 1–4 across the linear 3-1-0 payoff regime (1981–82..2025–26; Lucas-critique exclusion of pre-1981 2-pt tables and right-censored 2026/27 fixtures). Because schedule lengths vary across «G ∈ {38g, 40g, 42g, 44g, 46g}» and league cardinality across «K ∈ [20, 24]», all regressors are vectorized per match (W/G, D/G, GF/G, GA/G, GD/G, PPG) and standings projected onto normalized finish score «y = 1 − (pos − 1)/(K − 1) ∈ [0, 1]». Default analysis sample: 178 slots (4,092 team-seasons); the 2 curtailed 2019–20 slots are excluded unless included by filter.`)
         );
       } else {
         banner.append(
           el('strong', { textContent: 'How the numbers stay fair: ' }),
-          `This study covers all ${ds.metadata.totalTierSeasonSlots} completed and curtailed league tables (${fmtInt(ds.metadata.totalTeamSeasons)} team seasons, ${fmtInt(ds.metadata.totalMatchesPlayed)} matches) across Tiers 1–4 from 1981–82, when three points for a win arrived, through 2025–26. Completed seasons run anywhere from 38 to 46 matches and divisions hold 20 to 24 clubs; the two curtailed 2019–20 tables ended early after 34–37 games. We measure stats per game and place every finish on a clean 0-to-1 scale (1 = first, 0 = last). Unfinished seasons after 2025–26 are left out. The filters below narrow every figure on this page; the Showing line always lists the slice in use.`
+          `This study covers all ${ds.metadata.totalTierSeasonSlots} completed and curtailed league tables (${fmtInt(ds.metadata.totalTeamSeasons)} team seasons, ${fmtInt(ds.metadata.totalMatchesPlayed)} matches) across Tiers 1–4 from 1981–82, when three points for a win arrived, through 2025–26. By default the figures below use the 178 completed tables (4,092 team seasons), leaving out the two curtailed tables; the full panel is the 180 tables and 4,139 team seasons. Completed seasons run anywhere from 38 to 46 matches and divisions hold 20 to 24 clubs; the two curtailed 2019–20 tables ended early after 34–37 games. We measure stats per game and place every finish on a clean 0-to-1 scale (1 = first, 0 = last). Unfinished seasons after 2025–26 are left out. The filters below narrow every figure on this page; the Showing line always lists the slice in use.`
         );
       }
     }
@@ -3686,7 +3686,7 @@
     });
     const allSlots = state.dataset.tierSeasons.length;
     const curtailedOut = state.dataset.tierSeasons.filter((ts) => ts.status === 'curtailed' && !state.scope.includeCurtailed && state.scope.tiers.includes(ts.tier) && ts.startYear >= state.scope.startYear && ts.startYear <= state.scope.endYear);
-    setText('sec5b-ledger-subtitle', `Rows without a verified leader say so. Nothing is estimated. This ledger has ${inScope.length} rows; the full archive has ${allSlots} division-seasons.${curtailedOut.length ? ` The ${curtailedOut.length} curtailed 2019–20 ${plural(curtailedOut.length, 'table is', 'tables are')} left out because the filter excludes curtailed seasons.` : ''}`);
+    setText('sec5b-ledger-subtitle', `Rows without a verified leader say so. Nothing is estimated. This ledger has ${inScope.length} rows; the full archive has ${allSlots} division-seasons. Scroll inside the table to read every row.${curtailedOut.length ? ` The ${curtailedOut.length} curtailed 2019–20 ${plural(curtailedOut.length, 'table is', 'tables are')} left out because the filter excludes curtailed seasons.` : ''}`);
     setText('sec5b-source-note', 'Sources: RSSSF (rsssf.org/tablese/engtops.html), englishfootballleaguetables.co.uk, footballsite.co.uk, FBref and Transfermarkt, plus the project’s Premier League records. Exact page links per season are in data/division-leaders.json.');
   }
 
