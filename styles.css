@@ -227,8 +227,10 @@ table th,
 
 .ledger-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
+  gap: 0.35rem 1rem;
   border-block-end: 2px solid var(--rule-heavy);
   padding-block-end: 0.4rem;
   margin-block-end: 1.25rem;

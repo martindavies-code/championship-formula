@@ -485,8 +485,8 @@ test('Stage 2 A1-A5 browser DOM invariants: dual GF/GA metrics, draw copy/quarti
       });
       const sSel = document.getElementById('scope-start-year');
       const eSel = document.getElementById('scope-end-year');
-      sSel.value = '2022'; sSel.dispatchEvent(new Event('change'));
       eSel.value = '2022'; eSel.dispatchEvent(new Event('change'));
+      sSel.value = '2022'; sSel.dispatchEvent(new Event('change'));
     }`);
     await new Promise((r) => setTimeout(r, 150));
     const rawSingle = await cdp.evalJs(`() => ({
@@ -596,8 +596,8 @@ test('Final polish: neutral divergence prose without causal claim and PL 38-game
       });
       const sSel = document.getElementById('scope-start-year');
       const eSel = document.getElementById('scope-end-year');
-      sSel.value = '2022'; sSel.dispatchEvent(new Event('change'));
       eSel.value = '2022'; eSel.dispatchEvent(new Event('change'));
+      sSel.value = '2022'; sSel.dispatchEvent(new Event('change'));
     }`);
     await new Promise((r) => setTimeout(r, 150));
     const t2Raw = await cdp.evalJs(`() => ({
@@ -606,6 +606,135 @@ test('Final polish: neutral divergence prose without causal claim and PL 38-game
     })`);
     assertNoBanned('tier2-2022-23-raw', t2Raw.body);
     assert.ok(!t2Raw.sec3.includes('38-game Premier League baseline'));
+    assert.equal(cdp.pageErrors.length, 0);
+  } finally {
+    await cdp.close();
+    server.close();
+  }
+});
+
+test('Headline ledger semantic DOM invariants: plain English without statistical misstatements', { timeout: 45000 }, async () => {
+  const { server, baseUrl } = await startStaticServer();
+  const cdp = await launchCdpSession();
+  const shorthandRe = /within-slot|\|r\||R²\(PPG\)|\bIQR\b|% Pct|\b38g\b|\b46g\b|\bexcl\.|\bslots\b|\bmed\b|\bGA\/G\b|\bGF\/G\b|\bGD\/G\b|\bW\/G\b|\bPPG\b/i;
+  const badTokenRe = /\[object\b|\bundefined\b|\bNaN\b|\bInfinity\b/;
+  try {
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+    await cdp.navigateAndWait(`${baseUrl}/`);
+
+    const checkLedger = async (label) => {
+      await new Promise((r) => setTimeout(r, 150));
+      const snap = await cdp.evalJs(`() => ({
+        note: document.getElementById('ledger-sample-note').textContent,
+        ledger: document.getElementById('ledger').innerText,
+        emptyHidden: document.getElementById('empty-scope-panel').hidden,
+        emptyMsg: document.getElementById('empty-scope-message').textContent,
+      })`);
+      const mShort = shorthandRe.exec(snap.ledger);
+      assert.equal(mShort, null, `${label} ledger must avoid shorthand jargon (found "${mShort?.[0]}")`);
+      const mBad = badTokenRe.exec(snap.ledger);
+      assert.equal(mBad, null, `${label} ledger must avoid bad tokens (found "${mBad?.[0]}")`);
+      return snap;
+    };
+
+    // 1. Default 174-table scope
+    const defSnap = await checkLedger('default');
+    assert.ok(defSnap.note.includes('174 league tables') && defSnap.note.includes('4,000 team seasons') && defSnap.note.includes('official standings'));
+    assert.ok(defSnap.ledger.includes('negative in 111 of 174 tables and positive in 63'));
+    assert.ok(defSnap.ledger.includes('65.5% of variation') && defSnap.ledger.includes('61.0% with conceding'));
+    assert.ok(defSnap.ledger.includes('middle half roughly 1.94 to 2.16') && !/\bmost\b|\bmajority\b/i.test(defSnap.ledger));
+    assert.ok(defSnap.ledger.includes('164 tables with relegation; 10 without it'));
+    assert.ok(defSnap.ledger.includes('minority (12 of 33)') && defSnap.ledger.includes('41 Golden Boot') && !/rarely|needed/i.test(defSnap.ledger));
+
+    // 2. PL preset
+    await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2025"]').click()`);
+    const plSnap = await checkLedger('pl-1992-2025');
+    assert.ok(plSnap.ledger.includes('33 league tables') && plSnap.ledger.includes('77.2% of variation'));
+
+    // 3. Tier 1 2011-2013 near-tie reproduction
+    await cdp.evalJs(`() => {
+      document.querySelector('[data-preset="all-4-tiers"]').click();
+      document.querySelectorAll('#scope-tier-checkboxes input[type="checkbox"]').forEach((cb) => {
+        const want = cb.value === '1';
+        if (cb.checked !== want) cb.click();
+      });
+      const sSel = document.getElementById('scope-start-year');
+      const eSel = document.getElementById('scope-end-year');
+      eSel.value = '2013'; eSel.dispatchEvent(new Event('change'));
+      sSel.value = '2011'; sSel.dispatchEvent(new Event('change'));
+    }`);
+    const nearSnap = await checkLedger('tier1-2011-2013');
+    assert.ok(nearSnap.ledger.includes('0.852 vs 0.851') && nearSnap.ledger.includes('nearly equal on table rank'));
+    assert.ok(nearSnap.ledger.includes('81.5% of variation') && nearSnap.ledger.includes('65.4% with conceding'));
+
+    // 4. Tier 2 2021 raw mode (Reading 41 official vs 47 raw)
+    await cdp.evalJs(`() => {
+      document.querySelector('[data-preset="all-4-tiers"]').click();
+      document.querySelector('[data-points-mode="raw"]').click();
+      document.querySelectorAll('#scope-tier-checkboxes input[type="checkbox"]').forEach((cb) => {
+        const want = cb.value === '2';
+        if (cb.checked !== want) cb.click();
+      });
+      const sSel = document.getElementById('scope-start-year');
+      const eSel = document.getElementById('scope-end-year');
+      eSel.value = '2021'; eSel.dispatchEvent(new Event('change'));
+      sSel.value = '2021'; sSel.dispatchEvent(new Event('change'));
+    }`);
+    const raw21Snap = await checkLedger('tier2-2021-raw');
+    assert.ok(raw21Snap.note.includes('Cards 01–02: raw 3W+D points; Cards 03–06: official standings'));
+    assert.ok(raw21Snap.ledger.includes('Reading stayed up on 41 official points') && raw21Snap.ledger.includes('47 raw points'));
+
+    // 5. Tier 4 1981-1985 re-election zero-relegation scope
+    await cdp.evalJs(`() => {
+      document.querySelector('[data-preset="all-4-tiers"]').click();
+      document.querySelectorAll('#scope-tier-checkboxes input[type="checkbox"]').forEach((cb) => {
+        const want = cb.value === '4';
+        if (cb.checked !== want) cb.click();
+      });
+      const sSel = document.getElementById('scope-start-year');
+      const eSel = document.getElementById('scope-end-year');
+      sSel.value = '1981'; sSel.dispatchEvent(new Event('change'));
+      eSel.value = '1985'; eSel.dispatchEvent(new Event('change'));
+    }`);
+    const zeroRelSnap = await checkLedger('tier4-1981-85');
+    assert.ok(zeroRelSnap.ledger.includes('5 tables without relegation (0 with relegation)'));
+    assert.ok(zeroRelSnap.ledger.includes('automatic relegation was not in place'));
+
+    // 6. Curtailed-only 2019-20 Tier 3-4 excluded by default -> empty state, then opt-in
+    await cdp.evalJs(`() => {
+      document.querySelector('[data-preset="all-4-tiers"]').click();
+      document.querySelectorAll('#scope-tier-checkboxes input[type="checkbox"]').forEach((cb) => {
+        const want = cb.value === '3' || cb.value === '4';
+        if (cb.checked !== want) cb.click();
+      });
+      const sSel = document.getElementById('scope-start-year');
+      const eSel = document.getElementById('scope-end-year');
+      eSel.value = '2019'; eSel.dispatchEvent(new Event('change'));
+      sSel.value = '2019'; sSel.dispatchEvent(new Event('change'));
+    }`);
+    const curtExclSnap = await checkLedger('curtailed-only-excluded');
+    assert.equal(curtExclSnap.emptyHidden, false);
+    assert.ok(curtExclSnap.emptyMsg.includes('curtailed and excluded by default'));
+    await cdp.evalJs(`() => document.getElementById('scope-include-curtailed').click()`);
+    const curtInclSnap = await checkLedger('curtailed-only-included');
+    assert.equal(curtInclSnap.emptyHidden, true);
+    assert.ok(curtInclSnap.note.includes('2 league tables'));
+
+    // 7. Single-table 2022-23 T2 Raw mode
+    await cdp.evalJs(`() => {
+      document.querySelector('[data-preset="all-4-tiers"]').click();
+      document.querySelector('[data-points-mode="raw"]').click();
+      document.querySelectorAll('#scope-tier-checkboxes input[type="checkbox"]').forEach((cb) => {
+        const want = cb.value === '2';
+        if (cb.checked !== want) cb.click();
+      });
+      const sSel = document.getElementById('scope-start-year');
+      const eSel = document.getElementById('scope-end-year');
+      eSel.value = '2022'; eSel.dispatchEvent(new Event('change'));
+      sSel.value = '2022'; sSel.dispatchEvent(new Event('change'));
+    }`);
+    const singleSnap = await checkLedger('single-t2-raw');
+    assert.ok(singleSnap.note.includes('1 league table · 24 team seasons'));
     assert.equal(cdp.pageErrors.length, 0);
   } finally {
     await cdp.close();
