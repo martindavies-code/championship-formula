@@ -1173,7 +1173,33 @@ h3[id] {
   section[id],
   h2[id],
   h3[id] {
-    scroll-margin-block-start: 10rem;
+    scroll-margin-block-start: 4.5rem;
+  }
+}
+
+/* ==========================================================================
+   SMALL-SCREEN SECTION NAV (phones up to 700px)
+   The jump bar stays sticky but collapses to one sideways-scrolling row so it
+   takes a single line of the viewport instead of most of it; every section
+   link stays reachable with a swipe.
+   ========================================================================== */
+
+@media (max-width: 700px) {
+  .section-nav {
+    padding-block: 0.35rem;
+    margin-block-end: 1.25rem;
+  }
+
+  .section-nav-list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.25rem 1rem;
+    padding-block: 0.15rem;
+    scrollbar-width: thin;
+  }
+
+  .section-nav-list a {
+    white-space: nowrap;
   }
 }
 
