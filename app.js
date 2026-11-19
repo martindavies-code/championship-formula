@@ -371,23 +371,84 @@
     tooltipEl.style.top = `${top}px`;
   }
 
+  let clearPinnedTooltip = null;
+  let globalTooltipDismissWired = false;
+
+  function ensureGlobalTooltipDismiss() {
+    if (globalTooltipDismissWired) return;
+    globalTooltipDismissWired = true;
+    document.addEventListener('click', (evt) => {
+      if (!evt.target?.closest?.('[data-tip-id]')) {
+        if (clearPinnedTooltip) clearPinnedTooltip();
+        hideTooltip();
+      }
+    });
+    document.addEventListener('keydown', (evt) => {
+      if (evt.key === 'Escape') {
+        if (clearPinnedTooltip) clearPinnedTooltip();
+        hideTooltip();
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (clearPinnedTooltip) clearPinnedTooltip();
+      hideTooltip();
+    }, { passive: true });
+  }
+
   function hideTooltip() {
     if (!tooltipEl) return;
     tooltipEl.classList.remove('visible');
     tooltipEl.setAttribute('aria-hidden', 'true');
+    tooltipEl.style.left = '0px';
+    tooltipEl.style.top = '0px';
+    if (clearPinnedTooltip) clearPinnedTooltip();
   }
 
   function wireDelegatedTooltips(svg, tipRegistry) {
-    svg.addEventListener('pointermove', (evt) => {
+    ensureGlobalTooltipDismiss();
+    let pinnedTarget = null;
+    const clearPin = () => { pinnedTarget = null; };
+    const showForEvent = (evt) => {
       const target = evt.target?.closest?.('[data-tip-id]');
       if (!target) {
-        hideTooltip();
+        if (evt.type === 'click') {
+          pinnedTarget = null;
+          hideTooltip();
+        } else if (!pinnedTarget) {
+          if (tooltipEl) {
+            tooltipEl.classList.remove('visible');
+            tooltipEl.setAttribute('aria-hidden', 'true');
+          }
+        }
         return;
       }
       const data = tipRegistry.get(target.dataset.tipId);
-      if (data) showTooltipData(data, evt.clientX, evt.clientY);
+      if (!data) return;
+      if (evt.type === 'click') {
+        if (pinnedTarget === target && tooltipEl?.classList.contains('visible')) {
+          pinnedTarget = null;
+          hideTooltip();
+          return;
+        }
+        pinnedTarget = target;
+        clearPinnedTooltip = clearPin;
+      }
+      const hasClientPos = typeof evt.clientX === 'number' && typeof evt.clientY === 'number' && (evt.clientX !== 0 || evt.clientY !== 0);
+      if (hasClientPos) {
+        showTooltipData(data, evt.clientX, evt.clientY);
+      } else {
+        const r = target.getBoundingClientRect();
+        showTooltipData(data, r.left + r.width / 2, r.top);
+      }
+    };
+    svg.addEventListener('pointermove', showForEvent);
+    svg.addEventListener('click', showForEvent);
+    svg.addEventListener('pointerleave', () => {
+      if (!pinnedTarget && tooltipEl) {
+        tooltipEl.classList.remove('visible');
+        tooltipEl.setAttribute('aria-hidden', 'true');
+      }
     });
-    svg.addEventListener('pointerleave', hideTooltip);
     svg.addEventListener('focusin', (evt) => {
       const target = evt.target?.closest?.('[data-tip-id]');
       if (!target) return;
@@ -397,7 +458,10 @@
         showTooltipData(data, r.left + r.width / 2, r.top);
       }
     });
-    svg.addEventListener('focusout', hideTooltip);
+    svg.addEventListener('focusout', () => { pinnedTarget = null; hideTooltip(); });
+    svg.addEventListener('keydown', (evt) => {
+      if (evt.key === 'Escape') { pinnedTarget = null; hideTooltip(); }
+    });
   }
 
   /* ========================================================================
@@ -448,6 +512,7 @@
     'voice-label': 'Lexical Verbosity Vector:',
     'scope-details-label': 'Estimator Controls',
     'voice-hint': 'UNSUPERVISED QUANT MODE ENGAGED: zero hand-holding, maximum pedantry',
+    'masthead-aside': 'Unsupervised Empirical Audit · Tiers 1–4',
     'masthead-kicker': 'Panel-Data Econometric Spec v2.0.0 · Linear 3-1-0 Payoff Regime («t ∈ [1981, 2025]») · Zero-Imputation ETL',
     'masthead-title': 'The Championship Formula: Within-Slot Pearsonian & Stacked OLS Decomposition of English Pyramid Standings',
     'masthead-deck': 'An unsmoothed, non-causal longitudinal audit of 180 unbalanced tier-season slots across heterogeneous 38g–46g schedules and variable club cardinalities («K ∈ [20, 24]»), isolating within-slot «|r|» hierarchies, right-tail champion drift, survival-boundary truncation, and single-elimination play-off variance.',
@@ -1573,7 +1638,7 @@
     }
     bullets.push({
       lead: 'Clubs that draw most often usually finish mid-table, with striking exceptions.',
-      body: `${fmtNum(dlMidPct, 0)}% (${dl.middleHalfCount} of ${dl.count}) of the clubs that drew most in their division finished in the middle half of the table, ${dl.relegatedCount} went down, and ${dl.championCount === 0 ? 'none won the title' : `only ${dl.championCount} won the league (${dlChampNames})`}.${dl25Example}`,
+      body: `${fmtNum(dlMidPct, 0)}% (${dl.middleHalfCount} of ${dl.count}) of the clubs that drew most in their division finished in the middle half of the table, ${dl.relegatedCount} went down, and ${dl.championCount === 0 ? 'none won the title' : dl.championCount === 1 ? `only one won the league (${dlChampNames})` : `only ${dl.championCount} won the league (${dlChampNames})`}.${dl25Example}`,
     });
 
     // 5. Golden Boot vs champions (when verified PL seasons are in scope)
@@ -1884,7 +1949,7 @@
           el('p', null,
             'Between attack and defence, two common ways of measuring strength can point differently: ',
             el('strong', { textContent: withinPhrase }),
-            ` (goals conceded ${fmtNum(atkDef.gaWithin, 3)} against goals scored ${fmtNum(atkDef.gfWithin, 3)}, gap ${fmtNum(atkDef.withinDiff, 3)} before rounding; defence stronger in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables vs ${m.withinSlot.gfBeatsGaCount} for scoring${atkDef.ties > 0 ? `, ${atkDef.ties} tied` : ''}), whereas `,
+            ` (goals conceded ${fmtNum(atkDef.gaWithin, 3)} against goals scored ${fmtNum(atkDef.gfWithin, 3)}, gap ${fmtNum(atkDef.withinDiff, 3)} before rounding; defence stronger in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables against ${m.withinSlot.gfBeatsGaCount} for scoring${atkDef.ties > 0 ? `, ${atkDef.ties} tied` : ''}), whereas `,
             el('strong', { textContent: pooledPhrase }),
             ` (goals scored ${fmtNum(atkDef.gfR2 * 100, 1)}% against goals conceded ${fmtNum(atkDef.gaR2 * 100, 1)}%, overlapping descriptive links rather than additive shares).${sec1Differs ? ' The measures use different outcomes and aggregation methods, so their rankings can differ.' : ''} Both margins are modest descriptive associations rather than tactical prescriptions.`
           ),
@@ -1944,12 +2009,12 @@
         const tGfPool = row.pooledCorrelations?.find((p) => p.key === 'gfPerGame');
         const tGaPool = row.pooledCorrelations?.find((p) => p.key === 'gaPerGame');
         tierTbody.appendChild(el('tr', null,
-          el('td', { className: 'text-col', textContent: `Tier ${row.tier}` }),
-          el('td', { textContent: String(row.slotCount) }),
-          el('td', { textContent: fmtNum(gf?.medianAbsRFinish, 3) }),
-          el('td', { textContent: fmtNum(ga?.medianAbsRFinish, 3) }),
-          el('td', { textContent: `${row.gaBeatsGfCount}/${row.comparableGfGaSlots}` }),
-          el('td', { textContent: `${fmtNum((tGfPool?.r2Ppg ?? 0) * 100, 1)}% / ${fmtNum((tGaPool?.r2Ppg ?? 0) * 100, 1)}%` })
+          el('td', { className: 'text-col', 'data-label': 'Tier', textContent: `Tier ${row.tier}` }),
+          el('td', { 'data-label': 'Tables', textContent: String(row.slotCount) }),
+          el('td', { 'data-label': 'Scoring', textContent: fmtNum(gf?.medianAbsRFinish, 3) }),
+          el('td', { 'data-label': 'Conceding', textContent: fmtNum(ga?.medianAbsRFinish, 3) }),
+          el('td', { 'data-label': 'Defence wins', textContent: `${row.gaBeatsGfCount}/${row.comparableGfGaSlots}` }),
+          el('td', { 'data-label': 'Points variation', textContent: `${fmtNum((tGfPool?.r2Ppg ?? 0) * 100, 1)}% / ${fmtNum((tGaPool?.r2Ppg ?? 0) * 100, 1)}%` })
         ));
       }
     }
@@ -2010,8 +2075,8 @@
     xMin -= xPad;
     xMax += xPad;
 
-    const yMin = targetIsPpg ? Math.max(0, Math.min(...yVals) - 0.1) : -0.04;
-    const yMax = targetIsPpg ? Math.max(...yVals) + 0.1 : 1.04;
+    const yMin = targetIsPpg ? Math.max(0, Math.min(...yVals) - 0.12) : -0.05;
+    const yMax = targetIsPpg ? Math.max(...yVals) + 0.18 : 1.07;
 
     const sx = (v) => pad.left + ((v - xMin) / Math.max(1e-9, xMax - xMin)) * iw;
     const sy = (v) => pad.top + ih - ((v - yMin) / Math.max(1e-9, yMax - yMin)) * ih;
@@ -2232,7 +2297,7 @@
           el('p', null,
             m.champFewerWinsCases.length === 0
               ? 'Zero «argmax(W)» inversions occurred in this slice: every «pos=1» tuple weakly dominated the division in raw «W».'
-              : `Crucially, the «3W+D» linear functional is non-monotonic in «W» alone: ${m.champFewerWinsCases.length}/${m.champs.length} champions (exclusively T2–T4) satisfied «argmax_i(3W_i + D_i) ≠ argmax_i(W_i)», converting marginal draw-accumulation edges into title margins (e.g., ${m.champFewerWinsCases[0].champion.team} ${m.champFewerWinsCases[0].season} through ${m.champFewerWinsCases[m.champFewerWinsCases.length - 1].champion.team} ${m.champFewerWinsCases[m.champFewerWinsCases.length - 1].season}).`
+              : `The «3W+D» linear functional is non-monotonic in «W» alone: ${m.champFewerWinsCases.length}/${m.champs.length} champions (exclusively T2–T4) satisfied «argmax_i(3W_i + D_i) ≠ argmax_i(W_i)», converting marginal draw-accumulation edges into title margins (e.g., ${m.champFewerWinsCases[0].champion.team} ${m.champFewerWinsCases[0].season} through ${m.champFewerWinsCases[m.champFewerWinsCases.length - 1].champion.team} ${m.champFewerWinsCases[m.champFewerWinsCases.length - 1].season}).`
           )
         );
       } else {
@@ -2338,12 +2403,12 @@
       clearEl(tierTbody);
       for (const t of m.byTierChampions) {
         tierTbody.appendChild(el('tr', null,
-          el('td', { className: 'text-col', textContent: `Tier ${t.tier}` }),
-          el('td', { textContent: String(t.slotCount) }),
-          el('td', { textContent: fmtNum(t.champStats.ppg?.mean, 2) }),
-          el('td', { textContent: fmtNum(t.runnerStats.ppg?.mean, 2) }),
-          el('td', { textContent: fmtNum(t.champStats.gfPerGame?.mean, 2) }),
-          el('td', { textContent: fmtNum(t.champStats.gaPerGame?.mean, 2) })
+          el('td', { className: 'text-col', 'data-label': 'Tier', textContent: `Tier ${t.tier}` }),
+          el('td', { 'data-label': 'Tables', textContent: String(t.slotCount) }),
+          el('td', { 'data-label': '1st points/game', textContent: fmtNum(t.champStats.ppg?.mean, 2) }),
+          el('td', { 'data-label': '2nd points/game', textContent: fmtNum(t.runnerStats.ppg?.mean, 2) }),
+          el('td', { 'data-label': '1st scored/game', textContent: fmtNum(t.champStats.gfPerGame?.mean, 2) }),
+          el('td', { 'data-label': '1st conceded/game', textContent: fmtNum(t.champStats.gaPerGame?.mean, 2) })
         ));
       }
     }
@@ -2547,7 +2612,7 @@
           : `Survival Cutoff Snapshot (${ss.slotCount} ${plural(ss.slotCount, 'Table')} With Relegation)`);
       } else {
         setRich(titleEl, sicko
-          ? 'Cross-Stratum Truncation Non-Stationarity: 40/38g («1.053 PPG») Fails Below T1 While 50/46g («1.087 PPG») Overshoots Median Floors'
+          ? 'Cross-Stratum Truncation Non-Stationarity: 40/38g (1.053 PPG) Fails Below T1 While 50/46g (1.087 PPG) Overshoots Median Floors'
           : 'Safety Varies by Tier: 40-Point Pace Fails Lower-Tier Cutoffs, While 50-Point Pace Is Rarely Reached');
       }
     }
@@ -2816,8 +2881,8 @@
 
     const years = Array.from(new Set(m.survivalSeries.map((s) => s.startYear))).sort((a, b) => a - b);
     const vals = m.survivalSeries.flatMap((s) => [s.survivingPpg * mult, s.relegatedHighPpg * mult]);
-    const yMin = Math.min(...vals, 0.72 * mult);
-    const yMax = Math.max(...vals, 1.24 * mult);
+    const yMin = Math.min(...vals, 0.72 * mult) - 0.03 * mult;
+    const yMax = Math.max(...vals, 1.24 * mult) + 0.05 * mult;
 
     const W = 820;
     const H = 310;
@@ -3240,7 +3305,7 @@
           rows: [
             ['Promoted', `${sd.count} of ${ser.data.total}`],
             ['Promotion rate', `${fmtNum(pct, 1)}%`],
-            ['Vs. 25% equal odds', `${fmtSigned(diff25, 1)} percentage pts`],
+            ['Versus 25% equal odds', `${fmtSigned(diff25, 1)} percentage pts`],
             ['Median 1st–4th gap', fmtGap(ser.data.gap1to4)],
           ],
         });
@@ -3370,7 +3435,9 @@
           ? `«argmax(D)» Tuples Exhibit ${fmtNum(midPct, 0)}% IQR Finish-Percentile Capture, With Just ${dl.championCount} Title Outlier`
           : `«argmax(D)» Tuples Exhibit ${fmtNum(midPct, 0)}% IQR Finish-Percentile Capture (0 Title Outliers)`);
       } else if (dl.championCount > 0) {
-        titleEl.textContent = `Draw Leaders Cluster in the Middle Half (${fmtNum(midPct, 0)}%), With Only ${dl.championCount} ${plural(dl.championCount, 'Champion')}`;
+        titleEl.textContent = dl.championCount === 1
+          ? `Draw Leaders Cluster in the Middle Half (${fmtNum(midPct, 0)}%), With Only One Champion`
+          : `Draw Leaders Cluster in the Middle Half (${fmtNum(midPct, 0)}%), With Only ${dl.championCount} ${plural(dl.championCount, 'Champion')}`;
       } else {
         titleEl.textContent = `Draw Leaders Cluster in the Middle Half (${fmtNum(midPct, 0)}%)`;
       }
@@ -3419,7 +3486,9 @@
             el('strong', { textContent: `${dl.promotedCount}` }),
             ` won promotion. `,
             champText
-              ? `Just ${dl.championCount} draw ${plural(dl.championCount, 'leader')} took the title: ${champText}.${rawNote}`
+              ? (dl.championCount === 1
+                ? `Just one draw leader took the title: ${champText}.${rawNote}`
+                : `Just ${dl.championCount} draw ${plural(dl.championCount, 'leader')} took the title: ${champText}.${rawNote}`)
               : `No draw-leading side in scope won the league title.${rawNote}`
           )
         );
@@ -3538,14 +3607,15 @@
     4: { color: '#2f5d9e', label: 'Fourth tier', short: 'Tier 4', marker: 'triangle' },
   };
 
-  function leaderMarker(kind, cx, cy, color, title) {
+  function leaderMarker(kind, cx, cy, color, title, tipId) {
     const r = 5;
+    const attrs = tipId ? { fill: color, 'data-tip-id': tipId, tabindex: '0', role: 'img', 'aria-label': title } : { fill: color };
     let node;
-    if (kind === 'square') node = svgEl('rect', { x: cx - r, y: cy - r, width: 2 * r, height: 2 * r, fill: color });
-    else if (kind === 'diamond') node = svgEl('polygon', { points: `${cx},${cy - r - 1} ${cx + r + 1},${cy} ${cx},${cy + r + 1} ${cx - r - 1},${cy}`, fill: color });
-    else if (kind === 'triangle') node = svgEl('polygon', { points: `${cx},${cy - r - 1} ${cx + r + 1},${cy + r} ${cx - r - 1},${cy + r}`, fill: color });
-    else node = svgEl('circle', { cx, cy, r: r + 0.5, fill: color });
-    node.appendChild(svgEl('title', {}, title));
+    if (kind === 'square') node = svgEl('rect', { x: cx - r, y: cy - r, width: 2 * r, height: 2 * r, ...attrs });
+    else if (kind === 'diamond') node = svgEl('polygon', { points: `${cx},${cy - r - 1} ${cx + r + 1},${cy} ${cx},${cy + r + 1} ${cx - r - 1},${cy}`, ...attrs });
+    else if (kind === 'triangle') node = svgEl('polygon', { points: `${cx},${cy - r - 1} ${cx + r + 1},${cy + r} ${cx - r - 1},${cy + r}`, ...attrs });
+    else node = svgEl('circle', { cx, cy, r: r + 0.5, ...attrs });
+    if (title) node.appendChild(svgEl('title', {}, title));
     return node;
   }
 
@@ -3584,7 +3654,7 @@
     setRich(titleEl, sicko
       ? `Leader maxima verified in ${c.verified} of ${c.inScope} ${plural(c.inScope, 'division-season')}; ${c.inScope - c.verified} left missing, not imputed`
       : allVerified
-        ? `Every division’s leading scorer is verified for ${c.inScope === 1 ? 'the 1 season' : `all ${c.inScope} seasons`} in view`
+        ? `Every division’s leading scorer is verified for ${c.inScope === 1 ? 'the one season' : `all ${c.inScope} seasons`} in view`
         : `Leading league scorers are verified for ${c.verified} of ${c.inScope} ${plural(c.inScope, 'division-season')} in view`);
 
     appendKV(calloutEl, sicko ? 'Verified' : 'Verified seasons', `${c.verified} of ${c.inScope}`, 'is-strong');
@@ -3630,26 +3700,40 @@
 
     // Chart
     if (rows.length) {
-      const W = window.innerWidth < 600 ? 460 : 720, H = 360, L = 56, R = 14, T = 14, B = 46;
+      const W = window.innerWidth < 600 ? 460 : 720, H = 376, L = 58, R = 22, T = 18, B = 56;
       const x0 = Math.min(...rows.map((r) => r.startYear)), x1 = Math.max(...rows.map((r) => r.startYear));
-      const ymax = Math.ceil(Math.max(...rows.map((r) => r.goals)) / 5) * 5;
+      const ymax = Math.ceil((Math.max(...rows.map((r) => r.goals)) + 2) / 5) * 5;
       const sx = (v) => L + ((v - x0) / Math.max(1, x1 - x0)) * (W - L - R);
       const sy = (v) => T + (1 - v / ymax) * (H - T - B);
       const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', class: 'chart-svg', 'aria-label': `Scatter of the leading scorer's league goals by division and season; ${rows.length} verified ${plural(rows.length, 'division-season')}.` });
       for (let g = 0; g <= ymax; g += 5) {
         svg.appendChild(svgEl('line', { x1: L, x2: W - R, y1: sy(g), y2: sy(g), stroke: '#d9d4c7', 'stroke-width': 1 }));
-        svg.appendChild(svgEl('text', { x: L - 6, y: sy(g) + 4, 'text-anchor': 'end', 'font-size': 16, fill: '#4a463e' }, String(g)));
+        svg.appendChild(svgEl('text', { x: L - 6, y: sy(g) + 4, 'text-anchor': 'end', 'font-size': 12, fill: '#4a463e', class: 'axis-label' }, String(g)));
       }
-      for (let y = Math.ceil(x0 / 5) * 5; y <= x1 - 2; y += 5) {
-        svg.appendChild(svgEl('text', { x: sx(y), y: H - 14, 'text-anchor': 'middle', 'font-size': 16, fill: '#4a463e' }, String(y)));
+      const xStep = (x1 - x0) <= 15 ? 2 : 5;
+      for (let y = Math.ceil(x0 / xStep) * xStep; y <= x1; y += xStep) {
+        svg.appendChild(svgEl('text', { x: sx(y), y: H - B + 18, 'text-anchor': 'middle', 'font-size': 12, fill: '#4a463e', class: 'axis-label' }, String(y)));
       }
-      svg.appendChild(svgEl('text', { x: 14, y: H / 2, 'font-size': 16, fill: '#4a463e', transform: `rotate(-90 14 ${H / 2})`, 'text-anchor': 'middle' }, 'League goals'));
-      rows.forEach((r) => {
+      svg.appendChild(svgEl('text', { x: L + (W - L - R) / 2, y: H - 10, 'font-size': 12, 'font-weight': 600, fill: '#3e3c38', 'text-anchor': 'middle' }, 'Season start year'));
+      svg.appendChild(svgEl('text', { x: 16, y: T + (H - T - B) / 2, 'font-size': 12, 'font-weight': 600, fill: '#3e3c38', transform: `rotate(-90 16 ${T + (H - T - B) / 2})`, 'text-anchor': 'middle' }, 'League goals'));
+      const tipMap = new Map();
+      rows.forEach((r, idx) => {
         const meta = LEADER_TIER_META[r.tier];
         const jitter = (r.tier - 2.5) * 2.4;
-        svg.appendChild(leaderMarker(meta.marker, sx(r.startYear) + jitter, sy(r.goals), meta.color,
-          `${r.season} ${r.divisionName}: ${leaderNames(r.winners)}, ${r.goals} league goals`));
+        const tid = `s5b-${idx}`;
+        const label = `${r.season} ${r.divisionName}: ${leaderNames(r.winners)}, ${r.goals} league goals`;
+        tipMap.set(tid, {
+          title: `${r.season} · ${meta.label}`,
+          subtitle: r.divisionName,
+          rows: [
+            ['Leader(s)', leaderNames(r.winners)],
+            ['League goals', String(r.goals)],
+            ['Goals / game', r.rate ? fmtNum(r.rate, 3) : 'N/A (curtailed)'],
+          ],
+        });
+        svg.appendChild(leaderMarker(meta.marker, sx(r.startYear) + jitter, sy(r.goals), meta.color, label, tid));
       });
+      wireDelegatedTooltips(svg, tipMap);
       document.getElementById('chart-sec5b-leaders').appendChild(svg);
     }
     setText('sec5b-chart-subtitle', rows.length ? `${rows.length} verified ${plural(rows.length, 'division-season')}; each mark is one season` : 'Nothing verified in this filter');
@@ -3662,11 +3746,11 @@
       const meta = LEADER_TIER_META[t];
       const peakWho = s.peak.winners.map((w) => w.player).join(' and ');
       tbody.appendChild(el('tr', {},
-        el('th', { scope: 'row', className: 'text-col', textContent: meta.label }),
-        el('td', { textContent: String(s.n) }),
-        el('td', { textContent: fmtNum(s.goals.median, 1) }),
-        el('td', { textContent: s.rate ? fmtNum(s.rate.median, 2) : 'N/A' }),
-        el('td', { className: 'text-col', textContent: `${s.peak.goals}, ${peakWho} (${s.peak.season})` })));
+        el('th', { scope: 'row', className: 'text-col', 'data-label': 'Division', textContent: meta.label }),
+        el('td', { 'data-label': 'Seasons', textContent: String(s.n) }),
+        el('td', { 'data-label': 'Median Goals', textContent: fmtNum(s.goals.median, 1) }),
+        el('td', { 'data-label': 'Median goals/game', textContent: s.rate ? fmtNum(s.rate.median, 2) : 'N/A' }),
+        el('td', { className: 'text-col', 'data-label': 'Highest', textContent: `${s.peak.goals}, ${peakWho} (${s.peak.season})` })));
     });
     setText('sec5b-tier-subtitle', 'Verified seasons only. Goals per game divides the leader’s league goals by the league games each club in that division was scheduled to play that season (38, 40, 42, 44 or 46), not by the player’s own appearances. A leader who changed club in the same division counts once, with the goals the sources credit to him in that division; a tie counts as one season. Curtailed 2019–20 seasons have unequal games per club, so they get no rate.');
 
@@ -3680,11 +3764,11 @@
       const ok = r && r.status === 'verified_league';
       const status = ok ? 'Verified' : (r && r.status === 'disputed' ? 'Sources disagree' : 'No second source');
       ledger.appendChild(el('tr', { className: ok ? '' : 'row-missing' },
-        el('th', { scope: 'row', className: 'text-col', textContent: ts.season }),
-        el('td', { className: 'text-col', textContent: ts.historicalDivisionName }),
-        el('td', { className: 'text-col', textContent: ok ? leaderNames(r.winners) : 'Not shown' }),
-        el('td', { textContent: ok ? String(r.goals) : '—' }),
-        el('td', { className: 'text-col', textContent: status })));
+        el('th', { scope: 'row', className: 'text-col', 'data-label': 'Season', textContent: ts.season }),
+        el('td', { className: 'text-col', 'data-label': 'Division', textContent: ts.historicalDivisionName }),
+        el('td', { className: 'text-col', 'data-label': 'Leader(s)', textContent: ok ? leaderNames(r.winners) : 'Not shown' }),
+        el('td', { 'data-label': 'League Goals', textContent: ok ? String(r.goals) : '—' }),
+        el('td', { className: 'text-col', 'data-label': 'Status', textContent: status })));
     });
     const allSlots = state.dataset.tierSeasons.length;
     const curtailedOut = state.dataset.tierSeasons.filter((ts) => ts.status === 'curtailed' && !state.scope.includeCurtailed && state.scope.tiers.includes(ts.tier) && ts.startYear >= state.scope.startYear && ts.startYear <= state.scope.endYear);
@@ -3723,20 +3807,21 @@
     all.forEach((r) => { r.posResolved = posOf(r); });
     all.sort((a, b) => a.season.localeCompare(b.season) || a.posResolved - b.posResolved);
     const ver = all.filter((r) => r.ok);
+    const unresolvedCount = all.length - ver.length;
     const shares = ver.map((r) => (r.goals / r.gf) * 100);
     const med = shares.length ? CA.median(shares) : null;
     const clubProse = sicko
-      ? `Of «${all.length}» top-four club-seasons in view, «${ver.length}» have a verified leading scorer with league goals «G» and share «G / GF»; the median share is ${fmtNum(med, 1)}%. The other «${all.length - ver.length}» are left unresolved because of transfers, ties, or a count that two sources do not share.`
-      : `${ver.length} of the ${all.length} top-four club-seasons in view have a verified leading scorer. In those, the leader scored a median of ${fmtNum(med, 0)}% of the club’s league goals. The other ${all.length - ver.length} are left out and marked, because the player moved clubs mid-season, two players tied, or two sources gave different counts.`;
+      ? `Of «${all.length}» top-four club-seasons in view, «${ver.length}» have a verified leading scorer with league goals «G» and share «G / GF»; the median share is ${fmtNum(med, 1)}%.${unresolvedCount > 0 ? ` The other «${unresolvedCount}» are left unresolved because of transfers, ties, or a count that two sources do not share.` : ' All rows in view are verified.'}`
+      : `${ver.length} of the ${all.length} top-four club-seasons in view have a verified leading scorer. In those, the leader scored a median of ${fmtNum(med, 0)}% of the club’s league goals.${unresolvedCount > 0 ? ` The other ${unresolvedCount} are left out and marked, because the player moved clubs mid-season, two players tied, or two sources gave different counts.` : ' Every top-four club in view is verified.'}`;
     if (sicko) setRich(prose, clubProse); else prose.textContent = clubProse;
     all.forEach((r) => {
       tbody.appendChild(el('tr', { className: r.ok ? '' : 'row-missing' },
-        el('th', { scope: 'row', className: 'text-col', textContent: r.season }),
-        el('td', { textContent: ordinal(r.posResolved) }),
-        el('td', { className: 'text-col', textContent: r.team }),
-        el('td', { className: 'text-col', textContent: r.ok ? r.player : `Not shown: ${r.reason}` }),
-        el('td', { textContent: r.ok ? String(r.goals) : '—' }),
-        el('td', { textContent: r.ok ? `${fmtNum((r.goals / r.gf) * 100, 0)}%` : '—' })));
+        el('th', { scope: 'row', className: 'text-col', 'data-label': 'Season', textContent: r.season }),
+        el('td', { 'data-label': 'Finish', textContent: ordinal(r.posResolved) }),
+        el('td', { className: 'text-col', 'data-label': 'Club', textContent: r.team }),
+        el('td', { className: 'text-col', 'data-label': 'Leading Scorer', textContent: r.ok ? r.player : `Not shown: ${r.reason}` }),
+        el('td', { 'data-label': 'League Goals', textContent: r.ok ? String(r.goals) : '—' }),
+        el('td', { 'data-label': 'Share of Club Goals', textContent: r.ok ? `${fmtNum((r.goals / r.gf) * 100, 0)}%` : '—' })));
     });
     document.getElementById('sec5b-club-subtitle').textContent = 'League goals only. Share is the leader’s league goals divided by the club’s league goals.';
     note.textContent = 'Sources: englishfootballleaguetables.co.uk season scorer lists, each confirmed against a second page (the club’s season page on Wikipedia, or Pride of Anglia for Ipswich 1981–82). Links per row are in data/tier1-club-leaders-1981-92.json. This is a separate table, and it does not feed the Golden Boot analysis above.';
@@ -4367,6 +4452,7 @@
   function setVoiceMode(mode) {
     const next = mode === 'sicko' ? 'sicko' : 'normal';
     if (state.voiceMode === next) return;
+    hideTooltip();
     state.voiceMode = next;
     renderAll();
     const statusEl = document.getElementById('table-sort-status');

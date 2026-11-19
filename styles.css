@@ -130,8 +130,8 @@ table th,
 }
 
 .voice-mode-label {
-  font-family: var(--font-mono);
-  font-size: var(--fs-caption, 0.78rem);
+  font-family: var(--font-sans);
+  font-size: var(--fs-caption, 0.8125rem);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 700;
@@ -141,22 +141,23 @@ table th,
 .voice-mode-group {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
 .btn-voice {
   appearance: none;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.45rem;
   background-color: var(--bg-elevated);
   border: 1.5px solid var(--rule-medium);
   color: var(--ink-secondary);
-  font-family: var(--font-mono);
-  font-size: var(--fs-caption, 0.78rem);
+  font-family: var(--font-sans);
+  font-size: var(--fs-caption, 0.8125rem);
   font-weight: 600;
-  padding: 0.34rem 0.72rem;
-  min-block-size: 32px;
+  padding: 0.45rem 0.85rem;
+  min-block-size: 44px;
   cursor: pointer;
   transition: background-color 0.14s ease, color 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
 }
@@ -270,12 +271,12 @@ body.voice-sicko .takeaways-section {
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: safe center;
-  gap: 0.75rem 1.5rem;
-  padding-block-end: 1rem;
-  margin-block-end: 1.25rem;
-  border-block-end: 1px solid var(--rule-light);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
+  gap: 0.5rem 1.5rem;
+  padding-block-start: 0.9rem;
+  margin-block-start: 1.25rem;
+  border-block-start: 1px solid rgba(244, 239, 227, 0.28);
+  font-family: var(--font-sans);
+  font-size: var(--fs-caption, 0.8125rem);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ink-secondary);
@@ -287,38 +288,40 @@ body.voice-sicko .takeaways-section {
 }
 
 .masthead-title {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: clamp(2.1rem, 1.35rem + 3vw, 4.1rem);
-  line-height: 1.06;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-title, clamp(2.25rem, 1.3rem + 4.4vw, 4.4rem));
+  line-height: 1.04;
+  letter-spacing: -0.01em;
   margin: 0 0 0.85rem 0;
   color: var(--ink-primary);
 }
 
 .masthead-deck {
-  font-family: var(--font-serif);
-  font-size: clamp(1.12rem, 0.95rem + 0.6vw, 1.42rem);
-  line-height: 1.45;
+  font-family: var(--font-sans);
+  font-size: var(--fs-body, 1rem);
+  line-height: 1.55;
   color: var(--ink-secondary);
-  max-inline-size: 66ch;
+  max-inline-size: 64ch;
   margin: 0 0 1.25rem 0;
   font-weight: 400;
 }
 
 .normalisation-banner {
   background-color: var(--bg-subtle);
-  border-inline-start: 3px solid var(--ink-primary);
-  padding-block: 0.75rem;
-  padding-inline: 1rem;
-  font-size: 0.86rem;
-  line-height: 1.55;
+  border-inline-start: 3px solid var(--brand-red);
+  padding-block: 0.65rem;
+  padding-inline: 0.9rem;
+  margin-block-end: 0.85rem;
+  font-family: var(--font-sans);
+  font-size: var(--fs-caption, 0.8125rem);
+  line-height: 1.5;
   color: var(--ink-secondary);
 }
 
 .normalisation-banner strong {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-family: var(--font-sans);
+  font-size: var(--fs-caption, 0.8125rem);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--ink-primary);
@@ -699,10 +702,13 @@ body.voice-sicko .takeaways-section {
   background-color: var(--bg-paper);
   border: 1px solid var(--rule-medium);
   color: var(--ink-secondary);
-  font-family: var(--font-mono);
-  font-size: var(--fs-caption, 0.78rem);
-  padding: 0.35rem 0.65rem;
-  min-block-size: 28px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-caption, 0.8125rem);
+  font-weight: 500;
+  padding: 0.45rem 0.75rem;
+  min-block-size: 44px;
+  display: inline-flex;
+  align-items: center;
   cursor: pointer;
   transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
 }
@@ -728,10 +734,10 @@ body.voice-sicko .takeaways-section {
   background-color: var(--bg-paper);
   border: 1px solid var(--rule-medium);
   color: var(--ink-primary);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  padding: 0.35rem 0.65rem;
-  min-block-size: 30px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-caption, 0.8125rem);
+  padding: 0.4rem 0.7rem;
+  min-block-size: 44px;
 }
 
 .select-control:focus-visible {
@@ -959,8 +965,8 @@ table.data-table thead th > button {
   text-transform: inherit;
   letter-spacing: inherit;
   inline-size: 100%;
-  min-block-size: 32px;
-  padding: 0.5rem 0.7rem;
+  min-block-size: 44px;
+  padding: 0.5rem 0.65rem;
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
@@ -1340,13 +1346,14 @@ h3[id] {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  font-family: var(--font-mono);
-  font-size: var(--fs-caption, 0.78rem);
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-size: var(--fs-caption, 0.8125rem);
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ink-secondary);
-  padding-block-end: 0.7rem;
+  min-block-size: 44px;
+  padding-block: 0.4rem;
 }
 
 .scope-details > summary::before {
@@ -1428,11 +1435,11 @@ h3[id] {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  min-block-size: 2.25rem;
-  padding: 0.2rem 0.45rem;
+  min-block-size: 44px;
+  padding: 0.3rem 0.55rem;
   border: 1px solid var(--rule-light);
   background: var(--bg-paper);
-  font-size: 0.8rem;
+  font-size: var(--fs-caption, 0.8125rem);
   color: var(--ink-primary);
   cursor: pointer;
 }
@@ -2107,4 +2114,544 @@ body:not(.voice-sicko) .masthead-title {
 }
 @media print {
   body:not(.voice-sicko) .masthead-title { text-shadow: none; }
+}
+
+
+/* ==========================================================================
+   STAGE 1-5 POLISH: TOKENS, COHESIVE TYPOGRAPHY, TOUCH TARGETS, MUNDIAL ACCENTS
+   ========================================================================== */
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-display: 'CF Condensed', 'Arial Narrow', 'Helvetica Condensed', Impact, sans-serif;
+  --font-hand: 'CF Hand', cursive;
+  --fs-title: clamp(1.65rem, 0.75rem + 4.8vw, 4.4rem);
+  --fs-heading: clamp(1.35rem, 1.15rem + 0.65vw, 1.8rem);
+  --fs-body: 1rem;
+  --fs-caption: 0.8125rem;
+  --sp-1: 0.5rem;
+  --sp-2: 1rem;
+  --sp-3: 1.5rem;
+  --sp-4: 2rem;
+  --radius: 0px;
+}
+
+html {
+  scroll-padding-block-start: 68px;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-variant-numeric: tabular-nums;
+}
+
+/* WCAG 2.2 SC 2.4.11 Focus Not Obscured under sticky section navigation */
+:target,
+section[id],
+h2[id],
+h3[id],
+button,
+a,
+select,
+input,
+summary,
+[tabindex] {
+  scroll-margin-block: 116px 24px;
+}
+
+/* Stage 1: Eliminate mono/serif chrome sprawl -> cohesive proportional UI type + 4 sizes */
+.masthead-meta,
+.section-kicker,
+.section-nav-list,
+.section-nav-summary,
+.takeaways-subtitle,
+.ledger-index,
+.ledger-subtitle,
+.finding-callout-title,
+.finding-kv-list,
+.finding-kv-list dd,
+.chart-legend,
+.chart-note,
+.chart-tooltip,
+.chart-subtitle,
+.control-group-label,
+.era-card-label,
+.scope-legend,
+.year-label,
+.active-scope-banner,
+.normalisation-banner,
+.normalisation-banner strong,
+.scorer-scope-banner,
+.fewer-wins-box,
+.sicko-hero-caption,
+.tier-check,
+.btn-voice,
+.btn-toggle,
+.select-control,
+table.data-table,
+table.data-table caption,
+table.data-table thead th,
+.site-footer,
+.badge,
+.status-badge {
+  font-family: var(--font-sans);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  border-radius: var(--radius);
+}
+
+.section-prose,
+.masthead-deck,
+.takeaways-list li,
+.ledger-claim,
+.fewer-wins-box h4 {
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+}
+
+/* Mundial display hierarchy unified across BOTH Normal & Sicko modes */
+body:not(.voice-sicko) .masthead-title {
+  font-family: "CF Wordmark", var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-title);
+  line-height: 1.04;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--bg-paper);
+  text-shadow: 0.045em 0.045em 0 var(--brand-red);
+}
+
+body.voice-sicko .masthead-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2rem, 1.2rem + 2.6vw, 3.25rem);
+  line-height: 1.06;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+}
+
+body:not(.voice-sicko) .section-title,
+body.voice-sicko .section-title,
+body:not(.voice-sicko) .takeaways-title,
+body.voice-sicko .takeaways-title,
+body:not(.voice-sicko) .ledger-title,
+body.voice-sicko .ledger-title,
+.chart-title,
+.era-card-years,
+.fatal-error-title,
+.analysis-section h3,
+.analysis-section h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.018em;
+  font-size: var(--fs-heading);
+  line-height: 1.12;
+  color: var(--brand-blue-deep);
+}
+
+.fewer-wins-box h4 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--fs-body);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.masthead-hero-copy {
+  min-inline-size: 0;
+  overflow-x: clip;
+}
+
+/* Ledger headline numbers stay tabular bold sans per handoff spec */
+.ledger-stat {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Authentic Mundial Cover 1 & 2 hand-scripted accents ("CF Hand" / Caveat) */
+.masthead-aside {
+  display: inline-block;
+  font-family: var(--font-hand);
+  font-size: var(--fs-heading);
+  font-weight: 600;
+  line-height: 1.15;
+  color: #ffffff;
+  background-color: var(--brand-red);
+  padding: 0.16rem 0.7rem;
+  margin: 0 0 var(--sp-2) 0;
+  transform: rotate(-1.4deg);
+  box-shadow: 3px 3px 0 var(--brand-blue-deep);
+}
+
+body.voice-sicko .masthead-aside {
+  background-color: #ffffff;
+  color: var(--brand-blue-deep);
+  border: 1.5px solid var(--brand-blue-deep);
+  box-shadow: 3px 3px 0 var(--brand-red);
+}
+
+.voice-mode-hint {
+  font-family: var(--font-hand);
+  font-size: var(--fs-body);
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* Masthead colophon placed cleanly at bottom of masthead card (light ink on Mundial blue in BOTH modes) */
+.masthead .masthead-meta,
+body.voice-sicko .masthead .masthead-meta {
+  border-block-start: 1px solid rgba(244, 239, 227, 0.28);
+  border-block-end: 0;
+  padding-block: var(--sp-2) 0;
+  margin-block: var(--sp-3) 0 0;
+  color: rgba(244, 239, 227, 0.92);
+}
+
+.masthead .masthead-deck,
+body.voice-sicko .masthead .masthead-deck {
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  color: rgba(244, 239, 227, 0.94);
+  max-inline-size: 64ch;
+}
+
+.masthead .voice-mode-label,
+body.voice-sicko .masthead .voice-mode-label,
+.masthead .voice-mode-hint,
+body.voice-sicko .masthead .voice-mode-hint,
+.masthead .masthead-kicker,
+body.voice-sicko .masthead .masthead-kicker {
+  color: rgba(244, 239, 227, 0.94);
+}
+
+.masthead .num,
+body.voice-sicko .masthead .num {
+  color: #ffffff;
+}
+
+/* Key Takeaways & Callouts: Mundial red kicker contrast */
+body:not(.voice-sicko) .takeaways-header {
+  border-block-end: 2px solid var(--brand-blue);
+}
+
+body:not(.voice-sicko) .takeaways-subtitle {
+  background-color: var(--brand-red);
+  color: #ffffff;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.18rem 0.55rem;
+}
+
+/* Keep Georgia/serif math crisp across headings and body */
+.math-display,
+.math-inline,
+.section-title .math-inline,
+.chart-title .math-inline,
+.takeaways-title .math-inline {
+  font-family: Georgia, 'Times New Roman', 'Nimbus Roman', serif;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ==========================================================================
+   STAGE 3/5: TOUCH TARGETS (>= 44px), COMPACT STICKY NAV & MOBILE GRIDS
+   ========================================================================== */
+
+.btn-voice,
+.btn-toggle,
+.select-control,
+.tier-check,
+.scope-details > summary,
+.section-nav-summary,
+.section-nav-list a,
+table.data-table thead th > button {
+  min-block-size: 44px;
+}
+
+@media (min-width: 701px) {
+  .section-nav {
+    padding-block: 0.2rem;
+    margin-block-end: var(--sp-4);
+  }
+  .section-nav-list {
+    flex-wrap: wrap;
+    gap: 0.15rem 0.85rem;
+    align-items: center;
+  }
+  .section-nav-list a {
+    display: inline-flex;
+    align-items: center;
+    padding-block: 0.2rem;
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 1120px) {
+  .section-nav-list {
+    flex-wrap: wrap;
+    gap: 0.1rem 0.62rem;
+  }
+  .section-nav-list a {
+    padding-inline: 0.1rem;
+  }
+}
+
+.math-display {
+  max-inline-size: 100%;
+  flex-wrap: wrap;
+  row-gap: 0.35rem;
+  overflow-x: auto;
+}
+
+@media (max-width: 700px) {
+  .section-nav-summary {
+    display: flex;
+    align-items: center;
+    padding-block: 0.45rem;
+  }
+  .section-nav-list a {
+    display: flex;
+    align-items: center;
+    padding-block: 0.45rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .voice-mode-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    inline-size: 100%;
+  }
+  .scope-presets,
+  .scope-points-mode {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    inline-size: 100%;
+  }
+  .scope-presets > .control-group-label,
+  .scope-points-mode > .control-group-label {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+  .voice-mode-group .btn-voice,
+  .scope-presets .btn-toggle,
+  .scope-points-mode .btn-toggle {
+    inline-size: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+  .chart-tooltip {
+    max-inline-size: min(290px, calc(100vw - 24px));
+  }
+}
+
+/* ==========================================================================
+   STAGE 4: DATA TABLE FIT, WRAP & RESPONSIVE CARD STACKING (0px CLIPPING)
+   ========================================================================== */
+
+#sec1-tier-table th:first-child,
+#sec1-tier-table td:first-child {
+  white-space: nowrap;
+}
+
+#sec2-dist-table th,
+#sec2-dist-table td {
+  padding: 0.36rem 0.24rem;
+}
+
+#sec2-dist-table td:not(:first-child) {
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  #sec1-tier-table th,
+  #sec1-tier-table td,
+  #sec1-tier-table th.text-col,
+  #sec1-tier-table td.text-col,
+  #sec2-tier-table th,
+  #sec2-tier-table td,
+  #sec2-tier-table th.text-col,
+  #sec2-tier-table td.text-col,
+  #sec3-tier-table th,
+  #sec3-tier-table td,
+  #sec3-tier-table th.text-col,
+  #sec3-tier-table td.text-col,
+  #sec3-promo-table th,
+  #sec3-promo-table td,
+  #sec3-promo-table th.text-col,
+  #sec3-promo-table td.text-col,
+  #sec3-playoff-seed-table th,
+  #sec3-playoff-seed-table td,
+  #sec3-playoff-seed-table th.text-col,
+  #sec3-playoff-seed-table td.text-col,
+  #sec4-draws-table th,
+  #sec4-draws-table td,
+  #sec4-draws-table th.text-col,
+  #sec4-draws-table td.text-col,
+  #archive-league-table th,
+  #archive-league-table td,
+  #archive-league-table th.text-col,
+  #archive-league-table td.text-col,
+  #sec5b-ledger-table th,
+  #sec5b-ledger-table td,
+  #sec5b-club-table th,
+  #sec5b-club-table td,
+  #sec5b-tier-table th,
+  #sec5b-tier-table td,
+  table.data-table caption,
+  table.data-table thead th,
+  table.data-table td::before,
+  table.data-table tbody th[scope="row"]::before {
+    font-family: var(--font-sans);
+    font-size: var(--fs-caption);
+  }
+}
+
+#sec4-draws-table th,
+#sec4-draws-table td {
+  padding: 0.42rem 0.38rem;
+}
+
+#sec4-draws-table th:nth-child(4),
+#sec4-draws-table td:nth-child(4) {
+  white-space: nowrap;
+}
+
+@media (min-width: 601px) {
+  #sec5b-club-table th:nth-child(2),
+  #sec5b-club-table td:nth-child(2) {
+    text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  #sec5b-club-table thead,
+  #sec5b-ledger-table thead,
+  #sec5b-tier-table thead,
+  #sec1-tier-table thead,
+  #sec2-tier-table thead,
+  #sec1-corr-table thead,
+  #sec2-dist-table thead,
+  #sec3-tier-table thead,
+  #sec3-promo-table thead,
+  #sec5-gb-table thead {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  #sec5b-club-table caption,
+  #sec5b-ledger-table caption,
+  #sec5b-tier-table caption,
+  #sec1-tier-table caption,
+  #sec2-tier-table caption,
+  #sec1-corr-table caption,
+  #sec2-dist-table caption,
+  #sec3-tier-table caption,
+  #sec3-promo-table caption,
+  #sec5-gb-table caption {
+    display: block;
+    inline-size: 100%;
+  }
+
+  #sec5b-club-table, #sec5b-club-table tbody, #sec5b-club-table tr, #sec5b-club-table td, #sec5b-club-table th[scope="row"],
+  #sec5b-ledger-table, #sec5b-ledger-table tbody, #sec5b-ledger-table tr, #sec5b-ledger-table td, #sec5b-ledger-table th[scope="row"],
+  #sec5b-tier-table, #sec5b-tier-table tbody, #sec5b-tier-table tr, #sec5b-tier-table td, #sec5b-tier-table th[scope="row"],
+  #sec1-tier-table, #sec1-tier-table tbody, #sec1-tier-table tr, #sec1-tier-table td,
+  #sec2-tier-table, #sec2-tier-table tbody, #sec2-tier-table tr, #sec2-tier-table td,
+  #sec1-corr-table, #sec1-corr-table tbody, #sec1-corr-table tr, #sec1-corr-table td,
+  #sec2-dist-table, #sec2-dist-table tbody, #sec2-dist-table tr, #sec2-dist-table td,
+  #sec3-tier-table, #sec3-tier-table tbody, #sec3-tier-table tr, #sec3-tier-table td,
+  #sec3-promo-table, #sec3-promo-table tbody, #sec3-promo-table tr, #sec3-promo-table td,
+  #sec5-gb-table, #sec5-gb-table tbody, #sec5-gb-table tr, #sec5-gb-table td {
+    display: block;
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+
+  #sec5b-club-table tr,
+  #sec5b-ledger-table tr,
+  #sec5b-tier-table tr,
+  #sec1-tier-table tr,
+  #sec2-tier-table tr,
+  #sec1-corr-table tr,
+  #sec2-dist-table tr,
+  #sec3-tier-table tr,
+  #sec3-promo-table tr,
+  #sec5-gb-table tr {
+    border-block-end: 2px solid var(--rule-heavy);
+    padding: 0.45rem 0;
+  }
+
+  #sec5b-club-table tbody th[scope="row"],
+  #sec5b-ledger-table tbody th[scope="row"],
+  #sec5b-tier-table tbody th[scope="row"] {
+    position: static;
+    border-inline-end: 0;
+    background-color: transparent;
+  }
+
+  #sec5b-club-table td, #sec5b-club-table tbody th[scope="row"],
+  #sec5b-ledger-table td, #sec5b-ledger-table tbody th[scope="row"],
+  #sec5b-tier-table td, #sec5b-tier-table tbody th[scope="row"],
+  #sec1-tier-table td,
+  #sec2-tier-table td,
+  #sec1-corr-table td,
+  #sec2-dist-table td,
+  #sec3-tier-table td,
+  #sec3-promo-table td,
+  #sec5-gb-table td {
+    display: grid;
+    grid-template-columns: minmax(7rem, 44%) minmax(0, 1fr);
+    gap: 0.5rem;
+    align-items: baseline;
+    text-align: end;
+    padding: 0.38rem 0.65rem;
+    border-block-end: 1px solid var(--rule-light);
+    font-size: var(--fs-caption);
+    white-space: normal;
+  }
+
+  #sec5b-club-table td:last-child,
+  #sec5b-ledger-table td:last-child,
+  #sec5b-tier-table td:last-child,
+  #sec1-tier-table td:last-child,
+  #sec2-tier-table td:last-child,
+  #sec1-corr-table td:last-child,
+  #sec2-dist-table td:last-child,
+  #sec3-tier-table td:last-child,
+  #sec3-promo-table td:last-child,
+  #sec5-gb-table td:last-child {
+    border-block-end: 0;
+  }
+
+  #sec5b-club-table td::before, #sec5b-club-table tbody th[scope="row"]::before,
+  #sec5b-ledger-table td::before, #sec5b-ledger-table tbody th[scope="row"]::before,
+  #sec5b-tier-table td::before, #sec5b-tier-table tbody th[scope="row"]::before,
+  #sec1-tier-table td::before,
+  #sec2-tier-table td::before,
+  #sec1-corr-table td::before,
+  #sec2-dist-table td::before,
+  #sec3-tier-table td::before,
+  #sec3-promo-table td::before,
+  #sec5-gb-table td::before {
+    content: attr(data-label);
+    text-align: start;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: var(--fs-caption);
+    color: var(--ink-secondary);
+  }
+}
+
+.chart-panel svg [data-tip-id] {
+  cursor: pointer;
 }
