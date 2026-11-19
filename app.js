@@ -1649,7 +1649,7 @@
             ', with R² = r(x, PPG)² for each single-regressor fit. The two operators answer different questions (typical in-table link vs pooled variation), and GF/G and GA/G are collinear, so neither figure is an additive variance share or a causal effect.'
           ),
           el('p', null,
-            `D/G ranks ${ordinal(drawRankOverall)}/5 overall. Its r flips sign across slots (r < 0 in ${drawNegSlots}/${drawPred?.slotCount ?? 0}, r > 0 in ${drawPosSlots}), and sign flips are exactly what drives the two medians apart: the median of an absolute value is always at least the absolute value of the median, with equality only when the signs agree. Here they disagree, so `,
+            `D/G ranks ${ordinal(drawRankOverall)}/5 overall. Its r flips sign across slots (r < 0 in ${drawNegSlots}/${drawPred?.slotCount ?? 0}, r > 0 in ${drawPosSlots}). The median of an absolute value is always at least the absolute value of the median, and the two are equal when every sign agrees. Here the signs split, and that split is what opens the gap: absolute values pull the negative slots up alongside the positive ones, so `,
             el('strong', { textContent: `median(|r|) = ${fmtNum(drawPred?.medianAbsRFinish, 3)} ≥ |median(r)| = ${fmtNum(Math.abs(drawPred?.medianRFinish ?? 0), 3)}` }),
             ` (signed median r = ${fmtSigned(drawPred?.medianRFinish, 3)}, IQR [${fmtSigned(drawPred?.q1RFinish, 3)}, ${fmtSigned(drawPred?.q3RFinish, 3)}]). Payoff arithmetic completes the story: over 22 fixtures, 11W + 11L yields 33 pts vs 22 pts for 22D (and 11 pts for 11D).`
           )
