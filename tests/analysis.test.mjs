@@ -401,3 +401,74 @@ test('Headline ledger semantics: Items 1-6 across real scopes, fixtures, and edg
   assert.ok(!/\bNaN\b|\bInfinity\b|\bundefined\b|\[object/i.test(sickoTakText));
   assert.ok(sickoTakText.includes('argmax(W)') && sickoTakText.includes('R²(PPG)') && sickoTakText.includes('χ²') && sickoTakText.includes('PPG'));
 });
+
+
+const leaders = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'division-leaders.json'), 'utf8'));
+const allTiers = { tiers: [1, 2, 3, 4], startYear: 1981, endYear: 2025 };
+
+test('division leaders: every slot is accounted for and statuses are explicit', () => {
+  assert.equal(Object.keys(leaders.slots).length, dataset.tierSeasons.length);
+  for (const ts of dataset.tierSeasons) assert.ok(leaders.slots[ts.slotId], `missing ${ts.slotId}`);
+  for (const [id, r] of Object.entries(leaders.slots)) {
+    assert.ok(['verified_league', 'disputed', 'not_verified'].includes(r.status), id);
+    if (r.status === 'verified_league') {
+      assert.ok(r.winners.length >= 1 && r.winners.every((w) => typeof w.player === 'string' && w.player.length > 3 && !/^[A-Z]\./.test(w.player)), `${id} winners`);
+      assert.ok(Number.isInteger(r.goals) && r.goals >= 10 && r.goals <= 50, `${id} goals`);
+      assert.ok(r.sourceUrls.length >= 2, `${id} needs at least two source links`);
+    } else {
+      assert.equal(r.goals, null, `${id} must not show a count`);
+      assert.deepEqual(r.winners, [], `${id} must not show a leader`);
+    }
+  }
+});
+
+test('division leaders: Premier League seasons match the project Golden Boot data', () => {
+  for (const ts of dataset.tierSeasons.filter((s) => s.tier === 1 && s.startYear >= 1992)) {
+    const r = leaders.slots[ts.slotId];
+    assert.equal(r.status, 'verified_league', ts.slotId);
+    assert.equal(r.goals, ts.goldenBootGoals, ts.slotId);
+    assert.deepEqual(r.winners.map((w) => w.player).sort(), ts.goldenBootWinners.map((w) => w.player).sort(), ts.slotId);
+  }
+});
+
+test('division leaders: spot-checked records and summary arithmetic', () => {
+  assert.equal(leaders.slots['1990-91-T2'].status, 'not_verified'); // sources disagree on scope; no figure shown
+  assert.equal(leaders.slots['1986-87-T4'].goals, null);
+  assert.equal(leaders.slots['1988-89-T3'].goals, 37);
+  assert.equal(leaders.slots['1988-89-T3'].winners[0].player, 'Steve Bull');
+  assert.equal(leaders.slots['2021-22-T2'].goals, 43);
+  const res = CA.summarizeDivisionLeaders(dataset, leaders, allTiers);
+  assert.equal(res.counts.inScope, 178);
+  assert.equal(res.counts.verified + res.counts.disputed + res.counts.notVerified, res.counts.inScope);
+  assert.equal(res.rows.length, res.counts.verified);
+  const t3 = res.rows.filter((r) => r.tier === 3).map((r) => r.goals).sort((a, b) => a - b);
+  const mid = t3.length % 2 ? t3[(t3.length - 1) / 2] : (t3[t3.length / 2 - 1] + t3[t3.length / 2]) / 2;
+  assert.equal(res.byTier[3].goals.median, mid);
+  const noCurtail = CA.summarizeDivisionLeaders(dataset, leaders, { ...allTiers, includeCurtailed: false });
+  assert.ok(noCurtail.rows.every((r) => r.games >= 38));
+  assert.equal(CA.summarizeDivisionLeaders(dataset, null, allTiers).available, false);
+});
+
+const clubLeaders = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'tier1-club-leaders-1981-92.json'), 'utf8'));
+
+test('first division club leaders: rows match dataset finish and goals-for, unresolved rows carry reasons', () => {
+  assert.equal(clubLeaders.rows.length + clubLeaders.unresolved.length, 44);
+  for (const r of clubLeaders.rows) {
+    const slot = dataset.tierSeasons.find((t) => t.slotId === r.slotId);
+    const row = slot.table.find((x) => x.team === r.team);
+    assert.ok(row && row.pos <= 4 && row.pos === r.pos && row.gf === r.gf, `${r.slotId} ${r.team}`);
+    assert.ok(r.goals > 0 && r.goals <= r.gf, `${r.slotId} ${r.team} goals`);
+    assert.ok(r.sourceUrls.length >= 2, `${r.slotId} ${r.team} sources`);
+  }
+  const keys = new Set([...clubLeaders.rows, ...clubLeaders.unresolved].map((r) => `${r.season}|${r.team}`));
+  assert.equal(keys.size, 44, 'no club-season appears twice');
+  for (const u of clubLeaders.unresolved) assert.ok(u.reason.length > 20, u.team);
+  const un = (s, t) => clubLeaders.unresolved.find((u) => u.season === s && u.team === t);
+  assert.ok(un('1991-92', 'Arsenal'), 'Wright transfer row stays unresolved');
+  assert.ok(un('1990-91', 'Liverpool'), 'tied row stays unresolved');
+  assert.ok(un('1983-84', 'Nottingham Forest'), 'tied row stays unresolved');
+  assert.ok(un('1990-91', 'Arsenal'), 'count conflict stays unresolved');
+  const ruSh = clubLeaders.rows.find((r) => r.season === '1984-85' && r.team === 'Everton');
+  assert.equal(ruSh.player, 'Graeme Sharp');
+  assert.equal(ruSh.goals, 21);
+});

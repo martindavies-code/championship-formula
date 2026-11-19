@@ -416,6 +416,10 @@
      ======================================================================== */
   const state = {
     dataset: null,
+    leaders: null,
+    leadersError: null,
+    clubLeaders: null,
+    clubLeadersError: null,
     model: null,
     voiceMode: 'normal', // 'normal' | 'sicko'
     scope: {
@@ -472,6 +476,28 @@
     'nav-sec4': '04. Stalemate Distribution',
     'nav-sec5': '05. Scorer Concentration',
     'nav-sec6': '06. Raw Slot Ledger',
+    'nav-sec5b': '05b. Leader Order Statistics',
+    'sec5b-kicker': '05b / Division-Leader Order Statistic «M_{d,s}» (Verified Strata Only)',
+    'sec5b-callout-title': 'Verified Stratum Accounting',
+    'sec5b-c1-title': 'Scatter of «M_{d,s}» (League Goals of the Division Maximum) against Season Start',
+    'sec5b-c2-title': 'Location and Dispersion of «M_{d,s}» by Division',
+    'sec5b-tier-cap': 'Per-Division Summary of the Leader Maximum (Verified Seasons)',
+    'sec5b-th-div': 'Division «d»',
+    'sec5b-th-n': '«n_d»',
+    'sec5b-th-med': 'Median «M»',
+    'sec5b-th-rate': 'Median «M / g»',
+    'sec5b-th-peak': 'Sample Maximum',
+    'sec5b-c3-title': 'Full Stratum Ledger with Explicit Missingness',
+    'sec5b-led-cap': 'Leader Maximum by Division-Season, Verification Status Retained',
+    'sec5b-th-div2': 'Division «d»',
+    'sec5b-th-leader': 'Argmax Set',
+    'sec5b-th-goals': '«M_{d,s}»',
+    'sec5b-th-status': 'Status',
+    'sec5b-c4-title': 'Club-Level Leader Order Statistic, Top-Four Clubs, Tier 1 1981–82..1991–92',
+    'sec5b-club-cap': 'Per-Club Leading Scorer and «G / GF», Verified Rows Only',
+    'sec5b-th-club-leader': 'Argmax',
+    'sec5b-th-club-goals': '«G»',
+    'sec5b-th-club-share': '«G / GF»',
     'nav-sec7': '07. ETL & SHA-256 Spec',
     'empty-title': 'Empty Panel Intersection («N_slots = 0»)',
     'empty-btn': 'Reset Slice Spec to Full Panel (T1–T4, 1981–2026)',
@@ -687,6 +713,39 @@
       throw new Error(`Dataset validation failed: ${valid.error}`);
     }
     return ds;
+  }
+
+  async function loadOptionalFile(httpPath, bundleKey, validate) {
+    // Returns { data, error }. A missing or invalid file is reported, never treated as "no data".
+    const isFile = typeof window !== 'undefined' && window.location?.protocol === 'file:';
+    try {
+      let data = null;
+      if (isFile) {
+        data = typeof window !== 'undefined' ? window[bundleKey] : null;
+        if (!data) return { data: null, error: `Offline bundle ${bundleKey} was not loaded.` };
+      } else if (typeof fetch === 'function') {
+        const res = await fetch(httpPath, { cache: 'no-store' });
+        if (!res.ok) return { data: null, error: `HTTP ${res.status} fetching ${httpPath}` };
+        data = await res.json();
+      } else {
+        return { data: null, error: 'No way to load scorer files in this environment.' };
+      }
+      const problem = validate(data);
+      return problem ? { data: null, error: problem } : { data, error: null };
+    } catch (err) {
+      return { data: null, error: `Could not read ${httpPath}: ${err?.message || err}` };
+    }
+  }
+
+  function validateLeaders(d) {
+    if (!d || !d.slots) return 'Division leader file has no slots.';
+    const ids = state.dataset.tierSeasons.map((t) => t.slotId);
+    const missing = ids.filter((id) => !d.slots[id]);
+    return missing.length ? `Division leader file is missing ${missing.length} slots (first: ${missing[0]}).` : null;
+  }
+
+  function validateClubLeaders(d) {
+    return d && Array.isArray(d.rows) && Array.isArray(d.unresolved) ? null : 'First Division club leader file is malformed.';
   }
 
   function showFatalError(errMsg) {
@@ -930,7 +989,7 @@
           ? `Zero-imputation boundary: 0 verified scorer slots in slice`
           : `${withGb}/${avail} PL champions (${fmtNum((withGb / Math.max(1, avail)) * 100, 1)}%) housed Golden Boot (${gbCount} winner-seasons)`,
         detail: m.scorerAnalysis.status === 'unavailable'
-          ? 'Verified Golden Boot + club top-scorer vectors exist exclusively for Tier 1 PL (1992–93..2025–26). Pre-1992 T1 & T2–T4 are strictly non-imputed.'
+          ? 'Verified Golden Boot and club top-scorer vectors exist exclusively for Tier 1 PL (1992–93..2025–26); other strata are strictly non-imputed. Division-leader maxima («M_{d,s}») are verified separately in §05b.'
           : `Verified PL 1992–2026 subsample (${avail} slots; ${unavail} unverified slots explicitly gated rather than zero-filled): «r_pb(GB, Champion) = ${fmtSigned(m.scorerAnalysis.shareStats?.rGbChampAll, 3)}»; Top-4 concentration «r(share, PPG) = ${fmtSigned(m.scorerAnalysis.shareStats?.rSharePpgTop4, 3)}».`,
       },
     ];
@@ -1012,12 +1071,12 @@
 
     const tieClause = atkDef.ties > 0 ? `, ${atkDef.ties} tied` : '';
     const atkDefRankSentence = atkDef.withinLeader === 'ga'
-      ? `Within a table, conceding edges scoring as a median rank link (${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)}, 0–1 scale); separately, defence led in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables (${m.withinSlot.gfBeatsGaCount} for scoring${tieClause}).`
+      ? `Within a table, conceding edges scoring as a median rank link (${fmtNum(atkDef.gaWithin, 3)} against ${fmtNum(atkDef.gfWithin, 3)}, 0–1 scale); separately, defence led in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables (${m.withinSlot.gfBeatsGaCount} for scoring${tieClause}).`
       : atkDef.withinLeader === 'gf'
-        ? `Within a table, scoring edges conceding as a median rank link (${fmtNum(atkDef.gfWithin, 3)} vs ${fmtNum(atkDef.gaWithin, 3)}, 0–1 scale); separately, scoring led in ${m.withinSlot.gfBeatsGaCount} of ${m.withinSlot.comparableGfGaSlots} tables (${m.withinSlot.gaBeatsGfCount} for defence${tieClause}).`
+        ? `Within a table, scoring edges conceding as a median rank link (${fmtNum(atkDef.gfWithin, 3)} against ${fmtNum(atkDef.gaWithin, 3)}, 0–1 scale); separately, scoring led in ${m.withinSlot.gfBeatsGaCount} of ${m.withinSlot.comparableGfGaSlots} tables (${m.withinSlot.gaBeatsGfCount} for defence${tieClause}).`
         : atkDef.withinLeader === 'near-tie'
-          ? `Within a table, conceding and scoring are nearly equal as a median rank link (${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)}, within the 0.0005 near-tie margin); separately, defence led in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables (${m.withinSlot.gfBeatsGaCount} for scoring${tieClause}).`
-          : `Within a table, conceding and scoring are equal as a median rank link (${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)}, 0–1 scale); across tables, defence led in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} (${m.withinSlot.gfBeatsGaCount} for scoring${tieClause}).`;
+          ? `Within a table, conceding and scoring are nearly equal as a median rank link (${fmtNum(atkDef.gaWithin, 3)} against ${fmtNum(atkDef.gfWithin, 3)}, within the 0.0005 near-tie margin); separately, defence led in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables (${m.withinSlot.gfBeatsGaCount} for scoring${tieClause}).`
+          : `Within a table, conceding and scoring are equal as a median rank link (${fmtNum(atkDef.gaWithin, 3)} against ${fmtNum(atkDef.gfWithin, 3)}, 0–1 scale); across tables, defence led in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} (${m.withinSlot.gfBeatsGaCount} for scoring${tieClause}).`;
 
     const poolModeTag = isRaw ? ' (on raw 3W+D points)' : '';
     const atkDefPtsSentence = atkDef.pooledLeader === 'gf'
@@ -1122,7 +1181,7 @@
     const scorerCardStat = m.scorerAnalysis.status === 'unavailable' ? 'Unavailable' : `${withGb} / ${avail}`;
 
     let scorerClaim = 'No uniform scorer data before 1992 or below Tier 1';
-    let scorerDetail = 'Verified Golden Boot and club scorer tables cover the Premier League (1992–93 to 2025–26) only; widen your filter to inspect them.';
+    let scorerDetail = 'Club-level scorer tables cover the Premier League (1992–93 to 2025–26) only; widen your filter to inspect them. Division leading scorers are in section 05b.';
     if (m.scorerAnalysis.status !== 'unavailable') {
       if (withGb === 0) {
         scorerClaim = avail === 1
@@ -1144,7 +1203,7 @@
         ? ` (${gbWinnerCount} Golden Boot ${plural(gbWinnerCount, 'winner-season', 'winner-seasons')} including shared awards)`
         : '';
       const omitClause = unavail > 0
-        ? `; ${unavail} pre-1992 or lower-tier ${plural(unavail, 'table')} omitted for lacking matching records`
+        ? `; ${unavail} pre-1992 or lower-tier ${plural(unavail, 'table')} omitted because club-level scorer records exist only for the Premier League (division leaders are in section 05b)`
         : '';
       scorerDetail = `Across ${avail} verified Premier League ${plural(avail, 'season')}${coWinnerClause}, ${withGb} ${plural(withGb, 'champion')} fielded the Golden Boot winner${isRaw ? ' (official standings)' : ''}${omitClause}.`;
     }
@@ -1183,7 +1242,7 @@
         claim: `${m.champFewerWinsCases.length} ${plural(m.champFewerWinsCases.length, 'champion')} won fewer matches than a rival${isRaw ? ' (official standings)' : ''}`,
         detail: smallSample
           ? champDetailSmall
-          : `Median champion: ${champMedianTxt} official points a game (${quartileNote}), vs ${runnerMedianTxt} median for runners-up.${isRaw ? ' Official standings apply here.' : ''} ${m.champFewerWinsCases.length > 0 ? `${m.champFewerWinsCases[0].champion.team} won the ${m.champFewerWinsCases[0].season} ${m.champFewerWinsCases[0].historicalDivisionName} with ${m.champFewerWinsCases[0].champion.won} wins.` : 'Every champion here at least matched rivals for wins.'}`,
+          : `Median champion: ${champMedianTxt} official points a game (${quartileNote}), against ${runnerMedianTxt} median for runners-up.${isRaw ? ' Official standings apply here.' : ''} ${m.champFewerWinsCases.length > 0 ? `${m.champFewerWinsCases[0].champion.team} won the ${m.champFewerWinsCases[0].season} ${m.champFewerWinsCases[0].historicalDivisionName} with ${m.champFewerWinsCases[0].champion.won} wins.` : 'Every champion here at least matched rivals for wins.'}`,
       },
       {
         idx: '04 · Survival Line',
@@ -1415,7 +1474,7 @@
       const lastCase = m.champFewerWinsCases[m.champFewerWinsCases.length - 1];
       const fmtCase = (c) => {
         const rival = c.winLeaders[0];
-        const rivalPart = rival ? ` vs ${ordinal(rival.pos)}-placed ${rival.team}’s ${rival.won}` : '';
+        const rivalPart = rival ? ` against ${ordinal(rival.pos)}-placed ${rival.team}’s ${rival.won}` : '';
         return `${c.champion.team} in ${c.season} ${c.historicalDivisionName} (${c.champion.won} wins${rivalPart})`;
       };
       const examples = m.champFewerWinsCases.length === 1
@@ -1464,13 +1523,13 @@
       const rel40Count = ss.relegatedAtOrAbove40Over38Rate.length;
       const rel40Pct = (rel40Count / ss.slotCount) * 100;
       const pl38Tail = pl38.length >= 3
-        ? ` By contrast, in the ${pl38.length} 38-game Premier League seasons, 17th place stayed safe below 40 points ${pl38.filter((x) => x.survivingPts < 40).length} times (${fmtNum((pl38.filter((x) => x.survivingPts < 40).length / pl38.length) * 100, 1)}%).`
+        ? ` In the ${pl38.length} 38-game Premier League seasons, 17th place stayed safe below 40 points ${pl38.filter((x) => x.survivingPts < 40).length} times (${fmtNum((pl38.filter((x) => x.survivingPts < 40).length / pl38.length) * 100, 1)}%).`
         : '';
       bullets.push({
         lead: rel40Pct >= 20
-          ? 'The “40 points for safety” rule breaks down outside the top flight.'
+          ? 'The “40 points for safety” rule fails outside the top flight.'
           : 'Safety lines shift sharply from division to division.',
-        body: `Across ${ss.slotCount} tables with relegation, a relegated club reached 40-in-38 pace (1.053 points a game) in ${rel40Count} tables (${fmtNum(rel40Pct, 1)}%), while the median lowest survivor earned ${fmtNum(ss.survivingPpg?.median, 3)}.${pl38Tail}`,
+        body: `Across ${ss.slotCount} tables with relegation, a relegated club reached 40-in-38 pace (1.053 points a game) in ${rel40Count} tables (${fmtNum(rel40Pct, 1)}%). The median lowest survivor earned ${fmtNum(ss.survivingPpg?.median, 3)}.${pl38Tail}`,
       });
     }
 
@@ -1479,19 +1538,19 @@
     const rawBasisTag = isRaw ? ' on raw «3W+D» points' : '';
     if (atkDef.diverges) {
       bullets.push({
-        lead: 'Attack vs. defence has no single winner: it flips depending on how you measure it.',
-        body: `Inside individual tables${rawBasisTag}, ${atkDef.withinLeader === 'ga' ? 'conceding edges scoring' : 'scoring edges conceding'} (${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)}, leading ${atkDef.withinLeader === 'ga' ? m.withinSlot.gaBeatsGfCount : m.withinSlot.gfBeatsGaCount} of ${m.withinSlot.comparableGfGaSlots} tables); pooled across clubs, ${atkDef.pooledLeader === 'gf' ? 'scoring' : 'conceding'} tracks more points-per-game variation (${fmtNum(atkDef.gfR2 * 100, 1)}% vs ${fmtNum(atkDef.gaR2 * 100, 1)}%, overlapping descriptive links).`,
+        lead: 'Attack or defence? Neither wins outright; the answer depends on the measure.',
+        body: `Within each table${rawBasisTag}, ${atkDef.withinLeader === 'ga' ? 'conceding edges scoring' : 'scoring edges conceding'} (${fmtNum(atkDef.gaWithin, 3)} against ${fmtNum(atkDef.gfWithin, 3)}, leading ${atkDef.withinLeader === 'ga' ? m.withinSlot.gaBeatsGfCount : m.withinSlot.gfBeatsGaCount} of ${m.withinSlot.comparableGfGaSlots} tables); counting every club together, ${atkDef.pooledLeader === 'gf' ? 'scoring' : 'conceding'} tracks more points-per-game variation (${fmtNum(atkDef.gfR2 * 100, 1)}% against ${fmtNum(atkDef.gaR2 * 100, 1)}%; the two overlap, so the shares do not add up).`,
       });
     } else if (atkDef.withinLeader === 'near-tie' || atkDef.withinLeader === 'tie') {
       bullets.push({
-        lead: 'Attack and defence are nearly dead level on table rank.',
-        body: `Within a table${rawBasisTag}, conceding and scoring sit at ${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)}, while pooled across clubs they track ${fmtNum(atkDef.gfR2 * 100, 1)}% (scoring) and ${fmtNum(atkDef.gaR2 * 100, 1)}% (conceding) of points-per-game variation.`,
+        lead: 'Attack and defence are almost level on table rank.',
+        body: `Within a table${rawBasisTag}, conceding and scoring sit at ${fmtNum(atkDef.gaWithin, 3)} and ${fmtNum(atkDef.gfWithin, 3)}, while across all clubs together they track ${fmtNum(atkDef.gfR2 * 100, 1)}% (scoring) and ${fmtNum(atkDef.gaR2 * 100, 1)}% (conceding) of points-per-game variation.`,
       });
     } else {
       const winner = atkDef.withinLeader === 'ga' ? 'Defence' : 'Scoring';
       bullets.push({
         lead: `${winner} edges both measures here, though by a modest margin.`,
-        body: `Inside individual tables${rawBasisTag}, conceding sits at ${fmtNum(atkDef.gaWithin, 3)} vs ${fmtNum(atkDef.gfWithin, 3)} for scoring, and pooled across clubs scoring tracks ${fmtNum(atkDef.gfR2 * 100, 1)}% of points-per-game variation vs ${fmtNum(atkDef.gaR2 * 100, 1)}% for conceding.`,
+        body: `Inside individual tables${rawBasisTag}, conceding sits at ${fmtNum(atkDef.gaWithin, 3)} and scoring at ${fmtNum(atkDef.gfWithin, 3)}. Across all clubs together, scoring tracks ${fmtNum(atkDef.gfR2 * 100, 1)}% of the variation in points a game and conceding ${fmtNum(atkDef.gaR2 * 100, 1)}%.`,
       });
     }
 
@@ -1504,15 +1563,15 @@
     const dl25T2 = m.seasonDrawLeaders.find((r) => r.slotId === '2025-26-T2');
     let dl25Example = '';
     if (dl25T1 && dl25T3) {
-      dl25Example = ` Yet 2025–26 showed both extremes: Premier League draw leaders ${dl25T1.team} (${dl25T1.drawn} draws) still finished ${ordinal(dl25T1.officialPos)}, while League One draw leaders ${dl25T3.team} (${dl25T3.drawn} draws) won promotion.`;
+      dl25Example = ` The 2025–26 season showed both extremes: Premier League the most frequent drawers ${dl25T1.team} (${dl25T1.drawn} draws) still finished ${ordinal(dl25T1.officialPos)}, while League One the most frequent drawers ${dl25T3.team} (${dl25T3.drawn} draws) won promotion.`;
     } else if (dl25T1) {
       dl25Example = ` Yet in 2025–26, ${dl25T1.team} led the Premier League with ${dl25T1.drawn} draws and still finished ${ordinal(dl25T1.officialPos)}.`;
     } else if (dl25T2 && dl25T3) {
-      dl25Example = ` In 2025–26, Championship draw leaders ${dl25T2.team} went down while League One draw leaders ${dl25T3.team} won promotion.`;
+      dl25Example = ` In 2025–26, the Championship’s most frequent drawers ${dl25T2.team} went down while League One the most frequent drawers ${dl25T3.team} won promotion.`;
     }
     bullets.push({
-      lead: 'Leading the league in draws usually pulls clubs to the middle, with wild exceptions.',
-      body: `${fmtNum(dlMidPct, 0)}% (${dl.middleHalfCount} of ${dl.count}) of division draw leaders finished in the middle half, ${dl.relegatedCount} went down, and ${dl.championCount === 0 ? 'none won the title' : `only ${dl.championCount} won the league (${dlChampNames})`}.${dl25Example}`,
+      lead: 'Clubs that draw most often usually finish mid-table, with striking exceptions.',
+      body: `${fmtNum(dlMidPct, 0)}% (${dl.middleHalfCount} of ${dl.count}) of the clubs that drew most in their division finished in the middle half of the table, ${dl.relegatedCount} went down, and ${dl.championCount === 0 ? 'none won the title' : `only ${dl.championCount} won the league (${dlChampNames})`}.${dl25Example}`,
     });
 
     // 5. Golden Boot vs champions (when verified PL seasons are in scope)
@@ -1524,14 +1583,14 @@
         ? 'Most Premier League champions did not have the Golden Boot winner.'
         : withGb * 2 === avail
           ? 'Exactly half of Premier League champions here had the Golden Boot winner.'
-          : 'A majority of Premier League champions here fielded the Golden Boot winner.';
+          : 'Most Premier League champions here fielded the Golden Boot winner.';
       const has25T1 = hasSlot('2025-26-T1');
       const s25Note = has25T1
         ? ' In 2025–26, Arsenal won the title with Viktor Gyökeres on 14 goals while Manchester City’s Erling Haaland led the league with 27.'
         : '';
       bullets.push({
         lead,
-        body: `Only ${withGb} of ${avail} verified Premier League champions (${fmtNum((withGb / avail) * 100, 0)}%) fielded the league’s top scorer, and champions relied slightly less on one scorer (${fmtNum(sa.shareStats.champ?.median, 1)}% median share of team goals) than 3rd- and 4th-place clubs (${fmtNum(sa.shareStats.thirdFourth?.median, 1)}%).${s25Note}`,
+        body: `Only ${withGb} of ${avail} verified Premier League champions (${fmtNum((withGb / avail) * 100, 0)}%) fielded the league’s top scorer. Champions leaned a little less on one player (the median top scorer supplied ${fmtNum(sa.shareStats.champ?.median, 1)}% of team goals) than clubs finishing 3rd or 4th (${fmtNum(sa.shareStats.thirdFourth?.median, 1)}%).${s25Note}`,
       });
     }
 
@@ -1555,7 +1614,7 @@
         const [s1, s2, s3, s4] = ov.seeds;
         const tierNames = pb.byTier.map((t) => t.shortLabel.replace(/\s*\(Tier \d\)/, ''));
         const tierClause = pb.byTier.length === 3
-          ? ', a pattern that holds across the Championship, League One, and League Two'
+          ? ', a pattern seen in the Championship, League One and League Two'
           : pb.byTier.length === 2
             ? `, a similar split across ${tierNames[0]} and ${tierNames[1]}`
             : pb.byTier.length === 1
@@ -1563,9 +1622,9 @@
               : '';
         bullets.push({
           lead: s1.count * 2 < ov.total
-            ? 'Top play-off seeds miss out most of the time, and below 1st seed, seeding barely matters.'
+            ? 'The top play-off seed usually misses out, and below it seeding makes little difference.'
             : 'Top play-off seeds won most finals here, though lower seeds still broke through.',
-          body: `Across ${ov.total} four-team English league play-offs since 1988–89, 1st seeds went up ${fmtNum(s1.pct, 0)}% of the time (${s1.count}), vs ${fmtNum(s2.pct, 0)}% for 2nd (${s2.count}), ${fmtNum(s3.pct, 0)}% for 3rd (${s3.count}), and ${fmtNum(s4.pct, 0)}% for 4th (${s4.count})${tierClause}.${po25Note}${dedPart}`,
+          body: `Across ${ov.total} four-team English league play-offs since 1988–89, 1st seeds went up ${fmtNum(s1.pct, 0)}% of the time (${s1.count}), against ${fmtNum(s2.pct, 0)}% for 2nd (${s2.count}), ${fmtNum(s3.pct, 0)}% for 3rd (${s3.count}), and ${fmtNum(s4.pct, 0)}% for 4th (${s4.count})${tierClause}.${po25Note}${dedPart}`,
         });
       } else if (poTotal >= 3) {
         const poTopPct = (poTop / poTotal) * 100;
@@ -1777,7 +1836,7 @@
           el('p', null,
             'Attack vs. defence exhibits a textbook aggregation-operator sensitivity: within-slot ',
             el('strong', { textContent: `«median(|r_finish|)» puts GA/G at ${fmtNum(atkDef.gaWithin, 3)} vs GF/G at ${fmtNum(atkDef.gfWithin, 3)}` }),
-            ` (Δ = ${fmtNum(atkDef.withinDiff, 3)}; GA/G strictly exceeds GF/G in ${m.withinSlot.gaBeatsGfCount}/${m.withinSlot.comparableGfGaSlots} slots vs ${m.withinSlot.gfBeatsGaCount} for GF/G), whereas stacking all club-seasons into one cross-section and fitting bivariate OLS of PPG on each regressor separately yields `,
+            ` (Δ = ${fmtNum(atkDef.withinDiff, 3)} unrounded; GA/G strictly exceeds GF/G in ${m.withinSlot.gaBeatsGfCount}/${m.withinSlot.comparableGfGaSlots} slots vs ${m.withinSlot.gfBeatsGaCount} for GF/G), whereas stacking all club-seasons into one cross-section and fitting bivariate OLS of PPG on each regressor separately yields `,
             el('strong', { textContent: `«R²(PPG)» = ${fmtNum(atkDef.gfR2 * 100, 1)}% for GF/G vs ${fmtNum(atkDef.gaR2 * 100, 1)}% for GA/G` }),
             ', with «R² = r(x, PPG)²» for each single-regressor fit. The two operators answer different questions (typical in-table link vs pooled variation), and GF/G and GA/G are collinear, so neither figure is an additive variance share or a causal effect.'
           ),
@@ -1823,7 +1882,7 @@
           el('p', null,
             'Between attack and defence, two common ways of measuring strength can point differently: ',
             el('strong', { textContent: withinPhrase }),
-            ` (goals conceded ${fmtNum(atkDef.gaWithin, 3)} vs goals scored ${fmtNum(atkDef.gfWithin, 3)}, gap ${fmtNum(Math.abs(Number(fmtNum(atkDef.gaWithin, 3)) - Number(fmtNum(atkDef.gfWithin, 3))), 3)}; defence stronger in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables vs ${m.withinSlot.gfBeatsGaCount} for scoring${atkDef.ties > 0 ? `, ${atkDef.ties} tied` : ''}), whereas `,
+            ` (goals conceded ${fmtNum(atkDef.gaWithin, 3)} vs goals scored ${fmtNum(atkDef.gfWithin, 3)}, gap ${fmtNum(atkDef.withinDiff, 3)} before rounding; defence stronger in ${m.withinSlot.gaBeatsGfCount} of ${m.withinSlot.comparableGfGaSlots} tables vs ${m.withinSlot.gfBeatsGaCount} for scoring${atkDef.ties > 0 ? `, ${atkDef.ties} tied` : ''}), whereas `,
             el('strong', { textContent: pooledPhrase }),
             ` (goals scored ${fmtNum(atkDef.gfR2 * 100, 1)}% vs goals conceded ${fmtNum(atkDef.gaR2 * 100, 1)}%, overlapping descriptive links rather than additive shares).${sec1Differs ? ' The measures use different outcomes and aggregation methods, so their rankings can differ.' : ''} Both margins are modest descriptive associations rather than tactical prescriptions.`
           ),
@@ -2970,7 +3029,7 @@
           ),
           el('p', null,
             el('strong', { textContent: 'Stratum invariance & dispersion paradox: ' }),
-            `${tierChiTxt} Across active tiers, Seed 1 conversion sits at ${pb.byTier.map((t) => `T${t.tier}: ${fmtNum(t.seeds[0].pct, 1)}% (n=${t.total}, med. Δ(S1−S4) = ${fmtGap(t.gap1to4)})`).join('; ')}. Notably, tighter intra-bracket regular-season points dispersion does NOT monotonically depress Seed 1 conversion in finite samples (n ≈ 37–38 per stratum).`
+            `${tierChiTxt} Across active tiers, Seed 1 conversion sits at ${pb.byTier.map((t) => `T${t.tier}: ${fmtNum(t.seeds[0].pct, 1)}% (n=${t.total}, med. Δ(S1−S4) = ${fmtGap(t.gap1to4)})`).join('; ')}. Observe that tighter intra-bracket regular-season points dispersion does NOT monotonically depress Seed 1 conversion in finite samples (n ≈ 37–38 per stratum).`
           )
         );
       } else {
@@ -2998,9 +3057,9 @@
             el('strong', { textContent: `3rd seeds ${fmtNum(s3.pct, 1)}% (${s3.count})` }),
             ', and ',
             el('strong', { textContent: `4th seeds ${fmtNum(s4.pct, 1)}% (${s4.count}${seed4Note})` }),
-            `. Put together, the top two seeds, who host the semi-final second leg, went up `,
+            `. The top two seeds, who host the semi-final second leg, went up `,
             el('strong', { textContent: `${fmtNum(ov.topTwoPct, 1)}% of the time (${ov.topTwoCount} of ${ov.total})` }),
-            ` vs ${fmtNum(100 - ov.topTwoPct, 1)}% for the bottom two.`
+            ` against ${fmtNum(100 - ov.topTwoPct, 1)}% for the bottom two.`
           )
         );
 
@@ -3027,7 +3086,7 @@
             const otherDesc = otherMedians.length === 1
               ? `${otherMedians[0]} in both ${tierPalette[others[0].tier].shortName} and ${tierPalette[others[1].tier].shortName}`
               : others.map((t) => `${fmtGap(t.gap1to4)} in ${tierPalette[t.tier].shortName}`).join(' and ');
-            gapTail = ` One counter-intuitive twist: ${tierPalette[lowestGapTier.tier].plainName} had the tightest points spread between 1st and 4th seeds (median ${fmtGap(lowestGapTier.gap1to4)} vs ${otherDesc}), yet its 1st seed converted at the highest rate (${fmtNum(lowestGapTier.seeds[0].pct, 1)}%), a reminder that differences across ${minN}–${maxN} tournaments per tier sit well within small-sample noise.`;
+            gapTail = ` One counter-intuitive twist: ${tierPalette[lowestGapTier.tier].plainName} had the tightest points spread between 1st and 4th seeds (median ${fmtGap(lowestGapTier.gap1to4)} against ${otherDesc}), yet its 1st seed converted at the highest rate (${fmtNum(lowestGapTier.seeds[0].pct, 1)}%), a reminder that differences across ${minN}–${maxN} tournaments per tier sit well within small-sample noise.`;
           } else {
             const gapSummary = pb.byTier.map((t) => `${tierPalette[t.tier].plainName} ${fmtGap(t.gap1to4)}`).join(', ');
             gapTail = ` Median 1st-to-4th seed points gaps are ${gapSummary}.`;
@@ -3037,7 +3096,7 @@
             el('p', null,
               el('strong', {
                 textContent: consistent
-                  ? 'Higher vs. lower tiers: the pattern stays consistent across levels.'
+                  ? 'Higher and lower divisions: the pattern is much the same at every level.'
                   : 'Across the selected EFL tiers:',
               }),
               ` The 1st seed went up ${rateList}, while lower seeds stayed bunched across divisions rather than showing a steady gap between higher and lower leagues.${gapTail}`
@@ -3466,6 +3525,221 @@
   /* ========================================================================
      SECTION 5: GOLDEN BOOT & SCORER COVERAGE BOUNDARY
      ======================================================================== */
+
+  /* ========================================================================
+     SECTION 5B: DIVISION LEADING SCORERS (VERIFIED SEASONS ONLY)
+     ======================================================================== */
+  const LEADER_TIER_META = {
+    1: { color: '#141412', label: 'Top flight', short: 'Tier 1', marker: 'circle' },
+    2: { color: '#b8291f', label: 'Second tier', short: 'Tier 2', marker: 'square' },
+    3: { color: '#1b5670', label: 'Third tier', short: 'Tier 3', marker: 'diamond' },
+    4: { color: '#2e6f52', label: 'Fourth tier', short: 'Tier 4', marker: 'triangle' },
+  };
+
+  function leaderMarker(kind, cx, cy, color, title) {
+    const r = 5;
+    let node;
+    if (kind === 'square') node = svgEl('rect', { x: cx - r, y: cy - r, width: 2 * r, height: 2 * r, fill: color });
+    else if (kind === 'diamond') node = svgEl('polygon', { points: `${cx},${cy - r - 1} ${cx + r + 1},${cy} ${cx},${cy + r + 1} ${cx - r - 1},${cy}`, fill: color });
+    else if (kind === 'triangle') node = svgEl('polygon', { points: `${cx},${cy - r - 1} ${cx + r + 1},${cy + r} ${cx - r - 1},${cy + r}`, fill: color });
+    else node = svgEl('circle', { cx, cy, r: r + 0.5, fill: color });
+    node.appendChild(svgEl('title', {}, title));
+    return node;
+  }
+
+  function leaderNames(winners) {
+    return winners.map((w) => (w.club ? `${w.player} (${w.club})` : w.player)).join(' and ');
+  }
+
+  function renderSection5b() {
+    const sec = document.getElementById('sec-leaders');
+    if (!sec) return;
+    const titleEl = document.getElementById('sec5b-title');
+    const proseEl = document.getElementById('sec5b-prose');
+    const calloutEl = document.getElementById('sec5b-callout-list');
+    const sicko = isSicko();
+    const res = state.leaders ? CA.summarizeDivisionLeaders(state.dataset, state.leaders, state.scope) : null;
+
+    clearEl(calloutEl);
+    clearEl(proseEl);
+    ['chart-sec5b-leaders', 'sec5b-tier-tbody', 'sec5b-ledger-tbody', 'sec5b-legend'].forEach((id) => clearEl(document.getElementById(id)));
+    const setText = (id, t) => { const n = document.getElementById(id); if (n) n.textContent = t; };
+
+    if (!res || !res.available || res.counts.inScope === 0) {
+      setText('sec5b-title', sicko ? 'Division-leader records did not load for this stratum' : 'Division scorer records are not available here');
+      proseEl.appendChild(el('p', { textContent: res && res.counts.inScope === 0
+        ? 'No division-seasons fall inside the current filter.'
+        : `The division scorer file did not load${state.leadersError ? ` (${state.leadersError})` : ''}. Nothing is shown rather than anything guessed.` }));
+      proseEl.appendChild(el('p', { className: 'chart-note', textContent: 'This is a loading fault, not a finding that the data are missing.' }));
+      return;
+    }
+
+    const c = res.counts;
+    const allVerified = c.verified === c.inScope;
+    const tiersWith = Object.keys(res.byTier).map(Number).filter((t) => res.byTier[t].n > 0);
+    const rows = res.rows;
+
+    setRich(titleEl, sicko
+      ? `Leader maxima verified in «${c.verified}» of «${c.inScope}» ${plural(c.inScope, 'division-season')}; «${c.inScope - c.verified}» left missing, not imputed`
+      : allVerified
+        ? `Every division’s leading scorer is verified for ${c.inScope === 1 ? 'the 1 season' : `all ${c.inScope} seasons`} in view`
+        : `Leading league scorers are verified for ${c.verified} of ${c.inScope} ${plural(c.inScope, 'division-season')} in view`);
+
+    appendKV(calloutEl, sicko ? 'Verified' : 'Verified seasons', `${c.verified} of ${c.inScope}`, 'is-strong');
+    if (c.disputed > 0) appendKV(calloutEl, sicko ? 'Disputed' : 'Sources disagree', `${c.disputed}`);
+    if (c.notVerified > 0) appendKV(calloutEl, sicko ? 'Single-source / absent' : 'No second source found', `${c.notVerified}`);
+    const shared = rows.filter((r) => r.shared).length;
+    appendKV(calloutEl, sicko ? 'Tied maxima' : 'Shared leaders', `${shared}`);
+
+    if (rows.length === 0) {
+      proseEl.appendChild(el('p', { textContent: 'No season in this filter has a verified leading scorer yet. The ledger below shows why.' }));
+    } else {
+      const meds = tiersWith.map((t) => ({ t, med: res.byTier[t].goals.median, rate: res.byTier[t].rate ? res.byTier[t].rate.median : null, peak: res.byTier[t].peak, n: res.byTier[t].n }));
+      const hi = meds.reduce((a, b) => (b.med > a.med ? b : a));
+      const lo = meds.reduce((a, b) => (b.med < a.med ? b : a));
+      const nm = (t) => LEADER_TIER_META[t].label.toLowerCase();
+      const pk = rows.reduce((a, b) => (b.goals > a.goals ? b : a));
+      const pkWho = pk.winners.map((w) => w.player).join(' and ');
+      if (sicko) {
+        proseEl.appendChild(el('p', { textContent: `For division «d» and season «s», let «M_{d,s} = max_i G_{i,d,s}» be the league-goal count of the leading scorer. The stratum is verified only where two independent publishers agree on the full argmax set and on «M»; play-off and cup goals are excluded. Of «${c.inScope}» ${plural(c.inScope, 'division-season')} in scope, «${c.verified}» qualify. The remaining «${c.inScope - c.verified}» are not imputed and are listed one by one in the ledger below.` }));
+        proseEl.appendChild(el('p', { textContent: tiersWith.length > 1
+          ? `By division, the median of «M» is «${fmtNum(hi.med, 1)}» in the ${nm(hi.t)} («n = ${hi.n}») against «${fmtNum(lo.med, 1)}» in the ${nm(lo.t)} («n = ${lo.n}»). Normalising by games per club, «M/g» has median «${fmtNum(hi.rate, 3)}» and «${fmtNum(lo.rate, 3)}» respectively. The sample maximum is «${pk.goals}» (${pkWho}, ${pk.season}). With verified strata of unequal size and selection that is not random, no inferential claim attaches to these comparisons.`
+          : `In the ${nm(hi.t)} the median of «M» is «${fmtNum(hi.med, 1)}» («n = ${hi.n}»); the sample maximum is «${pk.goals}» (${pkWho}, ${pk.season}). With a single stratum in view, no between-division contrast is estimable.` }));
+      } else {
+        proseEl.appendChild(el('p', { textContent: `A division’s leading scorer is the player with the most league goals that season. Cup and play-off goals do not count. A season is shown as verified only when two separate sources agree on who led and on the goal count. ${c.verified} of the ${c.inScope} ${plural(c.inScope, 'division-season')} in view meet that test. The rest are listed as missing rather than guessed.` }));
+        proseEl.appendChild(el('p', { textContent: tiersWith.length > 1
+          ? `Divisions look alike on goals: the median leading scorer managed ${meds.map((m) => `${fmtNum(m.med, 0)} in the ${nm(m.t)}`).join(', ')}. Per game the clubs played, the median is ${meds.map((m) => `${m.rate ? fmtNum(m.rate, 2) : 'n/a'} in the ${nm(m.t)}`).join(', ')}. The most in any verified season is ${pk.goals}, by ${pkWho} in ${pk.season}. These figures summarise the verified seasons only. Those seasons are not a representative sample of all seasons, so the figures should not be read as typical of the whole period.`
+          : `The typical leading scorer in the ${nm(hi.t)} scored ${fmtNum(hi.med, 0)} league goals. The most in any verified season is ${pk.goals}, by ${pkWho} in ${pk.season}.` }));
+      }
+    }
+
+    // Legend
+    const legend = document.getElementById('sec5b-legend');
+    tiersWith.forEach((t) => {
+      const meta = LEADER_TIER_META[t];
+      legend.appendChild(el('span', { className: 'legend-item' },
+        (() => {
+          const s = svgEl('svg', { width: 14, height: 14, viewBox: '0 0 14 14', 'aria-hidden': 'true' });
+          s.appendChild(leaderMarker(meta.marker, 7, 7, meta.color, ''));
+          return s;
+        })(),
+        el('span', { textContent: ` ${meta.label}` })));
+    });
+
+    // Chart
+    if (rows.length) {
+      const W = window.innerWidth < 600 ? 460 : 720, H = 360, L = 56, R = 14, T = 14, B = 46;
+      const x0 = Math.min(...rows.map((r) => r.startYear)), x1 = Math.max(...rows.map((r) => r.startYear));
+      const ymax = Math.ceil(Math.max(...rows.map((r) => r.goals)) / 5) * 5;
+      const sx = (v) => L + ((v - x0) / Math.max(1, x1 - x0)) * (W - L - R);
+      const sy = (v) => T + (1 - v / ymax) * (H - T - B);
+      const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', class: 'chart-svg', 'aria-label': `Scatter of the leading scorer's league goals by division and season; ${rows.length} verified ${plural(rows.length, 'division-season')}.` });
+      for (let g = 0; g <= ymax; g += 5) {
+        svg.appendChild(svgEl('line', { x1: L, x2: W - R, y1: sy(g), y2: sy(g), stroke: '#d9d4c7', 'stroke-width': 1 }));
+        svg.appendChild(svgEl('text', { x: L - 6, y: sy(g) + 4, 'text-anchor': 'end', 'font-size': 16, fill: '#4a463e' }, String(g)));
+      }
+      for (let y = Math.ceil(x0 / 5) * 5; y <= x1 - 2; y += 5) {
+        svg.appendChild(svgEl('text', { x: sx(y), y: H - 14, 'text-anchor': 'middle', 'font-size': 16, fill: '#4a463e' }, String(y)));
+      }
+      svg.appendChild(svgEl('text', { x: 14, y: H / 2, 'font-size': 16, fill: '#4a463e', transform: `rotate(-90 14 ${H / 2})`, 'text-anchor': 'middle' }, 'League goals'));
+      rows.forEach((r) => {
+        const meta = LEADER_TIER_META[r.tier];
+        const jitter = (r.tier - 2.5) * 2.4;
+        svg.appendChild(leaderMarker(meta.marker, sx(r.startYear) + jitter, sy(r.goals), meta.color,
+          `${r.season} ${r.divisionName}: ${leaderNames(r.winners)}, ${r.goals} league goals`));
+      });
+      document.getElementById('chart-sec5b-leaders').appendChild(svg);
+    }
+    setText('sec5b-chart-subtitle', rows.length ? `${rows.length} verified ${plural(rows.length, 'division-season')}; each mark is one season` : 'Nothing verified in this filter');
+    setText('sec5b-chart-note', c.inScope > c.verified ? `${c.inScope - c.verified} ${plural(c.inScope - c.verified, 'division-season')} ${plural(c.inScope - c.verified, 'has', 'have')} no mark because ${plural(c.inScope - c.verified, 'it is', 'they are')} unverified or disputed. ${plural(c.inScope - c.verified, 'It is', 'They are')} listed below.` : 'Every division-season in view is plotted.');
+
+    // Tier summary
+    const tbody = document.getElementById('sec5b-tier-tbody');
+    tiersWith.forEach((t) => {
+      const s = res.byTier[t];
+      const meta = LEADER_TIER_META[t];
+      const peakWho = s.peak.winners.map((w) => w.player).join(' and ');
+      tbody.appendChild(el('tr', {},
+        el('th', { scope: 'row', className: 'text-col', textContent: meta.label }),
+        el('td', { textContent: String(s.n) }),
+        el('td', { textContent: fmtNum(s.goals.median, 1) }),
+        el('td', { textContent: s.rate ? fmtNum(s.rate.median, 2) : 'N/A' }),
+        el('td', { className: 'text-col', textContent: `${s.peak.goals}, ${peakWho} (${s.peak.season})` })));
+    });
+    setText('sec5b-tier-subtitle', 'Verified seasons only. Goals per game divides the leader’s league goals by the league games each club in that division was scheduled to play that season (38, 40, 42, 44 or 46), not by the player’s own appearances. A leader who changed club in the same division counts once, with the goals the sources credit to him in that division; a tie counts as one season. Curtailed 2019–20 seasons have unequal games per club, so they get no rate.');
+
+    // Ledger: every in-scope division-season with explicit status
+    const ledger = document.getElementById('sec5b-ledger-tbody');
+    const inScope = state.dataset.tierSeasons
+      .filter((ts) => state.scope.tiers.includes(ts.tier) && ts.startYear >= state.scope.startYear && ts.startYear <= state.scope.endYear && (ts.status !== 'curtailed' || state.scope.includeCurtailed))
+      .sort((a, b) => a.startYear - b.startYear || a.tier - b.tier);
+    inScope.forEach((ts) => {
+      const r = state.leaders.slots[ts.slotId];
+      const ok = r && r.status === 'verified_league';
+      const status = ok ? 'Verified' : (r && r.status === 'disputed' ? 'Sources disagree' : 'No second source');
+      ledger.appendChild(el('tr', { className: ok ? '' : 'row-missing' },
+        el('th', { scope: 'row', className: 'text-col', textContent: ts.season }),
+        el('td', { className: 'text-col', textContent: ts.historicalDivisionName }),
+        el('td', { className: 'text-col', textContent: ok ? leaderNames(r.winners) : 'Not shown' }),
+        el('td', { textContent: ok ? String(r.goals) : '—' }),
+        el('td', { className: 'text-col', textContent: status })));
+    });
+    const allSlots = state.dataset.tierSeasons.length;
+    const curtailedOut = state.dataset.tierSeasons.filter((ts) => ts.status === 'curtailed' && !state.scope.includeCurtailed && state.scope.tiers.includes(ts.tier) && ts.startYear >= state.scope.startYear && ts.startYear <= state.scope.endYear);
+    setText('sec5b-ledger-subtitle', `Rows without a verified leader say so. Nothing is estimated. This ledger has ${inScope.length} rows; the full archive has ${allSlots} division-seasons.${curtailedOut.length ? ` The ${curtailedOut.length} curtailed 2019–20 ${plural(curtailedOut.length, 'table is', 'tables are')} left out because the filter excludes curtailed seasons.` : ''}`);
+    setText('sec5b-source-note', 'Sources: RSSSF (rsssf.org/tablese/engtops.html), englishfootballleaguetables.co.uk, footballsite.co.uk, FBref and Transfermarkt, plus the project’s Premier League records. Exact page links per season are in data/division-leaders.json.');
+  }
+
+
+  function renderClubLeaders() {
+    const panel = document.getElementById('sec5b-club-panel');
+    if (!panel) return;
+    const sicko = isSicko();
+    const tbody = document.getElementById('sec5b-club-tbody');
+    const prose = document.getElementById('sec5b-club-prose');
+    clearEl(tbody); clearEl(prose);
+    const sc = state.scope;
+    const inView = sc.tiers.includes(1) && sc.startYear <= 1991;
+    panel.hidden = !inView;
+    if (!inView) return;
+    const note = document.getElementById('sec5b-club-note');
+    if (!state.clubLeaders) {
+      prose.textContent = `The First Division club leader file did not load${state.clubLeadersError ? ` (${state.clubLeadersError})` : ''}. This is a loading fault, not a finding.`;
+      clearEl(note);
+      return;
+    }
+    const all = [
+      ...state.clubLeaders.rows.map((r) => ({ ...r, ok: true })),
+      ...state.clubLeaders.unresolved.map((r) => ({ ...r, ok: false })),
+    ].filter((r) => parseInt(r.season, 10) >= sc.startYear && parseInt(r.season, 10) <= sc.endYear);
+    const posOf = (r) => {
+      if (r.pos) return r.pos;
+      const slot = state.dataset.tierSeasons.find((t) => t.slotId === r.slotId);
+      const row = slot && slot.table.find((x) => x.team === r.team);
+      return row ? row.pos : 9;
+    };
+    all.forEach((r) => { r.posResolved = posOf(r); });
+    all.sort((a, b) => a.season.localeCompare(b.season) || a.posResolved - b.posResolved);
+    const ver = all.filter((r) => r.ok);
+    const shares = ver.map((r) => (r.goals / r.gf) * 100);
+    const med = shares.length ? CA.median(shares) : null;
+    const clubProse = sicko
+      ? `Of «${all.length}» top-four club-seasons in view, «${ver.length}» have a verified leading scorer with league goals «G» and share «G / GF»; the median share is ${fmtNum(med, 1)}%. The other «${all.length - ver.length}» are left unresolved because of transfers, ties, or a count that two sources do not share.`
+      : `${ver.length} of the ${all.length} top-four club-seasons in view have a verified leading scorer. In those, the leader scored a median of ${fmtNum(med, 0)}% of the club’s league goals. The other ${all.length - ver.length} are left out and marked, because the player moved clubs mid-season, two players tied, or two sources gave different counts.`;
+    if (sicko) setRich(prose, clubProse); else prose.textContent = clubProse;
+    all.forEach((r) => {
+      tbody.appendChild(el('tr', { className: r.ok ? '' : 'row-missing' },
+        el('th', { scope: 'row', className: 'text-col', textContent: r.season }),
+        el('td', { textContent: ordinal(r.posResolved) }),
+        el('td', { className: 'text-col', textContent: r.team }),
+        el('td', { className: 'text-col', textContent: r.ok ? r.player : `Not shown: ${r.reason}` }),
+        el('td', { textContent: r.ok ? String(r.goals) : '—' }),
+        el('td', { textContent: r.ok ? `${fmtNum((r.goals / r.gf) * 100, 0)}%` : '—' })));
+    });
+    document.getElementById('sec5b-club-subtitle').textContent = 'League goals only. Share is the leader’s league goals divided by the club’s league goals.';
+    note.textContent = 'Sources: englishfootballleaguetables.co.uk season scorer lists, each confirmed against a second page (the club’s season page on Wikipedia, or Pride of Anglia for Ipswich 1981–82). Links per row are in data/tier1-club-leaders-1981-92.json. This is a separate table, and it does not feed the Golden Boot analysis above.';
+  }
+
   function renderSection5() {
     const m = state.model;
     const sa = m.scorerAnalysis;
@@ -3480,12 +3754,12 @@
     const sicko = isSicko();
     if (sa.status === 'unavailable') {
       const unavailText = sicko
-        ? 'Missing-not-at-random (MNAR) scorer coverage boundary: verified Golden Boot and club leading-scorer vectors exist solely for Tier 1 Premier League (1992–93..2025–26). Pre-1992 T1 and T2–T4 slots lack uniform source coverage and are strictly non-imputed.'
-        : 'Verified Golden Boot and club top-scorer records cover the Premier League (1992–93 to 2025–26) only. Pre-1992 First Division seasons and Tiers 2–4 lack uniform club-level scorer tables in our verified sources, so nothing is estimated or filled in.';
+        ? 'Missing-not-at-random (MNAR) coverage boundary: club-level leading-scorer vectors, and the Golden Boot flag built from them, exist solely for Tier 1 Premier League (1992–93..2025–26). Pre-1992 T1 and T2–T4 club vectors are strictly non-imputed. The division maximum «M_{d,s}» is verified for a wider stratum and is reported in §05b.'
+        : 'Club-level top-scorer records, and the Golden Boot question below, cover the Premier League (1992–93 to 2025–26) only. For earlier First Division seasons and Tiers 2–4 we found no reliable club-by-club scorer tables, so nothing is estimated or filled in. Each division’s leading scorer is checked separately in section 05b.';
       if (titleEl) {
         titleEl.textContent = sicko
           ? 'Scorer Concentration Estimators Gated Outside Verified PL Strata (1992–2026)'
-          : 'Top-Scorer Records Are Unavailable Outside the Premier League (1992–2026)';
+          : 'Club Scorer Records Are Unavailable Outside the Premier League (1992–2026)';
       }
       if (proseEl) {
         clearEl(proseEl);
@@ -3855,7 +4129,7 @@
       clearEl(scorersTbody);
       if (slot.scorerCoverage !== 'verified_pl_complete' && slot.scorerCoverage !== 'verified') {
         scorersTbody.appendChild(el('tr', null,
-          el('td', { colSpan: 5, className: 'text-col table-note-cell', textContent: `Scorer chart unavailable for ${slot.season} ${slot.historicalDivisionName}. Verified top-scorer records in this static archive cover Premier League (Tier 1, 1992–93 to 2025–26) only.` })
+          el('td', { colSpan: 5, className: 'text-col table-note-cell', textContent: `Scorer chart unavailable for ${slot.season} ${slot.historicalDivisionName}. Club-level top-scorer records here cover the Premier League (Tier 1, 1992–93 to 2025–26) only. The division’s leading scorer, where verified, is in section 05b.` })
         ));
       } else {
         for (const sc of slot.topScorers || []) {
@@ -4070,6 +4344,8 @@
     renderSection3();
     renderSection4();
     renderSection5();
+    renderSection5b();
+    renderClubLeaders();
     renderArchive();
 
     // Curtailed-aware season-length captions (rendered after voice chrome so the override sticks)
@@ -4231,6 +4507,10 @@
     }
     try {
       state.dataset = await loadDataset();
+      const ldr = await loadOptionalFile('./data/division-leaders.json', '__DIVISION_LEADERS__', validateLeaders);
+      state.leaders = ldr.data; state.leadersError = ldr.error;
+      const cl = await loadOptionalFile('./data/tier1-club-leaders-1981-92.json', '__T1_CLUB_LEADERS__', validateClubLeaders);
+      state.clubLeaders = cl.data; state.clubLeadersError = cl.error;
       populateYearDropdowns();
       state.scope = CA.normalizeScope(state.dataset, CA.PRESETS['all-4-tiers']);
       state.model = CA.buildAnalyticalModel(state.dataset, state.scope);

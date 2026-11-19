@@ -829,6 +829,8 @@ test('Voice mode switcher: Normal Person Mode vs Statistics Sicko Mode with cart
     assert.ok(sickoSnap.poTbodyH > 100, `Play-off seed table tbody must render full height in Sicko mode (got ${sickoSnap.poTbodyH})`);
     assert.ok(sickoSnap.title.includes('Within-Slot Pearsonian'));
     assert.equal(badTokenRe.exec(sickoSnap.bodyText), null, 'Sicko mode must have zero NaN/undefined/Infinity/[object tokens');
+    const rawMarkers = await cdp.evalJs(`() => document.getElementById('sec-leaders').innerText.includes('«') || document.getElementById('sec-leaders').innerText.includes('»')`);
+    assert.equal(rawMarkers, false, 'Sicko section 05b must not show raw «» typesetting markers');
     // Typeset math zones render scripts as real <sub>/<sup> nodes, so innerText
     // carries base glyphs (R2(PPG), χ2) rather than the precomposed unicode forms.
     for (const token of ['Within-Slot', 'R2(PPG)', 'IQR', 'GA/G', 'GF/G', 'χ2', 'argmax(W)', 'OLS', 'PPG']) {
@@ -882,6 +884,52 @@ test('Voice mode switcher: Normal Person Mode vs Statistics Sicko Mode with cart
     assert.equal(backNormal.title, 'The Championship Formula');
     assert.equal(pageJargonRe.exec(backNormal.bodyText), null, 'Returning to Normal Person Mode must restore jargon-free prose');
     assert.equal(cdp.pageErrors.length, 0);
+  } finally {
+    await cdp.close();
+    server.close();
+  }
+});
+
+
+test('Division leader section renders in both voices with explicit missing rows and no JS errors', { timeout: 45000 }, async () => {
+  const { server, baseUrl } = await startStaticServer();
+  const cdp = await launchCdpSession();
+  try {
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+    await cdp.navigateAndWait(`${baseUrl}/`);
+    const grab = `() => ({
+      title: document.getElementById('sec5b-title').textContent,
+      ledgerRows: document.querySelectorAll('#sec5b-ledger-tbody tr').length,
+      missingRows: document.querySelectorAll('#sec5b-ledger-tbody tr.row-missing').length,
+      clubRows: document.querySelectorAll('#sec5b-club-tbody tr').length,
+      clubMissing: document.querySelectorAll('#sec5b-club-tbody tr.row-missing').length,
+      marks: document.querySelectorAll('#chart-sec5b-leaders svg title').length,
+      sub: document.getElementById('sec5b-ledger-subtitle').textContent,
+      prose: document.getElementById('sec5b-prose').textContent,
+    })`;
+    const normal = await cdp.evalJs(grab);
+    assert.equal(normal.ledgerRows, 178);
+    assert.equal(normal.missingRows, 51);
+    assert.equal(normal.marks, 127);
+    assert.equal(normal.clubRows, 44);
+    assert.equal(normal.clubMissing, 9);
+    assert.ok(/2 curtailed 2019/.test(normal.sub), 'ledger explains the two curtailed tables');
+    assert.ok(/127 of 178/.test(normal.title));
+    await cdp.evalJs(`() => document.querySelector('[data-voice-mode="sicko"]').click()`);
+    const sicko = await cdp.evalJs(grab);
+    assert.equal(sicko.ledgerRows, 178);
+    assert.ok(sicko.prose.includes('argmax'));
+    assert.ok(!/[«»]/.test(sicko.prose + sicko.title), 'rich markers are rendered, not shown raw');
+    // Singular grammar on a single division-season
+    await cdp.evalJs(`() => {
+      document.querySelectorAll('#scope-tier-checkboxes input[type="checkbox"]').forEach((cb) => { const want = cb.value === '3'; if (cb.checked !== want) cb.click(); });
+      const sSel = document.getElementById('scope-start-year'); const eSel = document.getElementById('scope-end-year');
+      eSel.value = '1988'; eSel.dispatchEvent(new Event('change')); sSel.value = '1988'; sSel.dispatchEvent(new Event('change'));
+    }`);
+    const one = await cdp.evalJs(`() => ({ t: document.getElementById('sec5b-title').textContent, p: document.getElementById('sec5b-prose').textContent, panelHidden: document.getElementById('sec5b-club-panel').hidden })`);
+    assert.ok(!/\b1 division-seasons\b/.test(one.t + one.p), 'singular noun for one division-season');
+    assert.equal(one.panelHidden, true, 'club panel hidden when Tier 1 is not in view');
+    assert.equal(cdp.pageErrors.length, 0, cdp.pageErrors.join('; '));
   } finally {
     await cdp.close();
     server.close();

@@ -1163,7 +1163,7 @@
         availableSlotsCount: 0,
         unavailableSlotsCount: unavailableScorerSlots.length,
         availableRangeLabel: null,
-        note: 'Verified season top-scorer and club leading-scorer records cover Tier 1 Premier League (1992–93 to 2025–26) only. Historical First Division (pre-1992) and Football League/EFL Tiers 2–4 lack uniform season-long club top-scorer coverage in our verified sources, so no figures are guessed or zero-filled.',
+        note: 'Club-level leading-scorer records, and the Golden Boot flags built from them, cover Tier 1 Premier League (1992–93 to 2025–26) only. Historical First Division (pre-1992) and Football League/EFL Tiers 2–4 have no reliable club-by-club scorer tables in our sources, so no figures are guessed or zero-filled. Division leading scorers are verified separately in data/division-leaders.json.',
       };
     } else {
       const availTeams = [];
@@ -1317,6 +1317,51 @@
     };
   }
 
+  /**
+   * Division-leader summary. Uses only slots whose leader record is verified_league.
+   * Disputed and unverified slots are counted and listed, never imputed.
+   * Leader rate = leader league goals / games per club (completed seasons only).
+   */
+  function summarizeDivisionLeaders(dataset, leaders, scope) {
+    const rec = leaders && leaders.slots ? leaders.slots : null;
+    if (!rec) return { available: false, rows: [], byTier: {}, counts: { inScope: 0, verified: 0, disputed: 0, notVerified: 0 } };
+    const sc = normalizeScope(dataset, scope);
+    const inScope = dataset.tierSeasons.filter(
+      (ts) => sc.tiers.includes(ts.tier) && ts.startYear >= sc.startYear && ts.startYear <= sc.endYear &&
+        (ts.status !== 'curtailed' || sc.includeCurtailed)
+    );
+    const rows = [];
+    const counts = { inScope: inScope.length, verified: 0, disputed: 0, notVerified: 0 };
+    for (const ts of inScope) {
+      const r = rec[ts.slotId];
+      const status = r ? r.status : 'not_verified';
+      if (status === 'verified_league' && r.winners.length > 0 && Number.isFinite(r.goals)) {
+        counts.verified += 1;
+        const games = ts.status === 'curtailed' ? null : ts.plannedGamesPerTeam;
+        rows.push({
+          slotId: ts.slotId, season: ts.season, startYear: ts.startYear, tier: ts.tier,
+          divisionName: ts.historicalDivisionName, goals: r.goals, winners: r.winners,
+          games, rate: games ? r.goals / games : null, shared: r.winners.length > 1,
+        });
+      } else if (status === 'disputed') counts.disputed += 1;
+      else counts.notVerified += 1;
+    }
+    const byTier = {};
+    for (const tier of sc.tiers) {
+      const t = rows.filter((x) => x.tier === tier);
+      const rates = t.map((x) => x.rate).filter((v) => Number.isFinite(v));
+      const peak = t.reduce((best, x) => (!best || x.goals > best.goals ? x : best), null);
+      byTier[tier] = {
+        n: t.length,
+        sharedCount: t.filter((x) => x.shared).length,
+        goals: t.length ? statsSummary(t.map((x) => x.goals)) : null,
+        rate: rates.length ? statsSummary(rates) : null,
+        peak: peak ? { season: peak.season, goals: peak.goals, winners: peak.winners } : null,
+      };
+    }
+    return { available: true, rows, byTier, counts };
+  }
+
   return {
     PRESETS,
     TIER_LABELS,
@@ -1333,5 +1378,6 @@
     normalizeScope,
     formatSeasonLabel,
     buildAnalyticalModel,
+    summarizeDivisionLeaders,
   };
 });

@@ -70,7 +70,7 @@ This is a static, zero-runtime-dependency web application built on reconciled lo
 - **Typed `outcomeType` Separation of Non-Relegating & Reprieved Boundary Clubs**: Every club row carries a closed-set `outcomeType` (`none`, `reprieved`, `expelled`, `withdrew`, `administration_relegation`). Ten Tier 4 seasons had zero automatic relegation (`1981–82` through `1985–86` re-election era; `1990–91` restructuring; `1991–92` after Aldershot withdrew and Maidstone later resigned; plus ground-grading reprieves in `1993–94`, `1994–95`, and `1995–96`), leaving `168` relegation-active tables. Within relegation-active tables, `outcomeType` excludes non-merit survivors such as `2019–20` Tier 4 23rd-placed **Stevenage** (`reprieved` due to Bury’s Tier 3 expulsion) so **Morecambe** (22nd, `0.865 PPG`) is reported cleanly as the merit survivor.
 - **Club Identity & Lineage Policy**: Contested or discontinued club transitions (`Wimbledon` relegated in `2003–04` -> renamed/relocated `Milton Keynes Dons` from `2004–05` vs. `AFC Wimbledon`; pre-1992 `Aldershot` vs. `Aldershot Town`) remain distinct `clubId` records in `coverage-manifest.json` with explicit per-season outcomes resolved from sources (`MISSING_NEXT_TIER_OUTCOMES` fails loudly on any unrecorded Tiers 1–3 exit).
 - **Historical Tie-Break Rules**: From `1992–93` through `1998–99`, Football League Divisions One, Two, and Three (Tiers 2–4) broke ties on **Goals For (`GF`) ahead of Goal Difference (`GD`)**. Table sorting honors historical tie-break rules per division-season.
-- **Explicit Scorer Coverage Boundary**: Verified Golden Boot and leading club-scorer figures cover **Premier League (`Tier 1, 1992–93 to 2025–26`, 34 seasons)** only. Pre-`1992` First Division seasons and Tiers 2–4 (`146` of `180` slots; `144` of `178` completed tables) mark scorer coverage explicitly as `unavailable` rather than fabricating figures or setting missing values to zero.
+- **Explicit Scorer Coverage Boundary**: Verified Golden Boot and leading club-scorer figures (club-level) cover **Premier League (`Tier 1, 1992–93 to 2025–26`, 34 seasons)** only. Pre-`1992` First Division seasons and Tiers 2–4 (`146` of `180` slots; `144` of `178` completed tables) mark scorer coverage explicitly as `unavailable` rather than fabricating figures or setting missing values to zero.
 
 ---
 
@@ -132,6 +132,15 @@ Attack vs. defence depends legitimately on which metric is asked: **within-slot 
 - Among Top-4 sides (`n = 34` champions, `n = 34` runners-up, `n = 68` 3rd–4th finishers), champions show a slightly lower median leading-scorer share of team goals (**`23.53%`**) than runners-up (**`24.69%`**) and 3rd–4th finishers (**`26.10%`**), with a modest negative correlation between concentration share and official PPG (`r = -0.125`; descriptive association only).
 
 ---
+
+### 6. Division Leading Scorers and Top-Four Club Scorers (descriptive, separate from the Golden Boot analysis)
+
+Two extra data files sit beside the main dataset. They are descriptive and do not feed the Premier League scorer analysis in section 5.
+
+- `data/division-leaders.json` (browser copy `division-leaders-bundle.js`): one record per division-season, with a status of `verified_league`, `disputed` or `not_verified`. A season is `verified_league` only when two league-scoped publishers agree on the full set of leaders and on the league goal count. Wikipedia and RSSSF are used only as corroboration. Disputed and unverified seasons carry no player or count. Source links are in the file.
+- `data/tier1-club-leaders-1981-92.json` (browser copy `tier1-club-leaders-1981-92-bundle.js`): the leading league scorer of each top-four First Division club, 1981-82 to 1991-92. Rows with a transfer, a tie or a count conflict are kept and marked unresolved, not filled in.
+
+The goals-per-game figure divides the leader's league goals by the division's scheduled league games per club (38, 40, 42, 44 or 46). The verified seasons are not a representative sample of all seasons.
 
 ## Development, Regeneration & Verification
 

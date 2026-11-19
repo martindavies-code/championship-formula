@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/fonts.css">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -122,6 +123,7 @@
         <li><a href="#sec-survival" data-vk="nav-sec3">03. Survival &amp; Promotion</a></li>
         <li><a href="#sec-draws" data-vk="nav-sec4">04. Draws</a></li>
         <li><a href="#sec-golden-boot" data-vk="nav-sec5">05. Top Scorers</a></li>
+        <li><a href="#sec-leaders" data-vk="nav-sec5b">05b. Division Leaders</a></li>
         <li><a href="#sec-archive" data-vk="nav-sec6">06. Archive</a></li>
         <li><a href="#sec-methodology" data-vk="nav-sec7">07. Sources &amp; Methods</a></li>
       </ul>
@@ -579,6 +581,107 @@
         </div>
       </section>
 
+      <!-- SECTION 5B: DIVISION LEADING SCORERS -->
+      <section id="sec-leaders" class="analysis-section" aria-labelledby="sec5b-title">
+        <div class="section-header-grid">
+          <div>
+            <p class="section-kicker" data-vk="sec5b-kicker">05b / Division Leading Scorers</p>
+            <h2 id="sec5b-title" class="section-title">Checking division scorer records…</h2>
+            <div class="section-prose" id="sec5b-prose"></div>
+          </div>
+          <aside class="finding-callout" aria-label="Division leading scorer summary">
+            <h3 class="finding-callout-title" data-vk="sec5b-callout-title">Leading Scorers: What Is Verified</h3>
+            <dl class="finding-kv-list" id="sec5b-callout-list"></dl>
+          </aside>
+        </div>
+        <div class="split-grid wide-left">
+          <div class="chart-panel">
+            <div class="chart-panel-header">
+              <div>
+                <h3 class="chart-title" data-vk="sec5b-c1-title">League Goals by Each Division’s Leading Scorer</h3>
+                <p class="chart-subtitle" id="sec5b-chart-subtitle"></p>
+              </div>
+            </div>
+            <div class="chart-legend" id="sec5b-legend"></div>
+            <div id="chart-sec5b-leaders"></div>
+            <p class="chart-note" id="sec5b-chart-note"></p>
+          </div>
+          <div class="chart-panel">
+            <div class="chart-panel-header">
+              <div>
+                <h3 class="chart-title" data-vk="sec5b-c2-title">Leader Summary by Division</h3>
+                <p class="chart-subtitle" id="sec5b-tier-subtitle"></p>
+              </div>
+            </div>
+            <div tabindex="0" role="region" aria-labelledby="sec5b-tier-caption" class="table-wrapper">
+              <table class="data-table" id="sec5b-tier-table">
+                <caption id="sec5b-tier-caption" data-vk="sec5b-tier-cap">Leading Scorer Summary by Division (Verified Seasons)</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-col" data-vk="sec5b-th-div">Division</th>
+                    <th scope="col" data-vk="sec5b-th-n">Seasons</th>
+                    <th scope="col" data-vk="sec5b-th-med">Median Goals</th>
+                    <th scope="col" data-vk="sec5b-th-rate">Median Goals per Game</th>
+                    <th scope="col" class="text-col" data-vk="sec5b-th-peak">Highest</th>
+                  </tr>
+                </thead>
+                <tbody id="sec5b-tier-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="chart-panel" style="margin-block-start: 1.25rem;">
+          <div class="chart-panel-header">
+            <div>
+              <h3 class="chart-title" data-vk="sec5b-c3-title">Season-by-Season Record, Including What Is Missing</h3>
+              <p class="chart-subtitle" id="sec5b-ledger-subtitle"></p>
+            </div>
+          </div>
+          <div tabindex="0" role="region" aria-labelledby="sec5b-ledger-caption" class="table-wrapper" style="max-block-size: 420px;">
+            <table class="data-table" id="sec5b-ledger-table">
+              <caption id="sec5b-ledger-caption" data-vk="sec5b-led-cap">Leading League Scorer in Each Division, Each Season</caption>
+              <thead>
+                <tr>
+                  <th scope="col" class="text-col">Season</th>
+                  <th scope="col" class="text-col" data-vk="sec5b-th-div2">Division</th>
+                  <th scope="col" class="text-col" data-vk="sec5b-th-leader">Leader(s)</th>
+                  <th scope="col" data-vk="sec5b-th-goals">League Goals</th>
+                  <th scope="col" class="text-col" data-vk="sec5b-th-status">Status</th>
+                </tr>
+              </thead>
+              <tbody id="sec5b-ledger-tbody"></tbody>
+            </table>
+          </div>
+          <p class="chart-note" id="sec5b-source-note"></p>
+        </div>
+        <div class="chart-panel" id="sec5b-club-panel" style="margin-block-start: 1.25rem;">
+          <div class="chart-panel-header">
+            <div>
+              <h3 class="chart-title" data-vk="sec5b-c4-title">Top-Four Clubs’ Leading Scorers, First Division 1981–82 to 1991–92</h3>
+              <p class="chart-subtitle" id="sec5b-club-subtitle"></p>
+            </div>
+          </div>
+          <p class="section-prose" id="sec5b-club-prose"></p>
+          <div tabindex="0" role="region" aria-labelledby="sec5b-club-caption" class="table-wrapper" style="max-block-size: 420px;">
+            <table class="data-table" id="sec5b-club-table">
+              <caption id="sec5b-club-caption" data-vk="sec5b-club-cap">Leading League Scorer of Each Top-Four Club</caption>
+              <thead>
+                <tr>
+                  <th scope="col" class="text-col">Season</th>
+                  <th scope="col">Finish</th>
+                  <th scope="col" class="text-col">Club</th>
+                  <th scope="col" class="text-col" data-vk="sec5b-th-club-leader">Leading Scorer</th>
+                  <th scope="col" data-vk="sec5b-th-club-goals">League Goals</th>
+                  <th scope="col" data-vk="sec5b-th-club-share">Share of Club Goals</th>
+                </tr>
+              </thead>
+              <tbody id="sec5b-club-tbody"></tbody>
+            </table>
+          </div>
+          <p class="chart-note" id="sec5b-club-note"></p>
+        </div>
+      </section>
+
       <!-- SECTION 6: INTERACTIVE 180-TABLE ARCHIVE -->
       <section id="sec-archive" class="analysis-section" aria-labelledby="sec6-title">
         <div class="section-header-grid">
@@ -703,6 +806,8 @@
   </div>
 
   <script src="./data/england-tiers-1-4-1981-2026-bundle.js"></script>
+  <script src="./data/division-leaders-bundle.js"></script>
+  <script src="./data/tier1-club-leaders-1981-92-bundle.js"></script>
   <script defer src="./analysis.js"></script>
   <script defer src="./app.js"></script>
 </body>
