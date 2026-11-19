@@ -836,6 +836,22 @@ test('Voice mode switcher: Normal Person Mode vs Statistics Sicko Mode with cart
     }
     assert.ok(sickoSnap.scrollW <= sickoSnap.clientW, 'Sicko desktop layout must not overflow horizontally');
 
+    // Regression: multi-letter scripts must typeset as ONE <sub>/<sup> node
+    // (N_slots -> sub "slots", |r_finish| -> sub "finish"), not a leading char
+    // script with the rest stranded on the baseline. Assert script node text.
+    const scriptNodes = await cdp.evalJs(`() => {
+      const subs = Array.from(document.querySelectorAll('.math-inline sub')).map((n) => n.textContent);
+      const sups = Array.from(document.querySelectorAll('.math-inline sup')).map((n) => n.textContent);
+      const barsTitle = document.querySelector('[data-vk="sec1-bars-title"]');
+      const barsSubs = barsTitle ? Array.from(barsTitle.querySelectorAll('sub')).map((n) => n.textContent) : [];
+      return { subs, sups, barsSubs };
+    }`);
+    for (const want of ['slots', 'obs', 'rel', 'finish', 'PPG', 'pb']) {
+      assert.ok(scriptNodes.subs.includes(want), `expected a sub node with full identifier text "${want}" (got: ${scriptNodes.subs.slice(0, 24).join('|')})`);
+    }
+    assert.ok(scriptNodes.sups.includes('2'), 'expected a sup node "2" for R²(PPG)/χ²');
+    assert.ok(scriptNodes.barsSubs.includes('finish'), `flagged chart title must typeset r_finish as one sub (got: ${scriptNodes.barsSubs.join('|')})`);
+
     // Check Sicko mode across PL preset & 320px narrow mobile viewport
     await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2026"]').click()`);
     await new Promise((r) => setTimeout(r, 150));
