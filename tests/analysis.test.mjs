@@ -338,16 +338,66 @@ test('Headline ledger semantics: Items 1-6 across real scopes, fixtures, and edg
     }
   }
 
-  // Play-off top-seed counts (T2=14/39, T3=14/39, T4=15/39 => 43/117) & scope-isolated Key Findings bullets
-  assert.deepEqual(mDef.byTierPromotion.map((t) => [t.tier, t.poWinnerTopSeedCount, t.poWinnerCount]), [[2, 14, 39], [3, 14, 39], [4, 15, 39]]);
+  // Play-off seed counts (all-format T2=14/39, T3=14/39, T4=15/39; bottom seeds 7/39, 9/39, 9/39) & standard 4-team breakdown
+  assert.deepEqual(
+    mDef.byTierPromotion.map((t) => [t.tier, t.poWinnerTopSeedCount, t.poWinnerBottomSeedCount, t.poWinnerCount]),
+    [[2, 14, 7, 39], [3, 14, 9, 39], [4, 15, 9, 39]]
+  );
+  const pbDef = mDef.playoffSeedBreakdown;
+  assert.equal(pbDef.allCount, 117);
+  assert.equal(pbDef.transitionalCount, 5);
+  assert.equal(pbDef.hasSunderland1990, true);
+  assert.equal(pbDef.hasSouthampton2026, true);
+  assert.equal(pbDef.overall.total, 112);
+  assert.deepEqual(pbDef.overall.seeds.map((s) => s.count), [40, 27, 22, 23]);
+  assert.equal(pbDef.overall.topTwoCount, 67);
+  assert.equal(pbDef.overall.gap1to4.median, 7.5);
+  assert.deepEqual(
+    pbDef.byTier.map((t) => [t.tier, t.total, ...t.seeds.map((s) => s.count), t.gap1to4.median]),
+    [
+      [2, 38, 13, 9, 9, 7, 9],
+      [3, 37, 12, 10, 6, 9, 9],
+      [4, 37, 15, 8, 7, 7, 6],
+    ]
+  );
+
+  // Curtailed opt-in adds 2019-20 L1 (Wycombe 1st seed) and L2 (Northampton 4th seed) => 114 standard tournaments
+  const mCurPo = CA.buildAnalyticalModel(dataset, { ...CA.PRESETS['all-4-tiers'], includeCurtailed: true });
+  assert.equal(mCurPo.playoffSeedBreakdown.overall.total, 114);
+  assert.deepEqual(mCurPo.playoffSeedBreakdown.overall.seeds.map((s) => s.count), [41, 27, 22, 24]);
+
+  // PL-only has zero play-off seed records; Raw mode keeps official play-off seed breakdown invariant
+  const mPlOnly = CA.buildAnalyticalModel(dataset, CA.PRESETS['pl-1992-2026']);
+  assert.equal(mPlOnly.playoffSeedBreakdown.overall.total, 0);
+  assert.equal(mPlOnly.playoffSeedBreakdown.byTier.length, 0);
+  const mRawAll = CA.buildAnalyticalModel(dataset, { ...CA.PRESETS['all-4-tiers'], pointsMode: 'raw' });
+  assert.deepEqual(mRawAll.playoffSeedBreakdown.overall.seeds, pbDef.overall.seeds);
+
   const tDef = CL.buildTakeawaysView(mDef, CA.PRESETS['all-4-tiers']);
   assert.equal(tDef.bullets.length, 6);
   const tDefText = tDef.bullets.map((b) => `${b.lead} ${b.body}`).join(' ');
-  assert.ok(tDefText.includes('Bromley') && tDefText.includes('Salford City') && tDefText.includes('43 times') && tDefText.includes('Sheffield Wednesday') && tDefText.includes('Viktor Gyökeres'));
-  const tPl = CL.buildTakeawaysView(CA.buildAnalyticalModel(dataset, CA.PRESETS['pl-1992-2026']), CA.PRESETS['pl-1992-2026']);
+  assert.ok(tDefText.includes('Bromley') && tDefText.includes('Salford City') && tDefText.includes('112 four-team EFL play-offs') && tDefText.includes('36%') && tDefText.includes('Sheffield Wednesday') && tDefText.includes('Viktor Gyökeres'));
+  const tPl = CL.buildTakeawaysView(mPlOnly, CA.PRESETS['pl-1992-2026']);
   const tPlText = tPl.bullets.map((b) => `${b.lead} ${b.body}`).join(' ');
   assert.ok(tPlText.includes('West Ham') && tPlText.includes('AFC Bournemouth') && tPlText.includes('Viktor Gyökeres'));
   assert.ok(!/Bromley|Bolton|Hull City|Sheffield Wednesday/i.test(tPlText), 'PL-only takeaways must not leak EFL examples');
   const tEarly = CL.buildTakeawaysView(mT4Early, scT4Early);
   assert.ok(!/suspended/i.test(tEarly.bullets.map((b) => `${b.lead} ${b.body}`).join(' ')), 'Tier 4 re-election takeaways must not say suspended');
+
+  // Play-off chi-squared diagnostics & Statistics Sicko Mode views
+  assert.ok(Math.abs(pbDef.overall.chi2Uniform - 7.357142857) < 1e-4);
+  assert.ok(Math.abs(pbDef.overall.chi2Seeds2to4 - 0.583333333) < 1e-4);
+  assert.ok(Math.abs(pbDef.chi2TierContingency - 1.54) < 0.02);
+  assert.equal(pbDef.chi2TierDf, 6);
+
+  const sickoLedger = CL.buildLedgerView(mDef, CA.PRESETS['all-4-tiers'], 'sicko');
+  banBadNumbers(sickoLedger, 'sicko-ledger');
+  const sickoLedgerText = sickoLedger.cards.map((c) => `${c.idx} ${c.stat} ${c.claim} ${c.detail}`).join(' ');
+  assert.ok(sickoLedgerText.includes('R²(PPG)') && sickoLedgerText.includes('IQR') && sickoLedgerText.includes('GA/G') && sickoLedgerText.includes('argmax(W)'));
+
+  const sickoTakeaways = CL.buildTakeawaysView(mDef, CA.PRESETS['all-4-tiers'], 'sicko');
+  assert.equal(sickoTakeaways.bullets.length, 6);
+  const sickoTakText = sickoTakeaways.bullets.map((b) => `${b.lead} ${b.body}`).join(' ');
+  assert.ok(!/\bNaN\b|\bInfinity\b|\bundefined\b|\[object/i.test(sickoTakText));
+  assert.ok(sickoTakText.includes('argmax(W)') && sickoTakText.includes('R²(PPG)') && sickoTakText.includes('χ²') && sickoTakText.includes('PPG'));
 });

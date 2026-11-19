@@ -951,13 +951,23 @@
         });
       }
       if (poWin) {
+        const autoCount = autoRows.length;
+        const seedRank = poWin.pos - autoCount;
+        const isStandard4Team = s.startYear >= 1988 && seedRank >= 1 && seedRank <= 4;
+        const s1Row = s.enrichedTable[autoCount];
+        const s4Row = s.enrichedTable[autoCount + 3];
+        const gap1to4 = isStandard4Team && s1Row && s4Row ? (s1Row.points - s4Row.points) : null;
         playoffWinners.push({
           slotId: s.slotId,
           season: s.season,
+          startYear: s.startYear,
           tier: s.tier,
           team: poWin.team,
           pos: poWin.pos,
-          topSeedPos: autoRows.length + 1,
+          topSeedPos: autoCount + 1,
+          seedRank,
+          isStandard4Team,
+          gap1to4,
           ppg: poWin.officialPpg,
         });
       }
@@ -978,9 +988,93 @@
           poWinnerMedianPos: median(poSub.map((x) => x.pos)),
           poWinnerThirdCount: poSub.filter((x) => x.pos === 3).length,
           poWinnerTopSeedCount: poSub.filter((x) => x.pos === x.topSeedPos).length,
+          poWinnerBottomSeedCount: poSub.filter((x) => (x.isStandard4Team ? x.seedRank === 4 : x.seedRank === 3)).length,
           poWinnerLowestPosCount: poSub.filter((x) => (tierNum === 4 ? x.pos === 7 : x.pos === 6)).length,
         };
       });
+
+    const summarizePlayoffSeeds = (list) => {
+      const total = list.length;
+      const seedLabels = [
+        '1st Seed (Highest)',
+        '2nd Seed',
+        '3rd Seed',
+        '4th Seed (Lowest)',
+      ];
+      const seeds = [1, 2, 3, 4].map((seed, idx) => {
+        const count = list.filter((x) => x.seedRank === seed).length;
+        return {
+          seed,
+          label: seedLabels[idx],
+          count,
+          pct: total > 0 ? (count / total) * 100 : null,
+        };
+      });
+      const topTwoCount = seeds[0].count + seeds[1].count;
+      const chi2Uniform = total > 0
+        ? seeds.reduce((acc, sd) => {
+          const exp = total / 4;
+          return acc + ((sd.count - exp) * (sd.count - exp)) / exp;
+        }, 0)
+        : null;
+      const n24 = seeds[1].count + seeds[2].count + seeds[3].count;
+      const chi2Seeds2to4 = n24 > 0
+        ? [1, 2, 3].reduce((acc, i) => {
+          const exp = n24 / 3;
+          return acc + ((seeds[i].count - exp) * (seeds[i].count - exp)) / exp;
+        }, 0)
+        : null;
+      return {
+        total,
+        seeds,
+        topTwoCount,
+        topTwoPct: total > 0 ? (topTwoCount / total) * 100 : null,
+        chi2Uniform,
+        chi2Seeds2to4,
+        gap1to4: statsSummary(list.map((x) => x.gap1to4)),
+      };
+    };
+
+    const stdPoList = playoffWinners.filter((x) => x.isStandard4Team);
+    const transPoList = playoffWinners.filter((x) => !x.isStandard4Team);
+    const poOverall = summarizePlayoffSeeds(stdPoList);
+    const poByTier = [2, 3, 4]
+      .filter((tierNum) => stdPoList.some((x) => x.tier === tierNum))
+      .map((tierNum) => ({
+        tier: tierNum,
+        label: TIER_LABELS[tierNum],
+        shortLabel: tierNum === 2 ? 'Championship (Tier 2)' : tierNum === 3 ? 'League One (Tier 3)' : 'League Two (Tier 4)',
+        ...summarizePlayoffSeeds(stdPoList.filter((x) => x.tier === tierNum)),
+      }));
+    let chi2TierContingency = null;
+    let chi2TierDf = null;
+    if (poByTier.length >= 2 && poOverall.total > 0) {
+      let sum = 0;
+      for (const row of poByTier) {
+        for (let j = 0; j < 4; j++) {
+          const colTot = poOverall.seeds[j].count;
+          const exp = (row.total * colTot) / poOverall.total;
+          if (exp > 0) {
+            const diff = row.seeds[j].count - exp;
+            sum += (diff * diff) / exp;
+          }
+        }
+      }
+      chi2TierContingency = sum;
+      chi2TierDf = (poByTier.length - 1) * 3;
+    }
+    const playoffSeedBreakdown = {
+      allCount: playoffWinners.length,
+      transitionalCount: transPoList.length,
+      transitionalWinners: transPoList,
+      standardWinners: stdPoList,
+      hasSunderland1990: stdPoList.some((x) => x.slotId === '1989-90-T2'),
+      hasSouthampton2026: stdPoList.some((x) => x.slotId === '2025-26-T2'),
+      chi2TierContingency,
+      chi2TierDf,
+      overall: poOverall,
+      byTier: poByTier,
+    };
 
     // Legacy PL 38-game survival shortcuts for exact PL-parity reporting
     const survival38 = survivalSeries.filter((x) => x.gamesPerTeam === 38 && x.tier === 1);
@@ -1207,6 +1301,7 @@
       promotionSeries,
       playoffWinners,
       byTierPromotion,
+      playoffSeedBreakdown,
       seasonDrawLeaders,
       highDrawCampaigns,
       drawLeaderStats,
