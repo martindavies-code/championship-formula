@@ -620,7 +620,7 @@ test('D1-D3 & C1-C4: Boundary conservation, per-slot relegation counts & 2007-20
   assert.equal(aldSlot.relegationLinePos, null);
   assert.equal(aldSlot.survivalLinePos, null);
   assert.equal(aldSlot.table.every((r) => r.relegated === false), true, 'D2: every row in 1990-91 T4 must have relegated=false');
-  assert.ok(typeof ald.administrativeOutcome === 'string' && ald.administrativeOutcome.includes('withdrawing/folding'), 'C4: Aldershot keeps administrativeOutcome');
+  assert.ok(typeof ald.administrativeOutcome === 'string' && ald.administrativeOutcome.includes('folded during 1991-92'), 'C4: Aldershot keeps administrativeOutcome');
 
   const maid = bySlot.get('1991-92-T4').table.find((r) => r.team === 'Maidstone United');
   assert.ok(typeof maid.administrativeOutcome === 'string' && maid.administrativeOutcome.includes('resigned'), 'C4: Maidstone keeps administrativeOutcome');
@@ -659,7 +659,8 @@ test('D1-D3 & C1-C4: Boundary conservation, per-slot relegation counts & 2007-20
     }
   }
   assert.equal(wim.outcomeType, 'none');
-  assert.equal(ald.outcomeType, 'withdrew');
+  assert.equal(ald.outcomeType, 'none');
+  assert.equal(bySlot.get('1990-91-T4').expansionRestructure, true);
   assert.equal(maid.outcomeType, 'withdrew');
   assert.equal(bySlot.get('2006-07-T4').table.find((r) => r.team === 'Boston United').outcomeType, 'administration_relegation');
   assert.equal(bySlot.get('2018-19-T4').table.find((r) => r.team === 'Bury').outcomeType, 'expelled');
@@ -668,5 +669,5 @@ test('D1-D3 & C1-C4: Boundary conservation, per-slot relegation counts & 2007-20
   assert.equal(bySlot.get('1993-94-T4').table.find((r) => r.team === 'Northampton Town').outcomeType, 'reprieved');
   assert.equal(bySlot.get('1994-95-T4').table.find((r) => r.team === 'Exeter City').outcomeType, 'reprieved');
   assert.equal(bySlot.get('1995-96-T4').table.find((r) => r.team === 'Torquay United').outcomeType, 'reprieved');
-  assert.equal(specialRows.length, 8);
+  assert.equal(specialRows.length, 7);
 });

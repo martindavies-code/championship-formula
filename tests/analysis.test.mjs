@@ -228,7 +228,7 @@ test('Headline ledger semantics: Items 1-6 across real scopes, fixtures, and edg
   assert.ok(!/\bmost\b|\bmajority\b/i.test(vDef.cards[2].detail));
   // Card 04: 168 inside vs 10 outside with distinct reasons
   assert.ok(vDef.cards[3].claim.includes('168 tables with relegation; 10 without it'));
-  assert.ok(vDef.cards[3].detail.includes('5 Fourth Division re-election seasons where automatic relegation was not in place') && vDef.cards[3].detail.includes('2 after club withdrawal') && vDef.cards[3].detail.includes('3 after ground-grading reprieve'));
+  assert.ok(vDef.cards[3].detail.includes('5 Fourth Division re-election seasons where automatic relegation was not in place') && vDef.cards[3].detail.includes('1 after Football League expansion or restructuring') && vDef.cards[3].detail.includes('1 after club withdrawal') && vDef.cards[3].detail.includes('3 after ground-grading reprieve'));
   // Card 06: 12 of 34 minority, 42 co-winner instances, 144 omitted, no causal need claim
   assert.ok(vDef.cards[5].stat === '12 / 34' && vDef.cards[5].claim.includes('minority (12 of 34)'));
   assert.ok(vDef.cards[5].detail.includes('42 Golden Boot') && vDef.cards[5].detail.includes('144 pre-1992 or lower-tier tables omitted'));
@@ -376,7 +376,7 @@ test('Headline ledger semantics: Items 1-6 across real scopes, fixtures, and edg
   const tDef = CL.buildTakeawaysView(mDef, CA.PRESETS['all-4-tiers']);
   assert.equal(tDef.bullets.length, 6);
   const tDefText = tDef.bullets.map((b) => `${b.lead} ${b.body}`).join(' ');
-  assert.ok(tDefText.includes('Bromley') && tDefText.includes('Salford City') && tDefText.includes('112 four-team EFL play-offs') && tDefText.includes('36%') && tDefText.includes('Sheffield Wednesday') && tDefText.includes('Viktor Gyökeres'));
+  assert.ok(tDefText.includes('Bromley') && tDefText.includes('Salford City') && tDefText.includes('112 four-team English league play-offs') && tDefText.includes('36%') && tDefText.includes('Sheffield Wednesday') && tDefText.includes('Viktor Gyökeres'));
   const tPl = CL.buildTakeawaysView(mPlOnly, CA.PRESETS['pl-1992-2026']);
   const tPlText = tPl.bullets.map((b) => `${b.lead} ${b.body}`).join(' ');
   assert.ok(tPlText.includes('West Ham') && tPlText.includes('AFC Bournemouth') && tPlText.includes('Viktor Gyökeres'));
