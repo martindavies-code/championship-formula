@@ -19,15 +19,16 @@
   --rule-medium: #8c867a;
   --rule-light: #d5cfc2;
 
-  /* Data palette — high contrast, editorial, colorblind-conscious */
-  --accent-champ: #b8291f;      /* Crimson: Champions / 1st Place / Primary signal */
+  /* Data palette — Mundial magazine family: deep blue, off-white, red.
+     Supporting tones limited to blue shades and warm paper neutrals. */
+  --accent-champ: #c8221a;      /* Mundial red: Champions / 1st Place / Primary signal */
   --accent-champ-soft: #f5dfdc;
-  --accent-runner: #1b5670;     /* Prussian Petrol: Runners-up / 2nd Place */
+  --accent-runner: #0b3a8f;     /* Mundial deep blue: Runners-up / 2nd Place */
   --accent-runner-soft: #ddeaf0;
-  --accent-top4: #2e6f52;       /* Forest Slate: 3rd-4th / Survival safe */
-  --accent-top4-soft: #dfeee7;
-  --accent-warn: #a66314;       /* Ochre Amber: Draws / Threshold line */
-  --accent-warn-soft: #f5ead8;
+  --accent-top4: #2f5d9e;       /* Steel mid-blue: 3rd-4th / Survival safe */
+  --accent-top4-soft: #dfe8f4;
+  --accent-warn: #6e6a61;       /* Warm ink-grey: Draws / Reference lines */
+  --accent-warn-soft: #ece7dc;
   --accent-rel: #6e1a1a;        /* Oxblood: Relegated */
   --accent-rel-soft: #eedada;
   --accent-neutral: #8b8578;    /* Warm stone: Mid-table field */
@@ -507,28 +508,22 @@ body.voice-sicko .takeaways-section {
 }
 
 .ledger-stat {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: clamp(1.65rem, 1.3rem + 1vw, 2.25rem);
   font-weight: 700;
+  letter-spacing: -0.01em;
   line-height: 1.1;
   color: var(--accent-champ);
   margin-block-end: 0.35rem;
 }
 
-.ledger-card:nth-child(2) .ledger-stat {
-  color: var(--ink-primary);
-}
-
-.ledger-card:nth-child(3) .ledger-stat {
-  color: var(--accent-top4);
-}
-
-.ledger-card:nth-child(4) .ledger-stat {
-  color: var(--accent-warn);
-}
-
+/* Scorecard numbers stay in the two Mundial inks only: red for the first
+   and last headline cards, deep blue for everything between. */
+.ledger-card:nth-child(2) .ledger-stat,
+.ledger-card:nth-child(3) .ledger-stat,
+.ledger-card:nth-child(4) .ledger-stat,
 .ledger-card:nth-child(5) .ledger-stat {
-  color: var(--accent-runner);
+  color: var(--brand-blue-deep);
 }
 
 .ledger-claim {
@@ -1904,6 +1899,7 @@ h3[id] {
   padding: 1.1rem clamp(1rem, 3vw, 2rem) 2rem;
 }
 .masthead .voice-mode-bar { border-block-end-color: rgba(244, 239, 227, 0.35); }
+.masthead .voice-mode-hint { color: rgba(244, 239, 227, 0.85); }
 .masthead .voice-mode-label,
 .masthead .masthead-meta,
 .masthead .masthead-kicker,

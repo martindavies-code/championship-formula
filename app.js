@@ -404,10 +404,10 @@
      TEAM CATEGORY CLASSIFICATION FOR SCATTER PALETTE
      ======================================================================== */
   function pointColor(t) {
-    if (t.champion || t.pos === 1) return '#b8291f';
-    if (t.pos === 2 || t.promoted) return '#1b5670';
+    if (t.champion || t.pos === 1) return '#c8221a';
+    if (t.pos === 2 || t.promoted) return '#0b3a8f';
     if (t.relegated) return '#6e1a1a';
-    if (t.finishScore !== null && t.finishScore >= 0.72) return '#2e6f52';
+    if (t.finishScore !== null && t.finishScore >= 0.72) return '#2f5d9e';
     return '#8b8578';
   }
 
@@ -2137,7 +2137,7 @@
       // Min-Max whisker
       svg.appendChild(svgEl('line', { x1: sx(minV), x2: sx(maxV), y1: cy, y2: cy, stroke: '#8c867a', 'stroke-width': 1.5 }));
       // Q1-Q3 bar
-      const barColor = c.key === 'winRate' || c.key === 'gdPerGame' ? '#3e3c38' : c.key === 'gaPerGame' ? '#1b5670' : c.key === 'gfPerGame' ? '#b8291f' : '#a66314';
+      const barColor = c.key === 'winRate' || c.key === 'gdPerGame' ? '#3e3c38' : c.key === 'gaPerGame' ? '#0b3a8f' : c.key === 'gfPerGame' ? '#c8221a' : '#6e6a61';
       svg.appendChild(svgEl('rect', { x: sx(q1), y: cy - 7, width: Math.max(3, sx(q3) - sx(q1)), height: 14, fill: barColor, 'fill-opacity': '0.28', stroke: barColor, 'stroke-width': 1.2 }));
       // Median dot
       const tid = `s1b-${i}`;
@@ -2415,8 +2415,8 @@
       cPts.push(`${sx(yr).toFixed(1)},${sy(CA.mean(yp.map((x) => x.champion[tk]))).toFixed(1)}`);
       rPts.push(`${sx(yr).toFixed(1)},${sy(CA.mean(yp.map((x) => x.runnerUp[tk]))).toFixed(1)}`);
     }
-    svg.appendChild(svgEl('polyline', { fill: 'none', stroke: '#1b5670', 'stroke-width': 2, 'stroke-opacity': '0.7', points: rPts.join(' ') }));
-    svg.appendChild(svgEl('polyline', { fill: 'none', stroke: '#b8291f', 'stroke-width': 2.3, points: cPts.join(' ') }));
+    svg.appendChild(svgEl('polyline', { fill: 'none', stroke: '#0b3a8f', 'stroke-width': 2, 'stroke-opacity': '0.7', points: rPts.join(' ') }));
+    svg.appendChild(svgEl('polyline', { fill: 'none', stroke: '#c8221a', 'stroke-width': 2.3, points: cPts.join(' ') }));
 
     const tipMap = new Map();
     pairs.forEach((p, idx) => {
@@ -2443,8 +2443,8 @@
           ['Champion', `${p.champion.team} (${fmtNum(p.champion[tk], 3)})`],
         ],
       });
-      svg.appendChild(svgEl('circle', { cx: x.toFixed(1), cy: yr2.toFixed(1), r: 3.1, fill: '#1b5670', 'fill-opacity': '0.68', 'data-tip-id': rid }));
-      svg.appendChild(svgEl('circle', { cx: x.toFixed(1), cy: yc.toFixed(1), r: 3.6, fill: '#b8291f', 'fill-opacity': '0.88', 'data-tip-id': cid }));
+      svg.appendChild(svgEl('circle', { cx: x.toFixed(1), cy: yr2.toFixed(1), r: 3.1, fill: '#0b3a8f', 'fill-opacity': '0.68', 'data-tip-id': rid }));
+      svg.appendChild(svgEl('circle', { cx: x.toFixed(1), cy: yc.toFixed(1), r: 3.6, fill: '#c8221a', 'fill-opacity': '0.88', 'data-tip-id': cid }));
     });
 
     wireDelegatedTooltips(svg, tipMap);
@@ -2488,25 +2488,25 @@
 
       // Champion row (top half)
       const y1 = cy - 7;
-      svg.appendChild(svgEl('line', { x1: sx(cs.min), x2: sx(cs.max), y1, y2: y1, stroke: '#b8291f', 'stroke-width': 1.2, 'stroke-opacity': '0.55' }));
-      svg.appendChild(svgEl('rect', { x: sx(cs.q1), y: y1 - 4.5, width: Math.max(2, sx(cs.q3) - sx(cs.q1)), height: 9, fill: '#b8291f', 'fill-opacity': '0.35', stroke: '#b8291f' }));
+      svg.appendChild(svgEl('line', { x1: sx(cs.min), x2: sx(cs.max), y1, y2: y1, stroke: '#c8221a', 'stroke-width': 1.2, 'stroke-opacity': '0.55' }));
+      svg.appendChild(svgEl('rect', { x: sx(cs.q1), y: y1 - 4.5, width: Math.max(2, sx(cs.q3) - sx(cs.q1)), height: 9, fill: '#c8221a', 'fill-opacity': '0.35', stroke: '#c8221a' }));
       const tidC = `s2d-c-${idx}`;
       tipMap.set(tidC, {
         title: `1st Place · ${d.label}`,
         rows: [['Average / Median', `${fmtNum(cs.mean, 3)} / ${fmtNum(cs.median, 3)}`], ['Middle half', `${fmtNum(cs.q1, 3)}–${fmtNum(cs.q3, 3)}`], ['Lowest–highest', `${fmtNum(cs.min, 3)}–${fmtNum(cs.max, 3)}`]],
       });
-      svg.appendChild(svgEl('circle', { cx: sx(cs.median), cy: y1, r: 4, fill: '#b8291f', 'data-tip-id': tidC }));
+      svg.appendChild(svgEl('circle', { cx: sx(cs.median), cy: y1, r: 4, fill: '#c8221a', 'data-tip-id': tidC }));
 
       // Runner-Up row (bottom half)
       const y2 = cy + 7;
-      svg.appendChild(svgEl('line', { x1: sx(rs.min), x2: sx(rs.max), y1: y2, y2, stroke: '#1b5670', 'stroke-width': 1.2, 'stroke-opacity': '0.55' }));
-      svg.appendChild(svgEl('rect', { x: sx(rs.q1), y: y2 - 4.5, width: Math.max(2, sx(rs.q3) - sx(rs.q1)), height: 9, fill: '#1b5670', 'fill-opacity': '0.3', stroke: '#1b5670' }));
+      svg.appendChild(svgEl('line', { x1: sx(rs.min), x2: sx(rs.max), y1: y2, y2, stroke: '#0b3a8f', 'stroke-width': 1.2, 'stroke-opacity': '0.55' }));
+      svg.appendChild(svgEl('rect', { x: sx(rs.q1), y: y2 - 4.5, width: Math.max(2, sx(rs.q3) - sx(rs.q1)), height: 9, fill: '#0b3a8f', 'fill-opacity': '0.3', stroke: '#0b3a8f' }));
       const tidR = `s2d-r-${idx}`;
       tipMap.set(tidR, {
         title: `2nd Place · ${d.label}`,
         rows: [['Average / Median', `${fmtNum(rs.mean, 3)} / ${fmtNum(rs.median, 3)}`], ['Middle half', `${fmtNum(rs.q1, 3)}–${fmtNum(rs.q3, 3)}`], ['Lowest–highest', `${fmtNum(rs.min, 3)}–${fmtNum(rs.max, 3)}`]],
       });
-      svg.appendChild(svgEl('circle', { cx: sx(rs.median), cy: y2, r: 4, fill: '#1b5670', 'data-tip-id': tidR }));
+      svg.appendChild(svgEl('circle', { cx: sx(rs.median), cy: y2, r: 4, fill: '#0b3a8f', 'data-tip-id': tidR }));
     });
 
     wireDelegatedTooltips(svg, tipMap);
@@ -2846,8 +2846,8 @@
     // Reference benchmark lines: 40/38 and 50/46
     const b40 = (40 / 38) * mult;
     const b50 = (50 / 46) * mult;
-    svg.appendChild(svgEl('line', { x1: pad.left, x2: W - pad.right, y1: sy(b40), y2: sy(b40), stroke: '#a66314', 'stroke-width': 1.8, 'stroke-dasharray': '5 4' }));
-    svg.appendChild(svgEl('line', { x1: pad.left, x2: W - pad.right, y1: sy(b50), y2: sy(b50), stroke: '#1b5670', 'stroke-width': 1.8, 'stroke-dasharray': '2 3' }));
+    svg.appendChild(svgEl('line', { x1: pad.left, x2: W - pad.right, y1: sy(b40), y2: sy(b40), stroke: '#c8221a', 'stroke-width': 1.8, 'stroke-dasharray': '5 4' }));
+    svg.appendChild(svgEl('line', { x1: pad.left, x2: W - pad.right, y1: sy(b50), y2: sy(b50), stroke: '#0b3a8f', 'stroke-width': 1.8, 'stroke-dasharray': '2 3' }));
 
     // Annual averages
     const sLine = [];
@@ -2857,7 +2857,7 @@
       sLine.push(`${sx(yr).toFixed(1)},${sy(CA.mean(sub.map((x) => x.survivingPpg * mult))).toFixed(1)}`);
       rLine.push(`${sx(yr).toFixed(1)},${sy(CA.mean(sub.map((x) => x.relegatedHighPpg * mult))).toFixed(1)}`);
     }
-    svg.appendChild(svgEl('polyline', { fill: 'none', stroke: '#2e6f52', 'stroke-width': 2.1, points: sLine.join(' ') }));
+    svg.appendChild(svgEl('polyline', { fill: 'none', stroke: '#2f5d9e', 'stroke-width': 2.1, points: sLine.join(' ') }));
     svg.appendChild(svgEl('polyline', { fill: 'none', stroke: '#6e1a1a', 'stroke-width': 2.1, points: rLine.join(' ') }));
 
     const tipMap = new Map();
@@ -2885,7 +2885,7 @@
           ['Guaranteed safe', `${s.guaranteedSafePts} pts (${fmtNum(s.guaranteedSafePpg, 3)}/game)`],
         ],
       });
-      svg.appendChild(svgEl('circle', { cx: px.toFixed(1), cy: ySurv.toFixed(1), r: 3.1, fill: '#2e6f52', 'fill-opacity': '0.72', 'data-tip-id': idS }));
+      svg.appendChild(svgEl('circle', { cx: px.toFixed(1), cy: ySurv.toFixed(1), r: 3.1, fill: '#2f5d9e', 'fill-opacity': '0.72', 'data-tip-id': idS }));
       svg.appendChild(svgEl('circle', { cx: px.toFixed(1), cy: yRel.toFixed(1), r: 3.1, fill: '#6e1a1a', 'fill-opacity': '0.72', 'data-tip-id': idR }));
     });
 
@@ -2973,9 +2973,9 @@
     }
 
     const tierPalette = {
-      2: { color: '#b8291f', shortName: 'the Championship', plainName: 'Championship', tableLabel: 'Championship (Tier 2)' },
-      3: { color: '#1b5670', shortName: 'League One', plainName: 'League One', tableLabel: 'League One (Tier 3)' },
-      4: { color: '#2e6f52', shortName: 'League Two', plainName: 'League Two', tableLabel: 'League Two (Tier 4)' },
+      2: { color: '#c8221a', shortName: 'the Championship', plainName: 'Championship', tableLabel: 'Championship (Tier 2)' },
+      3: { color: '#0b3a8f', shortName: 'League One', plainName: 'League One', tableLabel: 'League One (Tier 3)' },
+      4: { color: '#2f5d9e', shortName: 'League Two', plainName: 'League Two', tableLabel: 'League Two (Tier 4)' },
     };
 
     const seriesList = [];
@@ -3177,7 +3177,7 @@
       x2: W - pad.right,
       y1: y25,
       y2: y25,
-      stroke: '#a66314',
+      stroke: '#6e6a61',
       'stroke-width': 1.8,
       'stroke-dasharray': '5 4',
     }));
@@ -3187,7 +3187,7 @@
       'text-anchor': 'start',
       'font-size': 10,
       'font-weight': 600,
-      fill: '#a66314',
+      fill: '#6e6a61',
     }, '25% equal'));
     svg.appendChild(svgEl('text', {
       x: W - pad.right + 7,
@@ -3195,7 +3195,7 @@
       'text-anchor': 'start',
       'font-size': 10,
       'font-weight': 600,
-      fill: '#a66314',
+      fill: '#6e6a61',
     }, 'odds'));
 
     const seedAxes = [
@@ -3460,9 +3460,9 @@
     if (chartEl) {
       clearEl(chartEl);
       const bins = [
-        { label: 'Top Quarter\n(>75%–100%)', items: m.seasonDrawLeaders.filter((x) => (x.officialFinishScore ?? 0) > 0.75), color: '#2e6f52' },
-        { label: 'Upper Mid\n(50%–75%)', items: m.seasonDrawLeaders.filter((x) => (x.officialFinishScore ?? 0) >= 0.5 && (x.officialFinishScore ?? 0) <= 0.75), color: '#1b5670' },
-        { label: 'Lower Mid\n(25%–<50%)', items: m.seasonDrawLeaders.filter((x) => (x.officialFinishScore ?? 0) >= 0.25 && (x.officialFinishScore ?? 0) < 0.5), color: '#a66314' },
+        { label: 'Top Quarter\n(>75%–100%)', items: m.seasonDrawLeaders.filter((x) => (x.officialFinishScore ?? 0) > 0.75), color: '#2f5d9e' },
+        { label: 'Upper Mid\n(50%–75%)', items: m.seasonDrawLeaders.filter((x) => (x.officialFinishScore ?? 0) >= 0.5 && (x.officialFinishScore ?? 0) <= 0.75), color: '#0b3a8f' },
+        { label: 'Lower Mid\n(25%–<50%)', items: m.seasonDrawLeaders.filter((x) => (x.officialFinishScore ?? 0) >= 0.25 && (x.officialFinishScore ?? 0) < 0.5), color: '#6e6a61' },
         { label: 'Bottom Quarter\n(0%–<25%)', items: m.seasonDrawLeaders.filter((x) => (x.officialFinishScore ?? 0) < 0.25), color: '#6e1a1a' },
       ];
       const maxCount = Math.max(1, ...bins.map((b) => b.items.length));
@@ -3533,9 +3533,9 @@
      ======================================================================== */
   const LEADER_TIER_META = {
     1: { color: '#141412', label: 'Top flight', short: 'Tier 1', marker: 'circle' },
-    2: { color: '#b8291f', label: 'Second tier', short: 'Tier 2', marker: 'square' },
-    3: { color: '#1b5670', label: 'Third tier', short: 'Tier 3', marker: 'diamond' },
-    4: { color: '#2e6f52', label: 'Fourth tier', short: 'Tier 4', marker: 'triangle' },
+    2: { color: '#c8221a', label: 'Second tier', short: 'Tier 2', marker: 'square' },
+    3: { color: '#0b3a8f', label: 'Third tier', short: 'Tier 3', marker: 'diamond' },
+    4: { color: '#2f5d9e', label: 'Fourth tier', short: 'Tier 4', marker: 'triangle' },
   };
 
   function leaderMarker(kind, cx, cy, color, title) {
@@ -3923,7 +3923,7 @@
 
       const tipMap = new Map();
       sa.top4Teams.forEach((t, i) => {
-        const col = t.pos === 1 ? '#b8291f' : t.pos === 2 ? '#1b5670' : '#2e6f52';
+        const col = t.pos === 1 ? '#c8221a' : t.pos === 2 ? '#0b3a8f' : '#2f5d9e';
         const tid = `s5-${i}`;
         tipMap.set(tid, {
           title: `${t.team} (${t.season})`,
@@ -3962,9 +3962,9 @@
     if (gbEl) {
       clearEl(gbEl);
       const buckets = [
-        { label: '1st (Champ)', n: sa.gbInstances.filter((x) => x.pos === 1).length, col: '#b8291f' },
-        { label: '2nd Place', n: sa.gbInstances.filter((x) => x.pos === 2).length, col: '#1b5670' },
-        { label: '3rd–4th', n: sa.gbInstances.filter((x) => x.pos === 3 || x.pos === 4).length, col: '#2e6f52' },
+        { label: '1st (Champ)', n: sa.gbInstances.filter((x) => x.pos === 1).length, col: '#c8221a' },
+        { label: '2nd Place', n: sa.gbInstances.filter((x) => x.pos === 2).length, col: '#0b3a8f' },
+        { label: '3rd–4th', n: sa.gbInstances.filter((x) => x.pos === 3 || x.pos === 4).length, col: '#2f5d9e' },
         { label: '5th+', n: sa.gbInstances.filter((x) => x.pos >= 5).length, col: '#8b8578' },
       ];
       const maxN = Math.max(1, ...buckets.map((b) => b.n));
