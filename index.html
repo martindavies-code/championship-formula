@@ -7,7 +7,7 @@
   <meta name="description" content="A descriptive empirical study of 180 league tables across the top four English divisions in the three-points-for-a-win era (1981–82 through 2025–26): what separates first place from everyone else.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./assets/fonts.css">
   <link rel="stylesheet" href="./styles.css">
@@ -34,6 +34,7 @@
 
       <div class="masthead-hero-grid" id="masthead-hero-grid">
         <div class="masthead-hero-copy">
+          <p class="masthead-aside" data-vk="masthead-aside">The Three-Points Issue · 1981–2026</p>
           <h1 class="masthead-title" id="masthead-title" data-vk="masthead-title">The Championship Formula</h1>
           <p class="masthead-deck" id="masthead-deck" data-vk="masthead-deck">
             Forty-five seasons of English league tables, from the top flight to the fourth tier, distilled into a clear picture of what wins titles, beats the drop and survives the play-offs.
@@ -45,6 +46,12 @@
             Fig. 0.0: Unsupervised empirical sicko observing unsmoothed 180-slot CSV panel ingest (<span class="math-inline" role="img" aria-label="t in [1981, 2025]"><span class="mx-var">t</span> ∈ [1981, 2025]</span>; zero priors assumed).
           </figcaption>
         </figure>
+      </div>
+      <div class="masthead-meta">
+        <span class="masthead-kicker" data-vk="masthead-kicker">English League Study · Three-Points Era</span>
+        <span class="num" id="meta-coverage">Loading dataset…</span>
+        <span class="num" id="meta-matches"></span>
+        <span class="num" id="meta-goals"></span>
       </div>
     </header>
 
@@ -101,18 +108,10 @@
         </div>
       </section>
 
-      <div class="masthead-meta">
-        <span class="masthead-kicker" data-vk="masthead-kicker">English League Study · Three-Points Era</span>
-        <span class="num" id="meta-coverage">Loading dataset…</span>
-        <span class="num" id="meta-matches"></span>
-        <span class="num" id="meta-goals"></span>
-      </div>
-
-      <div class="normalisation-banner" id="normalisation-banner">
-        <!-- Populated safely from dataset metadata and active scope -->
-      </div>
-
       <section class="scope-bar" aria-label="Filter controls">
+        <div class="normalisation-banner" id="normalisation-banner">
+          <!-- Populated safely from dataset metadata and active scope -->
+        </div>
         <details class="scope-details" id="scope-details" open>
           <summary class="scope-details-summary"><span data-vk="scope-details-label">Filters and settings</span></summary>
         <div class="scope-bar-top">
