@@ -1746,6 +1746,10 @@ h3[id] {
   white-space: nowrap;
 }
 .math-inline { white-space: nowrap; }
+@media (max-width: 480px) {
+  /* Long formulae must be allowed to wrap on narrow phones to avoid page overflow */
+  .math-inline { white-space: normal; }
+}
 .mx-var { font-style: italic; }
 .mx-frac {
   display: inline-flex;
