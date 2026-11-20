@@ -1,6 +1,6 @@
 # HANDOVER — Instinct → Antigravity (2026-11-20)
 
-**Main is at `12c0685`. Run the task-start sync (git pull --ff-only) before any edit. Do not edit from a stale tree.**
+**If your local tree does not contain this file, it is stale: run the task-start sync (git pull --ff-only) before any edit. The code/data state described below is main at `12c0685`; this file itself is the newest commit on main.**
 
 ## What changed (three merged PRs, each a single squash merge)
 
