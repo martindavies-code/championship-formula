@@ -19,9 +19,9 @@
    "https://www.transfermarkt.com/x/torschuetzenliste/wettbewerb/GB3/saison_id/2020 (GB2, GB3, GB4)"
   ],
   "counts": {
-   "verified_league": 129,
-   "disputed": 7,
-   "not_verified": 44
+   "verified_league": 156,
+   "disputed": 5,
+   "not_verified": 19
   }
  },
  "slots": {
@@ -41,11 +41,20 @@
    ]
   },
   "1981-82-T2": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 22,
+   "winners": [
+    {
+     "player": "Ronnie Moore",
+     "club": "Rotherham United"
+    }
+   ],
+   "basis": "RSSSF + footballsite league label + worldfootball all agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "http://www.footballsite.co.uk/Statistics/Seasons/1981-82/Div21981-82.htm",
+    "https://www.worldfootball.net/competition/co20/england-championship/records-top-goal-scorers/"
+   ]
   },
   "1982-83-T1": {
    "status": "verified_league",
@@ -63,11 +72,20 @@
    ]
   },
   "1982-83-T2": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 26,
+   "winners": [
+    {
+     "player": "Gary Lineker",
+     "club": "Leicester City"
+    }
+   ],
+   "basis": "RSSSF + footballsite + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "http://www.footballsite.co.uk/Statistics/Seasons/1982-83/Div21982-83.htm",
+    "https://www.worldfootball.net/competition/co20/england-championship/records-top-goal-scorers/"
+   ]
   },
   "1983-84-T1": {
    "status": "verified_league",
@@ -306,18 +324,39 @@
    ]
   },
   "1991-92-T2": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 23,
+   "winners": [
+    {
+     "player": "Duncan Shearer",
+     "club": "Swindon Town / Blackburn Rovers"
+    },
+    {
+     "player": "David Speedie",
+     "club": "Blackburn Rovers"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree on joint winners",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co20/england-championship/records-top-goal-scorers/"
+   ]
   },
   "1981-82-T3": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 24,
+   "winners": [
+    {
+     "player": "Gordon Davies",
+     "club": "Fulham"
+    }
+   ],
+   "basis": "RSSSF + footballsite + Transfermarkt agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "http://www.footballsite.co.uk/Statistics/Seasons/1981-82/Div31981-82.htm",
+    "https://www.transfermarkt.com/second-division-bis-03-04-/torschuetzenliste/wettbewerb/ENSD/saison_id/1981"
+   ]
   },
   "1981-82-T4": {
    "status": "not_verified",
@@ -598,11 +637,19 @@
    ]
   },
   "1992-93-T2": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 42,
+   "winners": [
+    {
+     "player": "Guy Whittingham",
+     "club": "Portsmouth"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co20/england-championship/records-top-goal-scorers/"
+   ]
   },
   "1993-94-T1": {
    "status": "verified_league",
@@ -620,11 +667,19 @@
    ]
   },
   "1993-94-T2": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 25,
+   "winners": [
+    {
+     "player": "John McGinlay",
+     "club": "Bolton Wanderers"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co20/england-championship/records-top-goal-scorers/"
+   ]
   },
   "1994-95-T1": {
    "status": "verified_league",
@@ -642,11 +697,19 @@
    ]
   },
   "1994-95-T2": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 24,
+   "winners": [
+    {
+     "player": "John Aldridge",
+     "club": "Tranmere Rovers"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co20/england-championship/records-top-goal-scorers/"
+   ]
   },
   "1995-96-T1": {
    "status": "verified_league",
@@ -826,11 +889,19 @@
    ]
   },
   "2000-01-T2": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 27,
+   "winners": [
+    {
+     "player": "Louis Saha",
+     "club": "Fulham"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co20/england-championship/records-top-goal-scorers/"
+   ]
   },
   "2001-02-T1": {
    "status": "verified_league",
@@ -908,11 +979,19 @@
    ]
   },
   "2003-04-T2": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 27,
+   "winners": [
+    {
+     "player": "Andrew Johnson",
+     "club": "Crystal Palace"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co20/england-championship/records-top-goal-scorers/"
+   ]
   },
   "2004-05-T1": {
    "status": "verified_league",
@@ -930,11 +1009,19 @@
    ]
   },
   "2004-05-T2": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 24,
+   "winners": [
+    {
+     "player": "Nathan Ellington",
+     "club": "Wigan Athletic"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co20/england-championship/records-top-goal-scorers/"
+   ]
   },
   "2005-06-T1": {
    "status": "verified_league",
@@ -952,11 +1039,19 @@
    ]
   },
   "2005-06-T2": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 21,
+   "winners": [
+    {
+     "player": "Marlon King",
+     "club": "Watford"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co20/england-championship/records-top-goal-scorers/"
+   ]
   },
   "2006-07-T1": {
    "status": "verified_league",
@@ -974,11 +1069,19 @@
    ]
   },
   "2006-07-T2": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 23,
+   "winners": [
+    {
+     "player": "Jamie Cureton",
+     "club": "Colchester United"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co20/england-championship/records-top-goal-scorers/"
+   ]
   },
   "2007-08-T1": {
    "status": "verified_league",
@@ -1089,11 +1192,21 @@
    ]
   },
   "2010-11-T2": {
-   "status": "disputed",
-   "goals": null,
-   "winners": [],
-   "basis": "Transfermarkt vs fbref conflict: sources disagree on the leader or the count; nothing displayed",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 24,
+   "winners": [
+    {
+     "player": "Danny Graham",
+     "club": "Watford"
+    }
+   ],
+   "basis": "RSSSF + worldfootball + Wikipedia division article + Transfermarkt all agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co20/england-championship/records-top-goal-scorers/",
+    "https://en.wikipedia.org/wiki/2010%E2%80%9311_Football_League_Championship",
+    "https://www.transfermarkt.com/x/torschuetzenliste/wettbewerb/GB2/saison_id/2010"
+   ]
   },
   "2011-12-T1": {
    "status": "verified_league",
@@ -1754,32 +1867,64 @@
    ]
   },
   "2000-01-T3": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 27,
+   "winners": [
+    {
+     "player": "Neil Harris",
+     "club": "Millwall"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co63/england-league-one/records-top-goal-scorers/"
+   ]
   },
   "2000-01-T4": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 28,
+   "winners": [
+    {
+     "player": "Bobby Zamora",
+     "club": "Brighton & Hove Albion"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co64/england-league-two/records-top-goal-scorers/"
+   ]
   },
   "2001-02-T3": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 28,
+   "winners": [
+    {
+     "player": "Bobby Zamora",
+     "club": "Brighton & Hove Albion"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co63/england-league-one/records-top-goal-scorers/"
+   ]
   },
   "2001-02-T4": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 24,
+   "winners": [
+    {
+     "player": "Steve Howard",
+     "club": "Luton Town"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co64/england-league-two/records-top-goal-scorers/"
+   ]
   },
   "2002-03-T3": {
    "status": "verified_league",
@@ -1812,60 +1957,145 @@
    ]
   },
   "2003-04-T3": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 25,
+   "winners": [
+    {
+     "player": "Leon Knight",
+     "club": "Brighton & Hove Albion"
+    },
+    {
+     "player": "Stephen McPhee",
+     "club": "Port Vale"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree on joint winners",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co63/england-league-one/records-top-goal-scorers/"
+   ]
   },
   "2003-04-T4": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 23,
+   "winners": [
+    {
+     "player": "Steven MacLean",
+     "club": "Scunthorpe United"
+    }
+   ],
+   "basis": "RSSSF + worldfootball + footballsite agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co64/england-league-two/records-top-goal-scorers/",
+    "http://www.footballsite.co.uk/Statistics/Seasons/2003-04/Div32003-04.htm"
+   ]
   },
   "2004-05-T3": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 27,
+   "winners": [
+    {
+     "player": "Stuart Elliott",
+     "club": "Hull City"
+    },
+    {
+     "player": "Dean Windass",
+     "club": "Bradford City"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree on joint winners",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co63/england-league-one/records-top-goal-scorers/"
+   ]
   },
   "2004-05-T4": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 27,
+   "winners": [
+    {
+     "player": "Phil Jevons",
+     "club": "Yeovil Town"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co64/england-league-two/records-top-goal-scorers/"
+   ]
   },
   "2005-06-T3": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 23,
+   "winners": [
+    {
+     "player": "Freddy Eastwood",
+     "club": "Southend United"
+    },
+    {
+     "player": "Billy Sharp",
+     "club": "Scunthorpe United"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree on joint winners",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co63/england-league-one/records-top-goal-scorers/"
+   ]
   },
   "2005-06-T4": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 22,
+   "winners": [
+    {
+     "player": "Karl Hawley",
+     "club": "Carlisle United"
+    },
+    {
+     "player": "Rickie Lambert",
+     "club": "Rochdale"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree on joint winners",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co64/england-league-two/records-top-goal-scorers/"
+   ]
   },
   "2006-07-T3": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 30,
+   "winners": [
+    {
+     "player": "Billy Sharp",
+     "club": "Scunthorpe United"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co63/england-league-one/records-top-goal-scorers/"
+   ]
   },
   "2006-07-T4": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 21,
+   "winners": [
+    {
+     "player": "Richard Barker",
+     "club": "Hartlepool United"
+    },
+    {
+     "player": "Izale McLeod",
+     "club": "Milton Keynes Dons"
+    }
+   ],
+   "basis": "RSSSF + worldfootball agree on joint winners",
+   "sourceUrls": [
+    "https://www.rsssf.org/tablese/engtops.html",
+    "https://www.worldfootball.net/competition/co64/england-league-two/records-top-goal-scorers/"
+   ]
   },
   "2007-08-T3": {
    "status": "disputed",
@@ -1995,11 +2225,32 @@
    ]
   },
   "2011-12-T4": {
-   "status": "not_verified",
-   "goals": null,
-   "winners": [],
-   "basis": "No second league-scoped source found for the leader and goal count",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 18,
+   "winners": [
+    {
+     "player": "Adebayo Akinfenwa",
+     "club": "Northampton Town"
+    },
+    {
+     "player": "Lewis Grabban",
+     "club": "Rotherham United"
+    },
+    {
+     "player": "Izale McLeod",
+     "club": "Barnet"
+    },
+    {
+     "player": "Jack Midson",
+     "club": "AFC Wimbledon"
+    }
+   ],
+   "basis": "worldfootball + Wikipedia division article + Transfermarkt agree on four-way tie",
+   "sourceUrls": [
+    "https://www.worldfootball.net/competition/co64/england-league-two/records-top-goal-scorers/",
+    "https://en.wikipedia.org/wiki/2011%E2%80%9312_Football_League_Two",
+    "https://www.transfermarkt.com/x/torschuetzenliste/wettbewerb/GB4/saison_id/2011"
+   ]
   },
   "2012-13-T3": {
    "status": "verified_league",
@@ -2093,11 +2344,20 @@
    ]
   },
   "2015-16-T3": {
-   "status": "disputed",
-   "goals": null,
-   "winners": [],
-   "basis": "Transfermarkt vs fbref conflict: sources disagree on the leader or the count; nothing displayed",
-   "sourceUrls": []
+   "status": "verified_league",
+   "goals": 25,
+   "winners": [
+    {
+     "player": "Will Grigg",
+     "club": "Wigan Athletic"
+    }
+   ],
+   "basis": "worldfootball + Wikipedia division article + Transfermarkt agree",
+   "sourceUrls": [
+    "https://www.worldfootball.net/competition/co63/england-league-one/records-top-goal-scorers/",
+    "https://en.wikipedia.org/wiki/2015%E2%80%9316_Football_League_One",
+    "https://www.transfermarkt.com/x/torschuetzenliste/wettbewerb/GB3/saison_id/2015"
+   ]
   },
   "2015-16-T4": {
    "status": "verified_league",
