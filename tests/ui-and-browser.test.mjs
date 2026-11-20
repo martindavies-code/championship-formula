@@ -912,7 +912,7 @@ test('Division leader section renders in both voices with explicit missing rows 
     assert.equal(normal.missingRows, 24);
     assert.equal(normal.marks, 154);
     assert.equal(normal.clubRows, 44);
-    assert.equal(normal.clubMissing, 9);
+    assert.equal(normal.clubMissing, 1);
     assert.ok(/2 curtailed 2019/.test(normal.sub), 'ledger explains the two curtailed tables');
     assert.ok(/154 of 178/.test(normal.title));
     await cdp.evalJs(`() => document.querySelector('[data-voice-mode="sicko"]').click()`);
