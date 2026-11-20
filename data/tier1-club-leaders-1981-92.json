@@ -4,8 +4,8 @@
   "title": "Top-four clubs: leading league scorer, First Division 1981-82 to 1991-92",
   "scope": "League goals only. A row is included only when the English Football League Tables list and a second publisher agree on the player and the goal count, and no transfer or tie leaves the club attribution open.",
   "counts": {
-   "verified": 35,
-   "unresolved": 9,
+   "verified": 43,
+   "unresolved": 1,
    "total": 44
   }
  },
@@ -464,62 +464,124 @@
     "https://www.englishfootballleaguetables.co.uk/stats/Report/goal/g1991-92.html",
     "https://en.wikipedia.org/wiki/1991%E2%80%9392_Sheffield_Wednesday_F.C._season"
    ]
-  }
- ],
- "unresolved": [
+  },
   {
    "slotId": "1982-83-T1",
    "season": "1982-83",
    "team": "Tottenham Hotspur",
-   "reason": "Combined total across two clubs; split by club not verified"
+   "pos": 4,
+   "gf": 65,
+   "player": "Steve Archibald",
+   "goals": 11,
+   "sourceUrls": [
+    "https://www.englishfootballleaguetables.co.uk/stats/Report/goal/g1982-83.html",
+    "https://www.11v11.com/teams/tottenham-hotspur/tab/players/season/1983/comp/200/",
+    "http://www.free-elements.com/England/Goals/TotH/TotH1982.html"
+   ]
   },
   {
    "slotId": "1983-84-T1",
    "season": "1983-84",
    "team": "Nottingham Forest",
-   "reason": "Joint leaders on equal goals; shown as unresolved so no club flag is implied"
+   "pos": 3,
+   "gf": 76,
+   "player": "Garry Birtles & Peter Davenport",
+   "goals": 15,
+   "sourceUrls": [
+    "https://www.englishfootballleaguetables.co.uk/stats/Report/goal/g1983-84.html",
+    "http://www.free-elements.com/England/Goals/NotF/NotF1983.html"
+   ]
   },
   {
    "slotId": "1985-86-T1",
    "season": "1985-86",
    "team": "Manchester United",
-   "reason": "Combined total across two clubs; split by club not verified"
+   "pos": 4,
+   "gf": 70,
+   "player": "Mark Hughes",
+   "goals": 17,
+   "sourceUrls": [
+    "https://www.englishfootballleaguetables.co.uk/stats/Report/goal/g1985-86.html",
+    "https://www.11v11.com/teams/manchester-united/tab/players/season/1986/comp/200/",
+    "http://www.free-elements.com/England/Goals/ManU/ManU1985.html"
+   ]
   },
   {
    "slotId": "1986-87-T1",
    "season": "1986-87",
    "team": "Liverpool",
-   "reason": "Combined total across two clubs; split by club not verified"
+   "pos": 2,
+   "gf": 72,
+   "player": "Ian Rush",
+   "goals": 30,
+   "sourceUrls": [
+    "https://www.englishfootballleaguetables.co.uk/stats/Report/goal/g1986-87.html",
+    "https://www.11v11.com/teams/liverpool/tab/players/season/1987/comp/200/",
+    "http://www.free-elements.com/England/Goals/LivP/LivP1986.html"
+   ]
   },
   {
    "slotId": "1989-90-T1",
    "season": "1989-90",
    "team": "Aston Villa",
-   "reason": "Combined total across two clubs; split by club not verified"
+   "pos": 2,
+   "gf": 57,
+   "player": "David Platt",
+   "goals": 19,
+   "sourceUrls": [
+    "https://www.englishfootballleaguetables.co.uk/stats/Report/goal/g1989-90.html",
+    "https://www.11v11.com/teams/aston-villa/tab/players/season/1990/comp/200/",
+    "http://www.free-elements.com/England/Goals/AstV/AstV1989.html"
+   ]
   },
   {
    "slotId": "1990-91-T1",
    "season": "1990-91",
    "team": "Liverpool",
-   "reason": "Joint leaders on equal goals; shown as unresolved so no club flag is implied"
+   "pos": 2,
+   "gf": 77,
+   "player": "John Barnes & Ian Rush",
+   "goals": 16,
+   "sourceUrls": [
+    "https://www.englishfootballleaguetables.co.uk/stats/Report/goal/g1990-91.html",
+    "https://www.11v11.com/teams/liverpool/tab/players/season/1991/comp/200/",
+    "http://www.free-elements.com/England/Goals/LivP/LivP1990.html"
+   ]
   },
   {
    "slotId": "1991-92-T1",
    "season": "1991-92",
    "team": "Arsenal",
-   "reason": "Combined total across two clubs; split by club not verified"
-  },
-  {
-   "slotId": "1990-91-T1",
-   "season": "1990-91",
-   "team": "Arsenal",
-   "reason": "League count disagrees between sources (23 in the English Football League Tables list, 22 on the club season page)"
+   "pos": 4,
+   "gf": 81,
+   "player": "Ian Wright",
+   "goals": 24,
+   "sourceUrls": [
+    "https://www.11v11.com/teams/arsenal/tab/players/season/1992/comp/200/",
+    "http://www.free-elements.com/England/Goals/ArsN/ArsN1991.html",
+    "https://en.wikipedia.org/wiki/1991%E2%80%9392_Arsenal_F.C._season"
+   ]
   },
   {
    "slotId": "1988-89-T1",
    "season": "1988-89",
    "team": "Norwich City",
-   "reason": "Second source names the player but gives no league count"
+   "pos": 4,
+   "gf": 48,
+   "player": "Robert Fleck",
+   "goals": 10,
+   "sourceUrls": [
+    "https://www.englishfootballleaguetables.co.uk/stats/Report/goal/g1988-89.html",
+    "http://www.free-elements.com/England/Goals/NorC/NorC1988.html"
+   ]
+  }
+ ],
+ "unresolved": [
+  {
+   "slotId": "1990-91-T1",
+   "season": "1990-91",
+   "team": "Arsenal",
+   "reason": "League count disagrees between sources: 23 in the English Football League Tables list, footballsite.co.uk and 11v11; 22 in RSSSF, the club season page and free-elements.com"
   }
  ]
 }
