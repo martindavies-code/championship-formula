@@ -2223,7 +2223,7 @@ body.voice-sicko .masthead-title {
   font-family: var(--font-display);
   font-weight: 400;
   font-size: clamp(2rem, 1.2rem + 2.6vw, 3.25rem);
-  line-height: 1.06;
+  line-height: 1.22;
   letter-spacing: 0.015em;
   text-transform: uppercase;
 }
