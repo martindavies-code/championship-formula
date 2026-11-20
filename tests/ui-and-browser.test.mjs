@@ -906,6 +906,7 @@ test('Division leader section renders in both voices with explicit missing rows 
       marks: document.querySelectorAll('#chart-sec5b-leaders svg title').length,
       sub: document.getElementById('sec5b-ledger-subtitle').textContent,
       prose: document.getElementById('sec5b-prose').textContent,
+      clubProse: document.getElementById('sec5b-club-prose').textContent,
     })`;
     const normal = await cdp.evalJs(grab);
     assert.equal(normal.ledgerRows, 178);
@@ -915,6 +916,9 @@ test('Division leader section renders in both voices with explicit missing rows 
     assert.equal(normal.clubMissing, 1);
     assert.ok(/2 curtailed 2019/.test(normal.sub), 'ledger explains the two curtailed tables');
     assert.ok(/154 of 178/.test(normal.title));
+    assert.ok(/43 of the 44 top-four club-seasons/.test(normal.clubProse), 'club summary counts verified coverage');
+    assert.ok(/The other 1 is left out and marked, because two sources gave different counts\./.test(normal.clubProse), 'club summary uses singular grammar and names the actual remaining reason');
+    assert.ok(!/two players tied/.test(normal.clubProse), 'resolved tie rows are no longer cited as excluded');
     await cdp.evalJs(`() => document.querySelector('[data-voice-mode="sicko"]').click()`);
     const sicko = await cdp.evalJs(grab);
     assert.equal(sicko.ledgerRows, 178);
