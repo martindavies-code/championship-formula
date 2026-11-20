@@ -2072,8 +2072,7 @@ table.data-table caption {
 }
 
 /* Equations keep a clear text face and normal case inside condensed headings */
-.section-title .math-inline, .chart-title .math-inline, .takeaways-title .math-inline,
-.masthead-title .math-inline, .math-display, .math-inline {
+.math-display, .math-inline {
   font-family: Georgia, 'Times New Roman', 'Nimbus Roman', serif;
   text-transform: none;
   letter-spacing: 0.015em;
@@ -2086,8 +2085,6 @@ table.data-table caption {
 }
 @media (max-width: 600px) {
 }
-
-.section-title .math-inline, .chart-title .math-inline, .takeaways-title .math-inline { font-size: 0.86em; font-weight: 400; vertical-align: baseline; }
 
 /* Season labels in the division-leader tables stay on one line */
 #sec-leaders table.data-table tbody tr > :first-child { white-space: nowrap; }
@@ -2259,6 +2256,18 @@ body.voice-sicko .ledger-title,
   letter-spacing: 0.04em;
 }
 
+/* Callout panel titles sit on their own blue tab bar; the generic heading
+   rule above must not repaint them dark-on-blue. */
+.analysis-section .finding-callout-title,
+.finding-callout-title {
+  font-family: var(--font-sans);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.05em;
+  color: var(--bg-paper);
+}
+
 .masthead-hero-copy {
   min-inline-size: 0;
   overflow-x: clip;
@@ -2346,15 +2355,52 @@ body:not(.voice-sicko) .takeaways-subtitle {
   padding: 0.18rem 0.55rem;
 }
 
-/* Keep Georgia/serif math crisp across headings and body */
+/* Short numeric/ordinal compounds wrapped by the app's text pipeline stay on
+   one line (2nd-placed, 38-game, 40-in-38, 1981–82). Bounded to short tokens
+   so nothing long becomes unbreakable. */
+.nb-c { white-space: nowrap; }
+
+/* Rag control everywhere: pretty wrapping for all running text, balanced
+   multi-line breaks on every heading role so no word strands on its own line.
+   text-wrap inherits, so body covers prose, captions, cards, tables, labels
+   and metadata; unsupported engines ignore both harmlessly. */
+body { text-wrap: pretty; }
+.masthead-title,
+.takeaways-title,
+.ledger-title,
+.section-title,
+.chart-title,
+.analysis-section h3,
+.analysis-section h4,
+table.data-table caption {
+  text-wrap: balance;
+}
+
+/* Keep Georgia/serif math crisp in body copy and display equations */
 .math-display,
-.math-inline,
-.section-title .math-inline,
-.chart-title .math-inline,
-.takeaways-title .math-inline {
+.math-inline {
   font-family: Georgia, 'Times New Roman', 'Nimbus Roman', serif;
   text-transform: none;
   letter-spacing: 0;
+}
+
+/* Headings keep one display voice: inline formulae inherit the heading face
+   instead of flipping to serif mid-line. Body/copy formulae stay serif above.
+   text-transform:none preserves maths case (argmax, i.i.d.) inside uppercase headings. */
+.masthead-title .math-inline,
+.takeaways-title .math-inline,
+.ledger-title .math-inline,
+.section-title .math-inline,
+.chart-title .math-inline,
+.analysis-section h3 .math-inline,
+.analysis-section h4 .math-inline {
+  font-family: inherit;
+  font-size: 1em;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-shadow: inherit;
+  text-transform: none;
+  white-space: normal;
 }
 
 /* ==========================================================================
@@ -2408,6 +2454,14 @@ table.data-table thead th > button {
 }
 
 @media (max-width: 700px) {
+  /* Mobile sticky nav is ~50px tall; land jumped-to sections just clear of it
+     instead of 116px down, which left a large empty gap below the nav. */
+  :target,
+  section[id],
+  h2[id],
+  h3[id] {
+    scroll-margin-block-start: 72px;
+  }
   .section-nav-summary {
     display: flex;
     align-items: center;

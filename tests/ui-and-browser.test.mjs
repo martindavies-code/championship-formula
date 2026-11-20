@@ -935,3 +935,53 @@ test('Division leader section renders in both voices with explicit missing rows 
     server.close();
   }
 });
+
+test('Break guard: short compounds wrapped without altering copy, idempotent across voice toggles', { timeout: 30000 }, async () => {
+  const { server, baseUrl } = await startStaticServer();
+  const cdp = await launchCdpSession();
+  try {
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+    await cdp.navigateAndWait(`${baseUrl}/`);
+
+    const grab = `() => ({
+      spans: document.querySelectorAll('.nb-c').length,
+      nested: document.querySelectorAll('.nb-c .nb-c').length,
+      longest: Math.max(0, ...[...document.querySelectorAll('.nb-c')].map((n) => n.textContent.length)),
+      noWrap: [...document.querySelectorAll('.nb-c')].every((n) => getComputedStyle(n).whiteSpace === 'nowrap'),
+      bodyHas38: document.body.textContent.includes('38-game'),
+      bodyHas2nd: document.body.textContent.includes('2nd-placed'),
+      bodyHasRange: document.body.textContent.includes('1981–82'),
+      noJoiner: !document.body.textContent.includes('\\u2060'),
+    })`;
+
+    const first = await cdp.evalJs(grab);
+    assert.ok(first.spans > 10, `expected many guarded compounds, got ${first.spans}`);
+    assert.equal(first.nested, 0, 'no nested guard spans');
+    assert.ok(first.longest <= 20, `guarded compound too long: ${first.longest} chars`);
+    assert.ok(first.noWrap, 'guard spans must be nowrap');
+    assert.ok(first.bodyHas38 && first.bodyHas2nd && first.bodyHasRange, 'rendered copy must stay byte-clean');
+    assert.ok(first.noJoiner, 'no invisible word joiners in rendered text');
+
+    // Voice toggle twice: content rebuilds through the same pipeline without doubling or losing guards
+    await cdp.evalJs(`() => document.querySelector('[data-voice-mode="sicko"]').click()`);
+    const sicko = await cdp.evalJs(grab);
+    assert.ok(sicko.spans > 10, 'guards present in sicko voice');
+    assert.equal(sicko.nested, 0, 'no nested guard spans after sicko toggle');
+    await cdp.evalJs(`() => document.querySelector('[data-voice-mode="normal"]').click()`);
+    const back = await cdp.evalJs(grab);
+    assert.equal(back.nested, 0, 'no nested guard spans after restoring normal voice');
+    assert.ok(back.bodyHas38 && back.bodyHas2nd, 'copy intact after round trip');
+
+    // A dynamic re-render (preset switch) keeps guards on regenerated text
+    await cdp.evalJs(`() => document.querySelector('[data-preset="pl-1992-2026"]').click()`);
+    await new Promise((r) => setTimeout(r, 150));
+    const dyn = await cdp.evalJs(grab);
+    assert.ok(dyn.spans > 5, 'guards present after dynamic re-render');
+    assert.ok(dyn.bodyHas38, 'compound copy intact after dynamic re-render');
+
+    assert.equal(cdp.pageErrors.length, 0, cdp.pageErrors.join('; '));
+  } finally {
+    await cdp.close();
+    server.close();
+  }
+});

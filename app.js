@@ -26,8 +26,7 @@
         if (v === undefined || v === null) continue;
         if (k === 'className') node.className = v;
         else if (k === 'textContent') {
-          if (typeof v === 'string' && v.includes('«')) setRich(node, v);
-          else node.textContent = String(v);
+          setRich(node, String(v));
         }
         else if (k === 'dataset' && typeof v === 'object') {
           for (const [dk, dv] of Object.entries(v)) {
@@ -45,12 +44,7 @@
     for (const child of children) {
       if (child === undefined || child === null || child === false) continue;
       if (typeof child === 'string' || typeof child === 'number') {
-        const s = String(child);
-        if (s.includes('«')) {
-          for (const n of richNodes(s)) node.appendChild(n);
-        } else {
-          node.appendChild(document.createTextNode(s));
-        }
+        for (const n of richNodes(String(child))) node.appendChild(n);
       } else {
         node.appendChild(child);
       }
@@ -229,19 +223,39 @@
     return s.replace(/\s+/g, ' ').trim();
   }
 
+  // Keep short numeric/ordinal compounds ("2nd-placed", "38-game", "40-in-38",
+  // "1981–82") on one line by wrapping them in a no-break span. DOM text stays
+  // byte-identical; only line breaking changes. Long prose still wraps freely.
+  const COMPOUND_RE = /\b\d(?:\.\d+)?(?:st|nd|rd|th)?-[A-Za-z][\w-]{0,13}|\b\d[\d.,]{0,6}\u2013\d[\d.,]{0,6}[A-Za-z]{0,2}/g;
+  function textNodesGuarded(text) {
+    const nodes = [];
+    let last = 0;
+    for (const m of text.matchAll(COMPOUND_RE)) {
+      if (m.index > last) nodes.push(document.createTextNode(text.slice(last, m.index)));
+      const span = document.createElement('span');
+      span.className = 'nb-c';
+      span.textContent = m[0];
+      nodes.push(span);
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) nodes.push(document.createTextNode(text.slice(last)));
+    if (!nodes.length) nodes.push(document.createTextNode(text));
+    return nodes;
+  }
+
   function richNodes(str) {
     const text = String(str);
-    if (!text.includes('«')) return [document.createTextNode(text)];
+    if (!text.includes('«')) return textNodesGuarded(text);
     const nodes = [];
     const re = /«([^«»]*)»/g;
     let last = 0;
     let match;
     while ((match = re.exec(text)) !== null) {
-      if (match.index > last) nodes.push(document.createTextNode(text.slice(last, match.index)));
+      if (match.index > last) nodes.push(...textNodesGuarded(text.slice(last, match.index)));
       nodes.push(mathInline(mathZoneAria(match[1]), ...mathZoneNodes(match[1])));
       last = match.index + match[0].length;
     }
-    if (last < text.length) nodes.push(document.createTextNode(text.slice(last)));
+    if (last < text.length) nodes.push(...textNodesGuarded(text.slice(last)));
     return nodes;
   }
 
@@ -730,7 +744,7 @@
       if (sicko && VOICE_CHROME[key] !== undefined) {
         setRich(node, VOICE_CHROME[key]);
       } else {
-        node.textContent = node.dataset.voiceNormal;
+        setRich(node, node.dataset.voiceNormal);
       }
     });
 
