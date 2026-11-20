@@ -3823,9 +3823,17 @@
     const unresolvedCount = all.length - ver.length;
     const shares = ver.map((r) => (r.goals / r.gf) * 100);
     const med = shares.length ? CA.median(shares) : null;
+    const unresolvedRows = all.filter((r) => !r.ok);
+    const unresolvedReasons = [];
+    if (unresolvedRows.some((r) => /moved clubs|transfer/i.test(r.reason || ''))) unresolvedReasons.push('the player moved clubs mid-season');
+    if (unresolvedRows.some((r) => /tied|tie[sd]?\b/i.test(r.reason || ''))) unresolvedReasons.push('two players tied');
+    if (unresolvedRows.some((r) => /disagree|differ|count|conflict/i.test(r.reason || ''))) unresolvedReasons.push('two sources gave different counts');
+    const reasonText = unresolvedReasons.length
+      ? `, because ${unresolvedReasons.length === 1 ? unresolvedReasons[0] : `${unresolvedReasons.slice(0, -1).join(', ')}, or ${unresolvedReasons[unresolvedReasons.length - 1]}`}`
+      : '';
     const clubProse = sicko
-      ? `Of «${all.length}» top-four club-seasons in view, «${ver.length}» have a verified leading scorer with league goals «G» and share «G / GF»; the median share is ${fmtNum(med, 1)}%.${unresolvedCount > 0 ? ` The other «${unresolvedCount}» are left unresolved because of transfers, ties, or a count that two sources do not share.` : ' All rows in view are verified.'}`
-      : `${ver.length} of the ${all.length} top-four club-seasons in view have a verified leading scorer. In those, the leader scored a median of ${fmtNum(med, 0)}% of the club’s league goals.${unresolvedCount > 0 ? ` The other ${unresolvedCount} are left out and marked, because the player moved clubs mid-season, two players tied, or two sources gave different counts.` : ' Every top-four club in view is verified.'}`;
+      ? `Of «${all.length}» top-four club-seasons in view, «${ver.length}» have a verified leading scorer with league goals «G» and share «G / GF»; the median share is ${fmtNum(med, 1)}%.${unresolvedCount > 0 ? ` The other «${unresolvedCount}» ${plural(unresolvedCount, 'is', 'are')} left unresolved${reasonText}.` : ' All rows in view are verified.'}`
+      : `${ver.length} of the ${all.length} top-four club-seasons in view have a verified leading scorer. In those, the leader scored a median of ${fmtNum(med, 0)}% of the club’s league goals.${unresolvedCount > 0 ? ` The other ${unresolvedCount} ${plural(unresolvedCount, 'is', 'are')} left out and marked${reasonText}.` : ' Every top-four club in view is verified.'}`;
     if (sicko) setRich(prose, clubProse); else prose.textContent = clubProse;
     all.forEach((r) => {
       tbody.appendChild(el('tr', { className: r.ok ? '' : 'row-missing' },
