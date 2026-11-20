@@ -909,12 +909,12 @@ test('Division leader section renders in both voices with explicit missing rows 
     })`;
     const normal = await cdp.evalJs(grab);
     assert.equal(normal.ledgerRows, 178);
-    assert.equal(normal.missingRows, 51);
-    assert.equal(normal.marks, 127);
+    assert.equal(normal.missingRows, 24);
+    assert.equal(normal.marks, 154);
     assert.equal(normal.clubRows, 44);
     assert.equal(normal.clubMissing, 9);
     assert.ok(/2 curtailed 2019/.test(normal.sub), 'ledger explains the two curtailed tables');
-    assert.ok(/127 of 178/.test(normal.title));
+    assert.ok(/154 of 178/.test(normal.title));
     await cdp.evalJs(`() => document.querySelector('[data-voice-mode="sicko"]').click()`);
     const sicko = await cdp.evalJs(grab);
     assert.equal(sicko.ledgerRows, 178);
